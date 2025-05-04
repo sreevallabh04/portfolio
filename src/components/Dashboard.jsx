@@ -14,13 +14,13 @@ const Dashboard = () => {
       case 'recruiter':
         return {
           banner: {
-            title: "Student of Software Engineering",
+            title: "KAKARALA SREEVALLABH",
             subtitle: "Vellore Institute of Technology, Chennai",
             period: "Sep. 2022 - June 2027",
-            description: "Software Engineer specializing in full-stack development and AI/ML solutions",
+            description: "Integrated Master of Technology in Software Engineering",
             contact: {
-              email: "sreevallabhk@gmail.com",
-              linkedin: "linkedin.com/in/sreevallabh-kakarala-7b4f8e219/",
+              email: "srivallabhkakarala@gmail.com",
+              linkedin: "linkedin.com/in/sreevallabh-kakarala-52ab8a248/",
               github: "github.com/sreevallabh04"
             }
           },
@@ -29,25 +29,17 @@ const Dashboard = () => {
               title: "Projects",
               items: [
                 {
-                  title: "Moodie - AI Wellness Companion",
-                  period: "2024",
-                  description: "A modern, emotionally intelligent wellness application that helps users track their mood, journal thoughts, and engage with an AI companion that adapts to emotional needs. Features include AI with multiple personality modes (Gen Z BFF, Mindful Therapist, Stoic Philosopher), mood tracking with visual charts, journaling with rich formatting, and persistent conversations.",
-                  techStack: "React, TypeScript, Vite, Tailwind CSS, Firebase, Groq API, Chart.js",
-                  link: "https://github.com/sreevallabh04/moodie"
+                  title: "VHTOP - Hostel Management Suite",
+                  period: "March 2024",
+                  description: "Developed a scalable management suite for hostel students using NextJS and Firebase. Integrated a carpooling micro-service, addressing safety and cost issues. Implemented utilities like laundry, mess updates, and emergency services, reducing queues by 80% and boosting efficiency by 50%. Linked authentication with university accounts for seamless operation, targeting 7000+ potential users.",
+                  techStack: "NextJS, Firebase, React"
                 },
                 {
-                  title: "AI-Integrated Blockchain Voting",
+                  title: "Sarah - AI-Driven Virtual Assistant",
                   period: "2024",
-                  description: "A next-generation voting platform combining blockchain technology with artificial intelligence for secure, transparent electoral processes. Features secure on-chain voting via Ethereum smart contracts, private voting through Zero-Knowledge Proofs, AI-powered analysis of vote justifications, and Multi-Agent Deliberative Democracy (MADD) for simulating diverse perspectives.",
-                  techStack: "Solidity, Ethereum, Web3.js, React, Zero-Knowledge Proofs, AI/ML",
-                  link: "https://github.com/sreevallabh04/AI-Integrated-Advanced-Blockchain-Voting-system"
-                },
-                {
-                  title: "Quiznetic - Interactive Learning",
-                  period: "2024",
-                  description: "An educational platform designed to help students learn subjects based on the Telangana State Board syllabus. Features interactive quizzes with a special focus on geography through map pointing exercises, providing a visually engaging learning experience with a cosmic space-themed UI.",
-                  techStack: "Next.js, React, Tailwind CSS, Vercel",
-                  link: "https://quiznetic.vercel.app/"
+                  description: "Developed an open-source, AI-powered virtual assistant with speech recognition, NLP, and automation capabilities. Integrated speech recognition and pyttsx3 for voice-based interactions, ensuring natural conversation flow. Implemented intent recognition using keyword analysis and machine learning techniques for improved accuracy. Enabled task execution for media playback, information retrieval, smart home control, and automation.",
+                  techStack: "Python, Machine Learning, NLP",
+                  achievements: "Achieved 91% speech recognition accuracy and 87% task execution accuracy through benchmarking."
                 }
               ]
             },
@@ -55,33 +47,44 @@ const Dashboard = () => {
               title: "Professional Experience",
               items: [
                 {
-                  title: "Agriculture Domain Research",
-                  subtitle: "VIT Chennai",
+                  title: "Research Intern",
+                  subtitle: "Agriculture Domain Research - VIT Chennai",
                   period: "Jan. 2025 - Present",
-                  description: "Exploring classification of spongy tissue disorder in mangoes using X-ray imaging and deep learning, aiming to enable non-invasive detection techniques for early post-harvest quality assessment."
+                  description: "Currently exploring the classification of spongy tissue disorder in mangoes using X-ray imaging and deep learning, aiming to enable non-invasive detection techniques for early post-harvest quality assessment."
                 },
                 {
                   title: "Freelance Web Developer",
                   subtitle: "Metic Synergy Website",
-                  period: "Dec. 2024 - Jan. 2025",
-                  description: "Designed and developed a responsive corporate website using NextJS, Firebase, and Tailwind CSS. Implemented interactive features with automated email notifications. Achieved 40% faster load times and 25% increase in organic traffic."
+                  period: "Dec. 2024 - Apr. 2025",
+                  description: "Designed and developed a responsive corporate website using NextJS, Firebase, and Tailwind CSS. Implemented interactive features including customer testimonials, service showcases, and contact forms with automated email notifications. Optimized site performance resulting in 40% faster load times and improved SEO rankings, increasing organic traffic by 25%. Designed and implemented a custom CMS allowing non-technical staff to easily update content, reducing maintenance overhead by 60%."
                 }
               ]
             },
             {
-              title: "Technical Skills",
+              title: "Technical Skills & Leadership",
               items: [
                 {
                   title: "Languages & Frameworks",
-                  description: "Python, Java, C/C++, JavaScript, SQL, NoSQL, Bash, Git, React, HTML, CSS/PHP/NextJS"
+                  description: "Python, Java, C/C++, JavaScript, SQL, NoSQL, Bash, Git, Flask, HTML, CSS, PHP, NextJS"
                 },
                 {
-                  title: "Machine Learning",
-                  description: "Numpy, Pandas, Scikit-learn, Matplotlib, PyTorch, TensorFlow"
+                  title: "Machine Learning & Databases",
+                  description: "Numpy, Pandas, Scikit-learn, Matplotlib, DynamoDB, Aurora, SQLite, MySQL, Firestore"
                 },
                 {
-                  title: "Development Tools",
-                  description: "Docker, Kubernetes, Linux, Android, Asana, Notion"
+                  title: "Leadership",
+                  description: "Microsoft Innovations Club - Management/Sponsorship at VIT Chennai. Organized events with participants. VITrendz - Social media lead managing a platform with 17,000+ followers, driving a 40% increase in engagement."
+                }
+              ]
+            },
+            {
+              title: "Education & Coursework",
+              items: [
+                {
+                  title: "Integrated Master of Technology in Software Engineering",
+                  subtitle: "Vellore Institute of Technology, Chennai",
+                  period: "Sep. 2022 - June 2027",
+                  description: "Relevant coursework includes Data Structures, Machine Learning, Algorithms Analysis, Database Management, Computer Networks, Operating Systems, Software Engineering, Cloud Computing and DevOps."
                 }
               ]
             }

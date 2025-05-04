@@ -11,16 +11,16 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [selectedProfile, setSelectedProfile] = useState(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 4000);
+  // Function to be called when the splash screen audio ends
+  const handleAudioEnd = () => {
+    setShowSplash(false);
+  };
 
-    return () => clearTimeout(timer);
-  }, []);
+  // No longer need the timer-based useEffect
 
   if (showSplash) {
-    return <SplashScreen />;
+    // Pass the handleAudioEnd function as a prop
+    return <SplashScreen onAudioEnd={handleAudioEnd} />;
   }
 
   return (
