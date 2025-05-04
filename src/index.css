@@ -1,0 +1,113 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 85% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 9%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 9%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 9%;
+    --input: 0 0% 9%;
+    --ring: 0 85% 45%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+.netflix-card {
+  @apply relative overflow-hidden rounded-md transition-transform duration-300 hover:scale-105 hover:z-10;
+}
+
+.netflix-card::after {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity duration-300;
+}
+
+.netflix-card:hover::after {
+  @apply opacity-100;
+}
+
+.netflix-row {
+  @apply relative -mx-4 flex space-x-4 overflow-x-scroll px-4 pb-4 scrollbar-hide;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.netflix-logo {
+  animation: netflixIntro 4s ease-out forwards;
+  transform-origin: center;
+}
+
+@keyframes netflixIntro {
+  0% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  20% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+}
+
+.profile-card {
+  @apply relative cursor-pointer rounded-lg p-2 transition-all duration-300;
+}
+
+.profile-card:hover {
+  @apply scale-110;
+}
+
+.profile-card:hover .profile-name {
+  @apply text-white;
+}
+
+.profile-avatar {
+  @apply h-32 w-32 rounded-lg border-2 border-transparent transition-all duration-300;
+}
+
+.profile-card:hover .profile-avatar {
+  @apply border-white;
+}
+
+.profile-name {
+  @apply mt-4 text-center text-lg text-gray-400 transition-colors duration-300;
+}
