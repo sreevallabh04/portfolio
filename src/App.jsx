@@ -1,10 +1,11 @@
 
-import React, { useState, useEffect, useRef } from 'react'; // Added useRef
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom'; // Import useParams
 import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
 import ProfileSelection from '@/components/ProfileSelection';
 import Dashboard from '@/components/Dashboard';
+// Removed RecruiterProfilePage import
 import { Toaster } from '@/components/ui/toaster';
 
 // Simple Button component for styling consistency (optional)
@@ -93,11 +94,11 @@ function App() {
               ) : (
                 <Navigate to={`/browse/${selectedProfile}`} replace />
               )
-            } 
+            }
           />
-          <Route 
-            path="/browse/:profile" 
-            element={<Dashboard />} 
+          <Route
+            path="/browse/:profile"
+            element={<Dashboard />} // Render Dashboard directly
           />
         </Routes>
       </AnimatePresence>
@@ -105,5 +106,7 @@ function App() {
     </Router>
   );
 }
+
+// Removed ProfileSpecificDashboard wrapper component
 
 export default App;

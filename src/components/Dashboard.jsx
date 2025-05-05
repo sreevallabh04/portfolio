@@ -12,18 +12,21 @@ const Dashboard = () => {
   const getProfileContent = () => {
     switch (profile) {
       case 'recruiter':
+        // Update banner content to match the target image
         return {
           banner: {
-            title: "KAKARALA SREEVALLABH",
-            subtitle: "Vellore Institute of Technology, Chennai",
-            period: "Sep. 2022 - June 2027",
-            description: "Integrated Master of Technology in Software Engineering",
-            contact: {
+            title: "Sreevallabh Kakarala", // From image
+            subtitle: "Vellore Institute of Technology, Chennai", // From image
+            period: "Sep. 2022 - June 2027", // From image
+            description: "Software Engineer specializing in full-stack development and AI/ML solutions", // From image
+            imageUrl: "/photo1.jpg", // Use the image from the public directory
+            contact: { // Keep contact info for buttons
               email: "srivallabhkakarala@gmail.com",
               linkedin: "linkedin.com/in/sreevallabh-kakarala-52ab8a248/",
               github: "github.com/sreevallabh04"
             }
           },
+          // Keep existing rows data for now
           rows: [
             {
               title: "Projects",
@@ -102,55 +105,88 @@ const Dashboard = () => {
   };
 
   const content = getProfileContent();
+  const isRecruiter = profile === 'recruiter'; // Check if it's the recruiter profile
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-black"
+      className="min-h-screen bg-black text-white" // Ensure text is white by default
     >
-      <div className="relative h-[56.25vw] max-h-[80vh]">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black">
-          <div className="absolute bottom-1/4 left-[4%] max-w-3xl">
-            <h1 className="mb-2 text-6xl font-bold text-white">{content.banner.title}</h1>
-            {profile === 'recruiter' && (
-              <>
-                <h2 className="mb-2 text-2xl font-semibold text-white/90">{content.banner.subtitle}</h2>
-                <p className="mb-4 text-lg text-white/70">{content.banner.period}</p>
-                <p className="mb-6 text-xl text-white/80">{content.banner.description}</p>
-                <div className="flex gap-4">
-                  <Button
-                    variant="default"
-                    className="flex items-center gap-2 bg-red-600 hover:bg-red-700"
-                    onClick={() => window.open('/resume.pdf', '_blank')}
-                  >
-                    <Download size={20} />
-                    Download Resume
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2 border-white text-white hover:bg-white/20"
-                    onClick={() => window.location.href = `mailto:${content.banner.contact.email}`}
-                  >
-                    <Mail size={20} />
-                    Contact Me
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+      {/* Banner Section - Adjusted structure and styling */}
+      <div className="relative h-[50vh] md:h-[65vh] lg:h-[80vh] w-full"> {/* Adjusted height */}
+        {/* Background Image */}
         <img
-          src="https://images.unsplash.com/photo-1553095066-5014bc7b7f2d?q=80&w=1920&auto=format&fit=crop" // Dark abstract background
-          alt="Abstract background"
-          className="h-full w-full object-cover object-center"
+          // Use the specific imageUrl from content, fallback if needed
+          src={content.banner.imageUrl || "https://images.unsplash.com/photo-1553095066-5014bc7b7f2d?q=80&w=1920&auto=format&fit=crop"}
+          alt="Banner background"
+          // Keep object-position, add subtle filter for contrast/brightness
+          className="absolute inset-0 h-full w-full object-cover object-left-center filter brightness-[.9] contrast-[1.05]" 
         />
+        {/* Gradient Overlay - Made even stronger for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/30"></div> 
+
+        {/* Text Content Overlay - Remains the same */}
+        <div className="absolute bottom-[10%] md:bottom-[15%] left-[4%] md:left-[5%] max-w-xl lg:max-w-2xl z-10">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-2 md:mb-3 drop-shadow-lg"> {/* Bolder font */}
+            {content.banner.title}
+          </h1>
+          {/* Conditional rendering for recruiter details */}
+          {isRecruiter && (
+            <>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-white/95 mb-1 md:mb-2 drop-shadow-md"> {/* Slightly brighter text */}
+                {content.banner.subtitle}
+              </h2>
+              <p className="text-sm sm:text-base text-white/80 mb-3 md:mb-4 drop-shadow-sm"> {/* Slightly brighter text */}
+                {content.banner.period}
+              </p>
+              <p className="text-base sm:text-lg md:text-xl text-white/90 mb-4 md:mb-6 drop-shadow-sm"> {/* Slightly brighter text */}
+                {content.banner.description}
+              </p>
+            </>
+          )}
+          {/* Render description for non-recruiter profiles if it exists */}
+          {!isRecruiter && content.banner.description && (
+             <p className="text-base sm:text-lg md:text-xl text-white/90 mb-4 md:mb-6 drop-shadow-sm">
+                {content.banner.description}
+              </p>
+          )}
+
+          {/* Buttons - Only for Recruiter profile - Adjusted styling */}
+          {isRecruiter && (
+            <div className="flex flex-wrap gap-3">
+              <Button
+                variant="default" // Shadcn default variant often has a primary color, let's override bg
+                className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 text-base font-semibold rounded-md" // Explicit red bg, white text, rounded
+                onClick={() => window.open('/resume.pdf', '_blank')}
+              >
+                <Download size={18} />
+                Download Resume
+              </Button>
+              <Button
+                variant="outline" // Shadcn outline variant
+                className="flex items-center gap-2 border-white/70 text-white hover:bg-white/10 px-5 py-2.5 text-base font-semibold rounded-md bg-black/50 backdrop-blur-sm" // Adjusted border, text, hover, added bg/blur
+                onClick={() => window.location.href = `mailto:${content.banner.contact.email}`}
+              >
+                <Mail size={18} />
+                Contact Me
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {content.rows.map((row, index) => (
-        <ContentRow key={index} title={row.title} items={row.items} />
-      ))}
+      {/* Content Rows Section - Added padding and title for recruiter */}
+      <div className="px-[4%] md:px-[5%] py-8 md:py-12">
+        {isRecruiter && (
+           <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">Featured Projects</h2> // Title from image
+        )}
+        {content.rows.map((row, index) => (
+          // Assuming ContentRow handles its own title if needed for non-recruiter
+          <ContentRow key={index} title={!isRecruiter ? row.title : undefined} items={row.items} />
+        ))}
+      </div>
     </motion.div>
   );
 };
