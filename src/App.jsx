@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
 import ProfileSelection from '@/components/ProfileSelection';
 import Dashboard from '@/components/Dashboard';
+import Navbar from '@/components/Navbar'; // Import Navbar
 // Removed RecruiterProfilePage import
 import { Toaster } from '@/components/ui/toaster';
 
@@ -84,10 +85,11 @@ function App() {
 
   return (
     <Router>
+      <Navbar /> {/* Add Navbar here */}
       <AnimatePresence mode="wait">
         <Routes>
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
               !selectedProfile ? (
                 <ProfileSelection onProfileSelect={setSelectedProfile} />

@@ -30,19 +30,40 @@ const Dashboard = () => {
             {
               title: "Projects",
               items: [
+                { // Metic Synergy first
+                  title: "Metic Synergy Website",
+                  period: "Dec 2024 - Apr 2025", // Assuming period from Experience section
+                  description: "Designed and developed a responsive corporate website using NextJS, Firebase, and Tailwind CSS, featuring interactive elements and optimized performance.", // Shortened description
+                  techStack: "NextJS, Firebase, Tailwind CSS",
+                  imageUrl: "/exp-thumbnail2.jpg", // Using placeholder from Experience section
+                  link: "https://meticsynergy.com" // Added link
+                },
                 {
                   title: "VHTOP - Hostel Management Suite",
                   period: "March 2024",
-                  description: "Developed a scalable management suite for hostel students using NextJS and Firebase. Integrated a carpooling micro-service, addressing safety and cost issues. Implemented utilities like laundry, mess updates, and emergency services, reducing queues by 80% and boosting efficiency by 50%. Linked authentication with university accounts for seamless operation, targeting 7000+ potential users.",
-                  techStack: "NextJS, Firebase, React"
+                  description: "Developed a scalable management suite for hostel students using NextJS and Firebase, integrating carpooling and various utilities.", // Shortened description
+                  techStack: "NextJS, Firebase, React",
+                  imageUrl: "/project-thumbnail1.jpg", // Placeholder image
+                  link: "https://vhtop-six.vercel.app/" // Added link
                 },
                 {
                   title: "Sarah - AI-Driven Virtual Assistant",
                   period: "2024",
-                  description: "Developed an open-source, AI-powered virtual assistant with speech recognition, NLP, and automation capabilities. Integrated speech recognition and pyttsx3 for voice-based interactions, ensuring natural conversation flow. Implemented intent recognition using keyword analysis and machine learning techniques for improved accuracy. Enabled task execution for media playback, information retrieval, smart home control, and automation.",
+                  description: "Developed an open-source, AI-powered virtual assistant with speech recognition, NLP, and automation capabilities.", // Shortened description
                   techStack: "Python, Machine Learning, NLP",
-                  achievements: "Achieved 91% speech recognition accuracy and 87% task execution accuracy through benchmarking."
+                  achievements: "Achieved 91% speech recognition accuracy and 87% task execution accuracy through benchmarking.",
+                  imageUrl: "/project-thumbnail2.jpg", // Placeholder image
+                  link: "https://github.com/sreevallabh04/AIzara" // Added link
+                },
+                {
+                  title: "AI integrated Blockchain voting system",
+                  period: "2024", // Assuming year, adjust if needed
+                  description: "A next-generation voting platform combining blockchain technology with artificial intelligence for secure, transparent, and intelligent electoral processes.",
+                  techStack: "Blockchain, AI, Solidity, ZKP, Groq LLM", // Example tech stack
+                  imageUrl: "/project-thumbnail3.jpg", // Placeholder image
+                  link: "https://github.com/sreevallabh04/AI-Integrated-Advanced-Blockchain-Voting-system"
                 }
+                // Note: Spongy Tissue Detection project is currently under Experience, not Projects.
               ]
             },
             {
@@ -126,48 +147,45 @@ const Dashboard = () => {
 
         {/* Text Content Overlay - Remains the same */}
         <div className="absolute bottom-[10%] md:bottom-[15%] left-[4%] md:left-[5%] max-w-xl lg:max-w-2xl z-10">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-2 md:mb-3 drop-shadow-lg"> {/* Bolder font */}
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white mb-4 drop-shadow-lg"> {/* Larger and bolder font */}
             {content.banner.title}
           </h1>
           {/* Conditional rendering for recruiter details */}
           {isRecruiter && (
             <>
-              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-white/95 mb-1 md:mb-2 drop-shadow-md"> {/* Slightly brighter text */}
-                {content.banner.subtitle}
-              </h2>
-              <p className="text-sm sm:text-base text-white/80 mb-3 md:mb-4 drop-shadow-sm"> {/* Slightly brighter text */}
-                {content.banner.period}
-              </p>
-              <p className="text-base sm:text-lg md:text-xl text-white/90 mb-4 md:mb-6 drop-shadow-sm"> {/* Slightly brighter text */}
+              {/* Removed subtitle and period to match image */}
+              <p className="text-lg sm:text-xl md:text-2xl text-white/90 mb-6 drop-shadow-sm"> {/* Larger text for description */}
                 {content.banner.description}
               </p>
             </>
           )}
           {/* Render description for non-recruiter profiles if it exists */}
           {!isRecruiter && content.banner.description && (
-             <p className="text-base sm:text-lg md:text-xl text-white/90 mb-4 md:mb-6 drop-shadow-sm">
+             <p className="text-lg sm:text-xl md:text-2xl text-white/90 mb-6 drop-shadow-sm"> {/* Larger text for description */}
                 {content.banner.description}
               </p>
           )}
 
-          {/* Buttons - Only for Recruiter profile - Adjusted styling */}
+          {/* Buttons - Only for Recruiter profile - Adjusted styling to match image */}
           {isRecruiter && (
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-4"> {/* Increased gap */}
               <Button
-                variant="default" // Shadcn default variant often has a primary color, let's override bg
-                className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 text-base font-semibold rounded-md" // Explicit red bg, white text, rounded
+                variant="default"
+                className="flex items-center gap-2 bg-white text-black px-6 py-3 text-lg font-semibold rounded-md hover:bg-gray-200 transition-colors duration-200" // White background, black text, larger padding/font
                 onClick={() => window.open('/resume.pdf', '_blank')}
               >
-                <Download size={18} />
-                Download Resume
+                {/* Using a simple triangle for play icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                Resume
               </Button>
               <Button
-                variant="outline" // Shadcn outline variant
-                className="flex items-center gap-2 border-white/70 text-white hover:bg-white/10 px-5 py-2.5 text-base font-semibold rounded-md bg-black/50 backdrop-blur-sm" // Adjusted border, text, hover, added bg/blur
-                onClick={() => window.location.href = `mailto:${content.banner.contact.email}`}
+                variant="outline"
+                className="flex items-center gap-2 border-white/70 text-white hover:bg-white/20 px-6 py-3 text-lg font-semibold rounded-md bg-white/10 backdrop-blur-sm transition-colors duration-200" // Darker background, white text, larger padding/font
+                onClick={() => window.open(`https://${content.banner.contact.linkedin}`, '_blank', 'noopener,noreferrer')} // Open LinkedIn link
               >
-                <Mail size={18} />
-                Contact Me
+                {/* Using a simple circle with 'i' for info icon */}
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0 18.5c4.69 0 8.5-3.81 8.5-8.5s-3.81-8.5-8.5-8.5-8.5 3.81-8.5 8.5 3.81 8.5 8.5 8.5zm-.5-13h1v7h-1zm.5 8.5c-.414 0-.75-.336-.75-.75s.336-.75.75-.75.75.336.75.75-.336.75-.75.75z"/></svg>
+                LinkedIn
               </Button>
             </div>
           )}
@@ -181,7 +199,7 @@ const Dashboard = () => {
         )}
         {content.rows.map((row, index) => (
           // Assuming ContentRow handles its own title if needed for non-recruiter
-          <ContentRow key={index} title={!isRecruiter ? row.title : undefined} items={row.items} />
+          <ContentRow key={index} title={row.title} items={row.items} />
         ))}
       </div>
     </motion.div>
