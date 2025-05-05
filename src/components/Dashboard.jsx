@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -116,16 +115,14 @@ const Dashboard = () => {
     >
       {/* Banner Section - Adjusted structure and styling */}
       <div className="relative h-[50vh] md:h-[65vh] lg:h-[80vh] w-full"> {/* Adjusted height */}
-        {/* Background Image */}
+        {/* Background Image - Using provided code */}
         <img
-          // Use the specific imageUrl from content, fallback if needed
-          src={content.banner.imageUrl || "https://images.unsplash.com/photo-1553095066-5014bc7b7f2d?q=80&w=1920&auto=format&fit=crop"}
+          src="/photo1.jpg"
           alt="Banner background"
-          // Keep object-position, add subtle filter for contrast/brightness
-          className="absolute inset-0 h-full w-full object-cover object-left-center filter brightness-[.9] contrast-[1.05]" 
+          className="absolute inset-0 h-full w-full object-cover object-right md:object-[85%_center]"
         />
-        {/* Gradient Overlay - Made even stronger for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/30"></div> 
+        {/* Gradient Overlay - Using provided code */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
 
         {/* Text Content Overlay - Remains the same */}
         <div className="absolute bottom-[10%] md:bottom-[15%] left-[4%] md:left-[5%] max-w-xl lg:max-w-2xl z-10">
