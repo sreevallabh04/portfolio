@@ -28,6 +28,15 @@ const Dashboard = () => {
               title: "Projects",
               items: [
                 {
+                  title: "Quiznetic",
+                  period: "2024",
+                  description: "Educational platform for Telangana State Board students with interactive quizzes and map exercises. Features cosmic space-themed UI and Leaflet-powered geography tools.",
+                  techStack: "React, TypeScript, Tailwind CSS, Framer Motion, Leaflet",
+                  imageUrl: "https://i.ibb.co/RGcgMwXL/telangana2.jpg",
+                  link: "https://quiznetic.vercel.app/",
+                  github: "https://github.com/sreevallabh04/Quiznetic"
+                },
+                {
                   title: "Metic Synergy Website",
                   period: "Dec 2024 - Apr 2025",
                   description: "Designed and developed a responsive corporate website using NextJS, Firebase, and Tailwind CSS, featuring interactive elements and optimized performance.",
@@ -48,7 +57,6 @@ const Dashboard = () => {
                   period: "2024",
                   description: "Developed an open-source, AI-powered virtual assistant with speech recognition, NLP, and automation capabilities.",
                   techStack: "Python, Machine Learning, NLP",
-                  achievements: "Achieved 91% speech recognition accuracy and 87% task execution accuracy through benchmarking.",
                   imageUrl: "https://i.postimg.cc/yNhwb7yF/Sarah-AI-agent.jpg",
                   link: "https://github.com/sreevallabh04/AIzara"
                 },
@@ -197,9 +205,6 @@ const Dashboard = () => {
       </div>
 
       <div className="px-[4%] md:px-[5%] py-8 md:py-12">
-        {isRecruiter && (
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">Featured Projects</h2>
-        )}
         {content.rows.map((row, index) => (
           <ContentRow key={index} title={row.title} items={row.items} />
         ))}
