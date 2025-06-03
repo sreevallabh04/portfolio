@@ -35,7 +35,7 @@ const Dashboard = () => {
       rows: [
         {
           title: "Projects",
-          isCarousel: true,
+          isNetflixCarousel: true, // New property for Netflix-style carousel
           items: [
             {
               title: "Quiznetic",
@@ -236,11 +236,7 @@ const Dashboard = () => {
 
       <div className="px-[4%] md:px-[5%] py-8 md:py-12">
         {content.rows.map((row, index) => (
-          row.title === "Projects" ? (
-            <SimpleContentRow key={index} title={row.title} items={row.items} />
-          ) : (
-            <ContentRow key={index} title={row.title} items={row.items} isSkills={row.isSkills} isCarousel={row.isCarousel} />
-          )
+          <ContentRow key={index} title={row.title} items={row.items} isSkills={row.isSkills} isCarousel={row.isCarousel} isNetflixCarousel={row.isNetflixCarousel} />
         ))}
       </div>
     </motion.div>
