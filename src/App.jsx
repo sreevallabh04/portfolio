@@ -6,6 +6,7 @@ import SplashScreen from '@/components/SplashScreen';
 import ProfileSelection from '@/components/ProfileSelection';
 import Dashboard from '@/components/Dashboard';
 import Navbar from '@/components/Navbar'; // Import Navbar
+import SkillsPage from '@/components/SkillsPage'; // Import SkillsPage
 // Removed RecruiterProfilePage import
 import { Toaster } from '@/components/ui/toaster';
 
@@ -102,6 +103,7 @@ function App() {
             path="/browse/:profile"
             element={<Dashboard />} // Render Dashboard directly
           />
+          <Route path="/skills" element={<SkillsPage />} /> {/* Add SkillsPage route */}
         </Routes>
       </AnimatePresence>
       <Toaster />

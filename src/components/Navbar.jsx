@@ -17,7 +17,7 @@ const Navbar = () => {
           <Link to="/" className="hover:text-red-600 transition-colors duration-200">Home</Link>
           {/* These links might need to scroll to sections on the Dashboard page */}
           <Link to="/browse/recruiter#professional" className="hover:text-red-600 transition-colors duration-200">Professional</Link>
-          <Link to="/browse/recruiter#skills" className="hover:text-red-600 transition-colors duration-200">Skills</Link>
+          <Link to="/skills" className="hover:text-red-600 transition-colors duration-200">Skills</Link>
           <Link to="/browse/recruiter#projects" className="hover:text-red-600 transition-colors duration-200">Projects</Link>
           {/* Assuming "Hire Me" is a contact link or section */}
           <Link to="/browse/recruiter#contact" className="hover:text-red-600 transition-colors duration-200">Hire Me</Link>

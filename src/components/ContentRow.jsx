@@ -20,7 +20,7 @@ const ContentRow = ({ title, items }) => {
         slidesPerView={'auto'}
         navigation
         freeMode={true}
-        className="!pb-4"
+        className="!px-4 !pb-4" // Add padding for navigation arrows on sides and bottom
         breakpoints={{
           640: { slidesPerView: 2, spaceBetween: 15 },
           768: { slidesPerView: 3, spaceBetween: 20 },
