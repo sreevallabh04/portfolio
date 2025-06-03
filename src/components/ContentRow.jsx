@@ -132,8 +132,11 @@ const ContentRow = ({ title, items }) => {
           {items.map((item, index) => (
             <motion.div
               key={index}
-              whileHover={{ scale: 1.05, zIndex: 1 }}
-              className="netflix-card min-w-[300px] flex-none"
+              onHoverStart={() => setHoveredIndex(index)}
+              onHoverEnd={() => setHoveredIndex(null)}
+              animate={{ scale: hoveredIndex === index ? 1.1 : 1, zIndex: hoveredIndex === index ? 10 : 1 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="netflix-card min-w-[300px] flex-none relative" // Added relative for zIndex
             >
               <div className="relative aspect-video overflow-hidden rounded-md bg-gray-900">
                 <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black p-4">

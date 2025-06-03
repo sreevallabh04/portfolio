@@ -6,7 +6,7 @@ import { ExternalLink } from 'lucide-react'; // Example icon
 const projects = [
   { id: 1, title: "VHTOP - Hostel Management", tag: "Real-time Systems", logo: "/path/to/vhtop-logo.png" },
   { id: 2, title: "Sarah - AI Assistant", tag: "NLP, Automation", logo: "/path/to/sarah-logo.png" },
-  { id: 3, title: "Metic Synergy Website", tag: "Web Dev, Firebase", logo: "/path/to/metic-logo.png" },
+  { id: 3, title: "Metic Synergy Website", tag: "Web Dev, Firebase", logo: "logo.png" },
   { id: 4, title: "Spongy Tissue Detection", tag: "X-ray Imaging, DL", logo: "/path/to/mango-logo.png" },
 ];
 
