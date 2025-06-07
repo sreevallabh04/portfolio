@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Info } from 'lucide-react';
 
 const HERO_TITLE = 'HopeCore';
 const HERO_TYPE = 'Film';
 const HERO_DESCRIPTION = `Sometimes writes bugs just to fix them and feel productive. Gym rat. Code addict. Meme lord in training.`;
-const HERO_THUMBNAIL = 'HopeCore.png';
+const HERO_THUMBNAIL = '/HopeCore.png';
 
 const StalkerPage = () => {
+  const videoRef = useRef(null);
+
+  const handlePlay = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = false; // Unmute if you want sound
+      videoRef.current.play();
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -32,9 +41,17 @@ const StalkerPage = () => {
             style={{ aspectRatio: '16/9', maxWidth: 900, margin: '0 auto' }}
           >
             <video
+              ref={videoRef}
               src="https://res.cloudinary.com/devtvoup1/video/upload/HopeCore_h2wr6x.mp4"
               controls
-              style={{ width: '100%', borderRadius: '1rem', background: 'black' }}
+              style={{
+                width: '100%',
+                height: '100%',
+                minHeight: 200,
+                aspectRatio: '16/9',
+                display: 'block',
+                background: 'black'
+              }}
             />
           </div>
         </motion.div>
@@ -58,6 +75,7 @@ const StalkerPage = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
             <button
+              onClick={handlePlay}
               className="flex items-center justify-center w-full sm:w-auto px-4 py-3 bg-white text-black font-bold rounded hover:bg-gray-200 transition-all text-base sm:text-lg shadow-lg"
             >
               <Play className="w-5 h-5 mr-2" /> Play
