@@ -4,8 +4,8 @@ import { Play, Pause, Volume2, VolumeX, Maximize, Minimize, Info, X } from 'luci
 
 const HERO_TITLE = 'HopeCore';
 const HERO_TYPE = 'Film';
-const HERO_DESCRIPTION = `HopeCore is a powerful and efficient core banking solution. Watch to learn more about its features and capabilities.`;
-const HERO_THUMBNAIL = '/HopeCoreLogo.png'; // Replace with your logo if available
+const HERO_DESCRIPTION = `Sometimes writes bugs just to fix them and feel productive. Gym rat. Code addict. Meme lord in training.`;
+const HERO_THUMBNAIL = '/HopeCore.png'; // Replace with your logo if available
 
 const StalkerPage = () => {
   const videoRef = useRef(null);

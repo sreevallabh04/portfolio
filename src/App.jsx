@@ -9,6 +9,7 @@ import SkillsPage from '@/components/SkillsPage'; // Import SkillsPage
 import ContactPage from '@/components/ContactPage';
 import StalkerPage from '@/components/StalkerPage';
 import RecruiterProjectsPage from '@/components/RecruiterProjectsPage';
+import DeveloperPage from '@/components/DeveloperPage';
 // Removed RecruiterProfilePage import
 import { Toaster } from '@/components/ui/toaster';
 
@@ -109,6 +110,7 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/browse/stalker" element={<StalkerPage />} />
           <Route path="/browse/recruiter/projects" element={<RecruiterProjectsPage />} />
+          <Route path="/browse/developer" element={<DeveloperPage />} />
         </Routes>
       </AnimatePresence>
       <Toaster />
