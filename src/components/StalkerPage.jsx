@@ -5,7 +5,7 @@ import { Play, Info } from 'lucide-react';
 const HERO_TITLE = 'HopeCore';
 const HERO_TYPE = 'Film';
 const HERO_DESCRIPTION = `Sometimes writes bugs just to fix them and feel productive. Gym rat. Code addict. Meme lord in training.`;
-const HERO_THUMBNAIL = '/HopeCore.png';
+const HERO_THUMBNAIL = 'HopeCore.png';
 
 const StalkerPage = () => {
   return (
