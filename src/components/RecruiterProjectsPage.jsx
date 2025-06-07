@@ -70,28 +70,31 @@ const RecruiterProjectsPage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-black text-white flex items-start justify-center"
+      className="min-h-screen bg-black text-white"
+      style={{ padding: 0, margin: 0 }}
     >
-      {/* Netflix-style Projects Grid ONLY */}
-      <div className="w-full max-w-7xl px-[4%] py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      {/* Netflix-style Projects Grid ONLY, edge-to-edge */}
+      <div className="w-full h-full py-12" style={{ paddingLeft: 0, paddingRight: 0 }}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-2 gap-y-6">
           {projects.map((project, idx) => (
             <motion.div
               key={idx}
-              whileHover={{ scale: 1.08, zIndex: 10 }}
-              className="relative bg-zinc-900 rounded-lg overflow-hidden shadow-lg cursor-pointer group transition-all duration-300"
+              whileHover={{ scale: 1.18, zIndex: 30 }}
+              className="relative bg-zinc-900 rounded-[4px] overflow-hidden shadow-2xl cursor-pointer group transition-all duration-200 border border-black"
+              style={{ minHeight: 0 }}
               onClick={() => project.link && window.open(project.link, '_blank', 'noopener,noreferrer')}
             >
               {/* Project Image */}
               <img
                 src={project.imageUrl}
                 alt={project.title}
-                className="w-full h-[260px] object-cover object-center group-hover:brightness-75 transition-all duration-300"
+                className="w-full aspect-[16/9] object-cover object-center group-hover:brightness-75 transition-all duration-200"
+                draggable={false}
               />
               {/* Overlay Info */}
-              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
-                <h3 className="text-lg font-bold text-white mb-1 truncate">{project.title}</h3>
-                <p className="text-xs text-red-400 font-semibold mb-1 truncate">{project.techStack}</p>
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
+                <h3 className="text-base font-bold text-white mb-1 truncate">{project.title}</h3>
+                <p className="text-[11px] text-red-400 font-semibold mb-1 truncate">{project.techStack}</p>
                 <p className="text-xs text-white/80 mb-2 line-clamp-2 min-h-[32px]">{project.description}</p>
                 <div className="flex gap-2">
                   {project.github && (
@@ -102,7 +105,7 @@ const RecruiterProjectsPage = () => {
                       className="p-2 rounded-full bg-black/60 hover:bg-white/20 transition-colors"
                       onClick={e => e.stopPropagation()}
                     >
-                      <Github size={18} className="text-white" />
+                      <Github size={16} className="text-white" />
                     </a>
                   )}
                   {project.link && (
@@ -113,7 +116,7 @@ const RecruiterProjectsPage = () => {
                       className="p-2 rounded-full bg-black/60 hover:bg-white/20 transition-colors"
                       onClick={e => e.stopPropagation()}
                     >
-                      <ExternalLink size={18} className="text-white" />
+                      <ExternalLink size={16} className="text-white" />
                     </a>
                   )}
                 </div>
@@ -124,8 +127,8 @@ const RecruiterProjectsPage = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  transition={{ duration: 0.18 }}
+                  className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
                 />
               </AnimatePresence>
             </motion.div>
