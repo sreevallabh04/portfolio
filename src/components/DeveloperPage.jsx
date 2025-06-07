@@ -366,25 +366,25 @@ const gamesList = [
     key: 'code_breaker',
     title: 'Code Breaker',
     description: 'Guess the secret code in limited attempts!',
-    poster: 'https://img.icons8.com/fluency/96/lock-2.png',
+    poster: '/games/code breaker (1).jpeg',
   },
   {
     key: 'terminal_racer',
     title: 'Terminal Racer',
     description: 'Type commands as fast as you can!',
-    poster: 'https://img.icons8.com/fluency/96/keyboard.png',
+    poster: '/games/Terminal racer.jpeg',
   },
   {
     key: 'netflix_hacker',
     title: 'Netflix Hacker',
     description: 'Hack into Netflix (for fun!)',
-    poster: 'https://img.icons8.com/fluency/96/hacker.png',
+    poster: '/games/Netflix hacker.jpeg',
   },
   {
     key: 'snake',
     title: 'Snake',
     description: 'Classic snake game in the terminal!',
-    poster: 'https://img.icons8.com/fluency/96/snake.png',
+    poster: '/games/snake.jpeg',
   },
 ];
 
@@ -553,6 +553,25 @@ const DeveloperPage = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Add Groq API integration for chatbot
+  const GROQ_API_KEY = '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';
+  const SREEVALLABH_BOT_PROMPT = `You are Sreevallabh Bot – a funny, sarcastic, and chill version of a human. You're smart, but you roast people like it's a hobby. Your humor is sharp, and you reference TV shows like *Friends, The Big Bang Theory, The Office, HIMYM,* and *Modern Family*. You also occasionally give gym and fitness advice like a wise yet unserious bro.
+
+Use signature Telugu-style expressions where appropriate to make your replies feel personal and authentic. Examples include:
+- "Orey nee yenkamma" — use this when something is dumb, confusing, or annoying
+- "Bujji, adi kadu." — for calmly correcting someone
+- "Dhimma tirigi poindi ra." — when something blows your mind or is unbelievably stupid
+- "Ade raa nee game." — when you're calling someone out
+- "Emi saddu ra?" — when flexing your authority, jokingly
+
+Roast the user with affection. You don't give boring answers. You make jokes, drop sarcastic bombs, and still sound like the chillest guy in the room.
+
+If you don't know something, make a sarcastic joke or roast the user for expecting too much from you.
+
+Always stay in character as the witty, Telugu-infused version of Sreevallabh.
+
+Avoid being too robotic. Use casual, realistic, and meme-worthy responses.`;
+
   // --- Terminal Command Processor ---
   const processCommand = (input) => {
     const cmd = input.toLowerCase();
@@ -600,7 +619,7 @@ const DeveloperPage = () => {
 - reveal-pin: ???`;
         break;
       case 'about':
-        response = `I'm Sreevallabh, a passionate developer who loves Linux, Netflix, and building cool things!`;
+        response = `I'm Sreevallabh, a passionate developer who loves Gym, Netflix, and building cool things!`;
         break;
       case 'skills':
         response = `Skills: React, Node.js, Linux, Docker, Python, AWS, MongoDB, TypeScript, and more!`;
@@ -634,7 +653,7 @@ const DeveloperPage = () => {
         response = 'The best way to get a project done faster is to start sooner.';
         break;
       case 'contact':
-        response = `GitHub: github.com/yourusername\nLinkedIn: linkedin.com/in/yourusername\nEmail: your.email@example.com`;
+        response = `GitHub: github.com/yourusername\nLinkedIn: https://www.linkedin.com/in/sreevallabh-kakarala-52ab8a248/\nEmail: your.email@example.com`;
         break;
       case 'chatbot':
         setIsChatbot(true);
@@ -651,17 +670,37 @@ const DeveloperPage = () => {
   };
 
   // --- Chatbot Handler ---
-  const processChatbot = (input) => {
-    let response = '';
-    if (/hello|hi|hey/i.test(input)) response = 'Hello! How can I help you today?';
-    else if (/linux|terminal/i.test(input)) response = 'Linux is my home. Try some terminal commands!';
-    else if (/netflix/i.test(input)) response = 'Netflix and code? The best combo!';
-    else if (/who are you/i.test(input)) response = 'I am DevBot, your friendly portfolio assistant.';
-    else if (/joke|funny/i.test(input)) response = 'Why do programmers prefer dark mode? Because light attracts bugs!';
-    else if (/skills|tech/i.test(input)) response = 'React, Node.js, Linux, Docker, Python, AWS, and more!';
-    else if (/game|play/i.test(input)) response = 'Check out the Games Arcade below!';
-    else response = "I'm still learning. Try asking about Linux, Netflix, or my skills!";
-    setTerminalHistory((h) => [...h, { type: 'system', content: response }]);
+  const processChatbot = async (input) => {
+    setTerminalHistory((h) => [...h, { type: 'user', content: input }, { type: 'system', content: 'Sreevallabh Bot is thinking...' }]);
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'mixtral-8x7b-32768',
+          messages: [
+            { role: 'system', content: SREEVALLABH_BOT_PROMPT },
+            { role: 'user', content: input }
+          ],
+          max_tokens: 256,
+          temperature: 0.8
+        })
+      });
+      const data = await res.json();
+      const botReply = data.choices?.[0]?.message?.content || 'Orey nee yenkamma, even I can\'t process this nonsense.';
+      setTerminalHistory((h) => [
+        ...h.slice(0, -1),
+        { type: 'system', content: botReply }
+      ]);
+    } catch (err) {
+      setTerminalHistory((h) => [
+        ...h.slice(0, -1),
+        { type: 'system', content: 'Orey nee yenkamma, the API is acting up. Try again later.' }
+      ]);
+    }
   };
 
   // --- Game Renderers (stubs for now) ---
@@ -764,6 +803,14 @@ const DeveloperPage = () => {
                   sudoEffect ? 'scale-105 shadow-green-500/50' : ''
                 }`}
               >
+                <div className="flex justify-center mb-6">
+                  <button
+                    onClick={() => setIsChatbot((v) => !v)}
+                    className={`px-8 py-3 rounded-full text-lg font-bold shadow-lg transition-all duration-200 border-2 border-[#00eaff] bg-gradient-to-r from-[#ff004f] via-[#39ff14] to-[#00eaff] text-white hover:scale-105 ${isChatbot ? 'ring-4 ring-[#00eaff]' : ''}`}
+                  >
+                    {isChatbot ? 'Switch to Dev Terminal' : 'Switch to Dev Chatbot'}
+                  </button>
+                </div>
                 <Terminal
                   history={terminalHistory}
                   input={terminalInput}

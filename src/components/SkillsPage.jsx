@@ -69,67 +69,33 @@ const SkillsPage = () => {
       className="min-h-screen bg-black text-white"
     >
       {/* Hero Banner */}
-      <div className="relative h-[40vh] md:h-[50vh] w-full bg-gradient-to-r from-red-900 to-black flex items-center justify-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-white drop-shadow-lg">
+      <div className="relative h-[30vh] sm:h-[40vh] md:h-[50vh] w-full bg-gradient-to-r from-red-900 to-black flex items-center justify-center">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white drop-shadow-lg text-center px-2 netflix-font">
           Skills Showcase
         </h1>
       </div>
 
-      {/* Skills Sections */}
-      <div className="px-[4%] py-8">
+      {/* Netflix-style Skills Rows */}
+      <div className="px-2 sm:px-[4%] py-6 sm:py-8">
         {Object.entries(skillsData).map(([category, skills]) => (
-          <div key={category} className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">{category}</h2>
-            <Swiper
-              modules={[Navigation, FreeMode]}
-              spaceBetween={15}
-              slidesPerView={'auto'}
-              navigation
-              freeMode={true}
-              className="!px-4 !pb-4"
-            >
-              {skills.map((skill, index) => {
-                const isHovered = hoveredIndex === `${category}-${index}`;
-
-                return (
-                  <SwiperSlide key={skill.name} className="!w-auto !h-auto group">
-                    <motion.div
-                      onHoverStart={() => setHoveredIndex(`${category}-${index}`)}
-                      onHoverEnd={() => setHoveredIndex(null)}
-                      animate={{
-                        scale: isHovered ? 1.15 : 1,
-                        zIndex: isHovered ? 20 : 1,
-                        transition: { duration: 0.3 },
-                      }}
-                      className="netflix-card w-[180px] h-[220px] bg-[#181818] rounded-md overflow-hidden shadow-xl relative flex flex-col items-center justify-end p-3 cursor-pointer"
-                    >
-                      {/* Logo Container */}
-                      <div className="absolute top-3 left-3 w-12 h-12 bg-white rounded flex items-center justify-center">
-                        <img
-                          src={skill.logo}
-                          alt={`${skill.name} Logo`}
-                          className="w-10 h-10 object-contain"
-                        />
-                      </div>
-
-                      {/* Skill Name */}
-                      <span className="text-sm font-semibold text-white text-center mb-2">{skill.name}</span>
-
-                      {/* Hover Overlay */}
-                      {isHovered && (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className="absolute inset-0 bg-gradient-to-t from-red-900/80 to-transparent flex items-end p-3"
-                        >
-                          <span className="text-sm font-semibold text-white text-center w-full">{skill.name}</span>
-                        </motion.div>
-                      )}
-                    </motion.div>
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
+          <div key={category} className="mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-red-500 mb-4 netflix-font">{category}</h2>
+            <div className="netflix-row">
+              {skills.map((skill, index) => (
+                <motion.div
+                  key={index}
+                  whileHover={{ scale: 1.12, zIndex: 10 }}
+                  className="netflix-card w-32 sm:w-40 md:w-52 h-32 sm:h-40 md:h-52 bg-zinc-900 rounded-md shadow-xl flex flex-col items-center justify-center mx-2 cursor-pointer transition-all duration-300"
+                  onHoverStart={() => setHoveredIndex(`${category}-${index}`)}
+                  onHoverEnd={() => setHoveredIndex(null)}
+                >
+                  <img src={skill.logo} alt={skill.name} className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain mb-2" />
+                  <span className="text-sm sm:text-base md:text-lg font-semibold text-white text-center mt-2 drop-shadow-lg">
+                    {skill.name}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
           </div>
         ))}
       </div>

@@ -29,23 +29,23 @@ const ContactPage = () => {
       className="min-h-screen bg-black text-white"
     >
       {/* Hero Banner */}
-      <div className="relative h-[40vh] md:h-[50vh] w-full bg-gradient-to-r from-red-900 to-black flex items-center justify-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-white drop-shadow-lg">
+      <div className="relative h-[30vh] sm:h-[40vh] md:h-[50vh] w-full bg-gradient-to-r from-red-900 to-black flex items-center justify-center">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white drop-shadow-lg text-center px-2">
           Get in Touch
         </h1>
       </div>
 
       {/* Contact Content */}
-      <div className="px-[4%] py-12 max-w-4xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="px-2 sm:px-[4%] py-8 sm:py-12 max-w-full sm:max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {/* Contact Information */}
           <motion.div
-            initial={{ x: -50, opacity: 0 }}
+            initial={{ x: -30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
-            <h2 className="text-3xl font-bold mb-6">Contact Information</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Contact Information</h2>
             
             <div className="space-y-4">
               <a
@@ -93,12 +93,12 @@ const ContactPage = () => {
 
           {/* Anonymous Message Form */}
           <motion.div
-            initial={{ x: 50, opacity: 0 }}
+            initial={{ x: 30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="space-y-6"
+            className="space-y-4 sm:space-y-6"
           >
-            <h2 className="text-3xl font-bold mb-6">Send an Anonymous Message</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Send an Anonymous Message</h2>
             
             {state.succeeded ? (
               <motion.div

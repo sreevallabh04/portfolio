@@ -96,29 +96,28 @@ const RecruiterProjectsPage = () => {
       className="min-h-screen bg-black text-white"
     >
       {/* Hero Section */}
-      <div className="relative h-[70vh] w-full flex items-center justify-center overflow-hidden">
+      <div className="relative h-[40vh] sm:h-[60vh] md:h-[70vh] w-full flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center">
           <img
             src={featuredProject.imageUrl}
             alt={featuredProject.title}
-            className="max-h-[350px] w-auto object-contain opacity-90 drop-shadow-xl"
+            className="max-h-[180px] sm:max-h-[250px] md:max-h-[350px] w-auto object-contain opacity-90 drop-shadow-xl"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
         </div>
-        
-        <div className="absolute bottom-0 left-0 p-8 md:p-16 max-w-3xl">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">
+        <div className="absolute bottom-0 left-0 p-4 sm:p-8 md:p-16 max-w-full sm:max-w-3xl">
+          <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold mb-4 text-white">
             {featuredProject.title}
           </h1>
-          <p className="text-lg md:text-xl text-gray-200 mb-6">
+          <p className="text-base sm:text-lg md:text-xl text-gray-200 mb-6">
             {featuredProject.description}
           </p>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <a
               href={featuredProject.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center gap-2 transition-colors"
+              className="px-6 py-2 sm:px-8 sm:py-3 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center gap-2 transition-colors text-base sm:text-lg"
             >
               <ExternalLink size={20} />
               View Project
@@ -128,7 +127,7 @@ const RecruiterProjectsPage = () => {
                 href={featuredProject.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-md flex items-center gap-2 transition-colors"
+                className="px-6 py-2 sm:px-8 sm:py-3 bg-white/10 hover:bg-white/20 text-white rounded-md flex items-center gap-2 transition-colors text-base sm:text-lg"
               >
                 <Github size={20} />
                 Source Code
@@ -139,13 +138,13 @@ const RecruiterProjectsPage = () => {
       </div>
 
       {/* Categories */}
-      <div className="px-4 md:px-8 py-6">
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="px-2 sm:px-4 md:px-8 py-4 sm:py-6">
+        <div className="flex gap-2 sm:gap-4 overflow-x-auto pb-2 sm:pb-4 scrollbar-hide">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
+              className={`px-3 py-1 sm:px-4 sm:py-2 rounded-full whitespace-nowrap transition-colors text-sm sm:text-base ${
                 selectedCategory === category
                   ? 'bg-red-600 text-white'
                   : 'bg-white/10 text-gray-300 hover:bg-white/20'
@@ -158,12 +157,12 @@ const RecruiterProjectsPage = () => {
       </div>
 
       {/* Projects Grid */}
-      <div className="px-4 md:px-8 pb-12">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="px-2 sm:px-4 md:px-8 pb-8 sm:pb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {filteredProjects.map((project, idx) => (
             <motion.div
               key={idx}
-              whileHover={{ scale: 1.05, zIndex: 30 }}
+              whileHover={{ scale: 1.03, zIndex: 30 }}
               className="relative bg-zinc-900 rounded-md overflow-hidden shadow-2xl cursor-pointer group"
               onClick={() => project.link && window.open(project.link, '_blank', 'noopener,noreferrer')}
             >
@@ -179,13 +178,11 @@ const RecruiterProjectsPage = () => {
               </div>
 
               {/* Project Info */}
-              <div className="p-4">
-                <h3 className="text-lg font-bold text-white mb-2">{project.title}</h3>
-                <p className="text-sm text-red-400 font-medium mb-2">{project.techStack}</p>
-                <p className="text-sm text-gray-300 line-clamp-2">{project.description}</p>
-                
-                {/* Action Buttons */}
-                <div className="flex gap-2 mt-4">
+              <div className="p-3 sm:p-4">
+                <h3 className="text-base sm:text-lg font-bold text-white mb-2">{project.title}</h3>
+                <p className="text-xs sm:text-sm text-red-400 font-medium mb-2">{project.techStack}</p>
+                <p className="text-xs sm:text-sm text-gray-300 line-clamp-2">{project.description}</p>
+                <div className="flex gap-2 mt-3">
                   {project.github && (
                     <a
                       href={project.github}
@@ -210,8 +207,6 @@ const RecruiterProjectsPage = () => {
                   )}
                 </div>
               </div>
-
-              {/* Hover Overlay */}
               <AnimatePresence>
                 <motion.div
                   initial={{ opacity: 0 }}

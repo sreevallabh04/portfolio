@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SimpleContentRow from '@/components/SimpleContentRow';
@@ -7,6 +7,10 @@ import * as anime from 'animejs';
 
 const Dashboard = () => {
   const { profile } = useParams();
+  const [showVideo, setShowVideo] = useState(false);
+  const [pinDigits, setPinDigits] = useState(['', '', '', '']);
+  const [pinError, setPinError] = useState('');
+  const inputRefs = [useRef(), useRef(), useRef(), useRef()];
 
   const getProfileContent = () => {
     if (profile !== 'recruiter') {
@@ -202,6 +206,73 @@ const Dashboard = () => {
 
   const content = getProfileContent();
   const isRecruiter = profile === 'recruiter';
+
+  // Handler for PIN input
+  const handlePinChange = (idx, value) => {
+    if (!/^[0-9]?$/.test(value)) return;
+    const newDigits = [...pinDigits];
+    newDigits[idx] = value;
+    setPinDigits(newDigits);
+    setPinError('');
+    if (value && idx < 3) {
+      inputRefs[idx + 1].current.focus();
+    }
+    if (newDigits.every(d => d.length === 1)) {
+      if (newDigits.join('') === '1501') setShowVideo(true);
+      else setPinError('Incorrect PIN. Try again.');
+    }
+  };
+
+  const handlePinKeyDown = (idx, e) => {
+    if (e.key === 'Backspace' && !pinDigits[idx] && idx > 0) {
+      inputRefs[idx - 1].current.focus();
+    }
+  };
+
+  if (profile === 'adventurer' && !showVideo) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-black px-2">
+        <div className="flex flex-col items-center w-full max-w-md mx-auto">
+          <div className="text-gray-300 text-base md:text-xl mb-4 text-center">Profile Lock is currently on.</div>
+          <div className="text-white text-2xl md:text-5xl font-bold mb-8 text-center leading-tight">Enter your PIN to access this profile.</div>
+          <div className="flex gap-3 md:gap-6 mb-6 w-full justify-center">
+            {[0, 1, 2, 3].map(idx => (
+              <input
+                key={idx}
+                ref={inputRefs[idx]}
+                type="password"
+                inputMode="numeric"
+                maxLength={1}
+                value={pinDigits[idx]}
+                onChange={e => handlePinChange(idx, e.target.value)}
+                onKeyDown={e => handlePinKeyDown(idx, e)}
+                className="w-12 h-12 md:w-20 md:h-20 text-2xl md:text-4xl text-center rounded border-2 border-gray-400 bg-black text-white focus:outline-none focus:border-red-600 transition-all font-mono"
+                autoFocus={idx === 0}
+              />
+            ))}
+          </div>
+          {pinError && <div className="text-red-500 mb-4 text-base md:text-lg text-center">{pinError}</div>}
+          <div className="text-gray-400 text-base md:text-lg mt-8 cursor-pointer hover:underline text-center">Forgot PIN?</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Adventurer unlocked: show immersive Apple-style background video with audio
+  if (profile === 'adventurer' && showVideo) {
+    return (
+      <div className="min-h-screen w-full h-full fixed inset-0 overflow-hidden bg-black">
+        <video
+          src="/adv.mp4"
+          autoPlay
+          loop
+          playsInline
+          className="fixed inset-0 w-full h-full object-cover z-0"
+          style={{ pointerEvents: 'none', minHeight: '100vh', minWidth: '100vw' }}
+        />
+      </div>
+    );
+  }
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen bg-black text-white">

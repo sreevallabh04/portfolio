@@ -192,4 +192,17 @@ export default defineConfig({
 			'@': path.resolve(__dirname, './src'),
 		},
 	},
+	build: {
+		outDir: 'dist',
+		minify: 'terser',
+		sourcemap: false,
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					vendor: ['react', 'react-dom', 'react-router-dom'],
+					three: ['three', '@react-three/fiber', '@react-three/drei'],
+				},
+			},
+		},
+	},
 });
