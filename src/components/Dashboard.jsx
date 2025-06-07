@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import SimpleContentRow from '@/components/SimpleContentRow';
 import { Button } from '@/components/ui/button';
+import * as anime from 'animejs';
 
 const Dashboard = () => {
   const { profile } = useParams();
