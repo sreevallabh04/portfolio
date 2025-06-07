@@ -9,8 +9,14 @@ try {
   // Ensure we're in the project root
   process.chdir(__dirname);
   
-  // Run the build command using npx to avoid permission issues
-  execSync('npx vite build', { stdio: 'inherit' });
+  // Run the build command directly using vite
+  execSync('vite build', { 
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      NODE_ENV: 'production'
+    }
+  });
   
   console.log('Build completed successfully!');
 } catch (error) {
