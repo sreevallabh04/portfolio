@@ -101,7 +101,7 @@ const SplashScreen = ({ onAudioEnd }) => {
     // Cleanup function
     return () => {
       // Stop the source node if it exists and is playing
-      if (sourceNodeRef.current) {
+      if (sourceNodeRef.current && sourceNodeRef.current.buffer) {
         try {
           sourceNodeRef.current.onended = null; // Remove listener
           sourceNodeRef.current.stop();
