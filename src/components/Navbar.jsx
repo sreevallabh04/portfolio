@@ -20,7 +20,7 @@ const Navbar = () => {
           <Link to="/skills" className="hover:text-red-600 transition-colors duration-200">Skills</Link>
           <Link to="/browse/recruiter#projects" className="hover:text-red-600 transition-colors duration-200">Projects</Link>
           {/* Assuming "Hire Me" is a contact link or section */}
-          <Link to="/browse/recruiter#contact" className="hover:text-red-600 transition-colors duration-200">Hire Me</Link>
+          <Link to="/contact" className="hover:text-red-600 transition-colors duration-200">Contact</Link>
         </div>
       </div>
     </nav>

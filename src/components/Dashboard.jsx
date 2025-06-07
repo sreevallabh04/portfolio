@@ -1,8 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import ContentRow from '@/components/ContentRow';
-import SimpleContentRow from '@/components/SimpleContentRow'; // Import SimpleContentRow
+import SimpleContentRow from '@/components/SimpleContentRow';
 import { Button } from '@/components/ui/button';
 
 const Dashboard = () => {
@@ -35,7 +34,6 @@ const Dashboard = () => {
       rows: [
         {
           title: "Projects",
-          isNetflixCarousel: true, // New property for Netflix-style carousel
           items: [
             {
               title: "Quiznetic",
@@ -236,7 +234,12 @@ const Dashboard = () => {
 
       <div className="px-[4%] md:px-[5%] py-8 md:py-12">
         {content.rows.map((row, index) => (
-          <ContentRow key={index} title={row.title} items={row.items} isSkills={row.isSkills} isCarousel={row.isCarousel} isNetflixCarousel={row.isNetflixCarousel} />
+          <SimpleContentRow 
+            key={index} 
+            title={row.title} 
+            items={row.items} 
+            isSkills={row.isSkills}
+          />
         ))}
       </div>
     </motion.div>

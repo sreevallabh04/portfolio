@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom'; // Import useParams
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,6 +6,7 @@ import ProfileSelection from '@/components/ProfileSelection';
 import Dashboard from '@/components/Dashboard';
 import Navbar from '@/components/Navbar'; // Import Navbar
 import SkillsPage from '@/components/SkillsPage'; // Import SkillsPage
+import ContactPage from '@/components/ContactPage';
 // Removed RecruiterProfilePage import
 import { Toaster } from '@/components/ui/toaster';
 
@@ -104,6 +104,7 @@ function App() {
             element={<Dashboard />} // Render Dashboard directly
           />
           <Route path="/skills" element={<SkillsPage />} /> {/* Add SkillsPage route */}
+          <Route path="/contact" element={<ContactPage />} />
         </Routes>
       </AnimatePresence>
       <Toaster />
