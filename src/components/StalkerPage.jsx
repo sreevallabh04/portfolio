@@ -50,8 +50,10 @@ const StalkerPage = () => {
           className="absolute inset-0 w-full h-full object-cover object-top"
           tabIndex="-1"
         />
-        {/* Gradient Overlay - lighter at the bottom */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent z-10 pointer-events-none" />
+        {/* Netflix-like Gradient Overlay */}
+        <div className="absolute inset-0 z-10 pointer-events-none" style={{
+          background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 25%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.01) 80%, transparent 100%)'
+        }} />
         {/* Left Overlay Card (hide when movie mode) */}
         {!isMovieMode && (
           <div className="relative z-20 flex flex-col justify-end h-full pl-8 pb-12 max-w-2xl w-full">
