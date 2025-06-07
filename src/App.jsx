@@ -7,6 +7,7 @@ import Dashboard from '@/components/Dashboard';
 import Navbar from '@/components/Navbar'; // Import Navbar
 import SkillsPage from '@/components/SkillsPage'; // Import SkillsPage
 import ContactPage from '@/components/ContactPage';
+import StalkerPage from '@/components/StalkerPage';
 // Removed RecruiterProfilePage import
 import { Toaster } from '@/components/ui/toaster';
 
@@ -105,6 +106,7 @@ function App() {
           />
           <Route path="/skills" element={<SkillsPage />} /> {/* Add SkillsPage route */}
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/browse/stalker" element={<StalkerPage />} />
         </Routes>
       </AnimatePresence>
       <Toaster />
