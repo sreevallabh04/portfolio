@@ -12,6 +12,7 @@ const HERO_GENRES = ['Slick', 'Suspenseful', 'Thriller', 'Conspiracy', 'Trailer'
 const HERO_DESCRIPTION = `Sometimes writes bugs just to fix them and feel productive. Gym rat. Code addict. Meme lord in training.`;
 const HERO_THUMBNAIL = '/HopeCore.png';
 const VIDEO_SRC = 'https://res.cloudinary.com/devtvoup1/video/upload/HopeCore_h2wr6x.mp4';
+const FALLBACK_VIDEO_SRC = 'https://res.cloudinary.com/devtvoup1/video/upload/v1710864000/HopeCore_h2wr6x.mp4';
 
 const StalkerPage = () => {
   const navigate = useNavigate();
@@ -175,7 +176,17 @@ const StalkerPage = () => {
           playsInline
           poster={HERO_THUMBNAIL}
           muted={isMuted}
-        />
+          crossOrigin="anonymous"
+          onError={(e) => {
+            console.error('Error loading primary video source:', e);
+            if (e.target.src !== FALLBACK_VIDEO_SRC) {
+              e.target.src = FALLBACK_VIDEO_SRC;
+            }
+          }}
+        >
+          <source src={VIDEO_SRC} type="video/mp4" />
+          <source src={FALLBACK_VIDEO_SRC} type="video/mp4" />
+        </video>
         
         {/* Subtle gradient overlay */}
         <div className="absolute inset-0 z-10 pointer-events-none" style={{
@@ -263,7 +274,17 @@ const StalkerPage = () => {
                 autoPlay
                 className="w-full h-full object-contain bg-black"
                 style={{ minHeight: 220, background: 'black' }}
-              />
+                crossOrigin="anonymous"
+                onError={(e) => {
+                  console.error('Error loading modal video source:', e);
+                  if (e.target.src !== FALLBACK_VIDEO_SRC) {
+                    e.target.src = FALLBACK_VIDEO_SRC;
+                  }
+                }}
+              >
+                <source src={VIDEO_SRC} type="video/mp4" />
+                <source src={FALLBACK_VIDEO_SRC} type="video/mp4" />
+              </video>
             </div>
           </motion.div>
         )}
