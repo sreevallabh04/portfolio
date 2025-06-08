@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://streamvallabh.life/sitemap.xml
+
+# Disallow admin or private routes
+Disallow: /admin/
+Disallow: /private/ 
