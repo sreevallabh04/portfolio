@@ -28,7 +28,7 @@ const Dashboard = () => {
         title: "Sreevallabh Kakarala",
         subtitle: "Vellore Institute of Technology, Chennai",
         period: "Sep. 2022 - June 2027",
-        description: "Software Engineer specializing in full-stack development and AI/ML solutions",
+        description: "Software Engineering student specializing in full-stack development and AI/ML solutions",
         imageUrl: "/photo1.jpg",
         contact: {
           email: "srivallabhkakarala@gmail.com",
