@@ -459,9 +459,9 @@ const Footer = () => (
     Built with <span className="text-red-500">React</span>, <span className="text-blue-400">Tailwind</span>, <span className="text-pink-400">Framer Motion</span>, and <span className="text-green-400">❤️</span> on <span className="text-yellow-400">Linux</span>.<br />
     <span className="text-white">© {new Date().getFullYear()} Sreevallabh Kakarala</span>
     <div className="flex justify-center space-x-4 mt-2">
-      <a href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer" className="hover:text-white">GitHub</a>
-      <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener noreferrer" className="hover:text-white">LinkedIn</a>
-      <a href="mailto:your.email@example.com" className="hover:text-white">Email</a>
+      <a href="https://github.com/sreevallabh04" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200">GitHub</a>
+      <a href="https://www.linkedin.com/in/sreevallabh-kakarala-52ab8a248/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200">LinkedIn</a>
+      <a href="mailto:srivallabhkakaral@gmail.com" className="hover:text-white transition-colors duration-200">Email</a>
     </div>
   </footer>
 );
