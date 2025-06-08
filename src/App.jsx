@@ -1,17 +1,47 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom'; // Import useParams
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
 import ProfileSelection from '@/components/ProfileSelection';
-import Dashboard from '@/components/Dashboard';
-import Navbar from '@/components/Navbar'; // Import Navbar
-import SkillsPage from '@/components/SkillsPage'; // Import SkillsPage
-import ContactPage from '@/components/ContactPage';
-import StalkerPage from '@/components/StalkerPage';
-import RecruiterProjectsPage from '@/components/RecruiterProjectsPage';
-import DeveloperPage from '@/components/DeveloperPage';
-// Removed RecruiterProfilePage import
+import Navbar from '@/components/Navbar';
 import { Toaster } from '@/components/ui/toaster';
+
+// Lazy load components for better performance
+const Dashboard = lazy(() => import('@/components/Dashboard'));
+const SkillsPage = lazy(() => import('@/components/SkillsPage'));
+const ContactPage = lazy(() => import('@/components/ContactPage'));
+const StalkerPage = lazy(() => import('@/components/StalkerPage'));
+const RecruiterProjectsPage = lazy(() => import('@/components/RecruiterProjectsPage'));
+const DeveloperPage = lazy(() => import('@/components/DeveloperPage'));
+
+// Loading component for route transitions
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-red-600"></div>
+  </div>
+);
+
+// 404 Page component
+const NotFound = () => (
+  <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
+    <h1 className="text-6xl font-bold mb-4">404</h1>
+    <p className="text-xl mb-8">Page not found</p>
+    <button
+      onClick={() => window.history.back()}
+      className="px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+    >
+      Go Back
+    </button>
+  </div>
+);
+
+// Protected Route component
+const ProtectedRoute = ({ children, profile }) => {
+  if (!profile) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
 
 // Simple Button component for styling consistency (optional)
 const EnterButton = ({ onClick }) => (
@@ -32,44 +62,36 @@ const EnterButton = ({ onClick }) => (
   </button>
 );
 
-
-function App() {
-  const [hasEntered, setHasEntered] = useState(false); // Controls if user has clicked "Enter"
-  const [showSplash, setShowSplash] = useState(false); // Controls splash visibility *after* entering
+function AppContent() {
+  const [hasEntered, setHasEntered] = useState(false);
+  const [showSplash, setShowSplash] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
-  const audioContextResumed = useRef(false); // Track if context was successfully resumed
+  const audioContextResumed = useRef(false);
 
   // Function to handle the initial "Enter" click
   const handleEnter = async () => {
-    // Attempt to create/resume AudioContext on first interaction
-    // This is the key step to enable audio playback later
     try {
       const context = new (window.AudioContext || window.webkitAudioContext)();
       if (context.state === 'suspended') {
         await context.resume();
         console.log('AudioContext resumed successfully on enter.');
       }
-      // Close the context immediately if we only need it to unlock autoplay
-      // Or keep it if SplashScreen needs it (current SplashScreen creates its own)
       await context.close();
-      audioContextResumed.current = true; // Mark as resumed
+      audioContextResumed.current = true;
     } catch (e) {
       console.error('Failed to resume AudioContext on enter:', e);
-      // Proceed anyway, playback might still work or fallback timer will trigger transition
       audioContextResumed.current = false;
     }
 
-    setHasEntered(true); // User has entered
-    setShowSplash(true); // Now show the splash screen
+    setHasEntered(true);
+    setShowSplash(true);
   };
-
 
   // Function to be called when the splash screen audio ends (or times out)
   const handleAudioEnd = () => {
-    setShowSplash(false); // Hide splash screen to show profile selection/dashboard
+    setShowSplash(false);
   };
 
-  // Render "Click to Enter" button if the user hasn't entered yet
   if (!hasEntered) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'black' }}>
@@ -78,46 +100,89 @@ function App() {
     );
   }
 
-  // Render SplashScreen if user has entered and splash is active
   if (showSplash) {
-    // Pass the handleAudioEnd function as a prop
-    // SplashScreen will attempt playback, hopefully succeeding now
     return <SplashScreen onAudioEnd={handleAudioEnd} />;
   }
 
-  // --- Rest of the application logic (Router, Profile Selection, Dashboard) ---
-
   return (
-    <Router>
-      <Navbar /> {/* Add Navbar here */}
+    <>
+      <Navbar />
       <AnimatePresence mode="wait">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              !selectedProfile ? (
-                <ProfileSelection onProfileSelect={setSelectedProfile} />
-              ) : (
-                <Navigate to={`/browse/${selectedProfile}`} replace />
-              )
-            }
-          />
-          <Route
-            path="/browse/:profile"
-            element={<Dashboard />} // Render Dashboard directly
-          />
-          <Route path="/skills" element={<SkillsPage />} /> {/* Add SkillsPage route */}
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/browse/stalker" element={<StalkerPage />} />
-          <Route path="/browse/recruiter/projects" element={<RecruiterProjectsPage />} />
-          <Route path="/browse/developer" element={<DeveloperPage />} />
-        </Routes>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                !selectedProfile ? (
+                  <ProfileSelection onProfileSelect={setSelectedProfile} />
+                ) : (
+                  <Navigate to={`/browse/${selectedProfile}`} replace />
+                )
+              }
+            />
+            <Route
+              path="/browse/:profile"
+              element={
+                <ProtectedRoute profile={selectedProfile}>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/skills"
+              element={
+                <ProtectedRoute profile={selectedProfile}>
+                  <SkillsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/contact"
+              element={
+                <ProtectedRoute profile={selectedProfile}>
+                  <ContactPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/browse/stalker"
+              element={
+                <ProtectedRoute profile={selectedProfile}>
+                  <StalkerPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/browse/recruiter/projects"
+              element={
+                <ProtectedRoute profile={selectedProfile}>
+                  <RecruiterProjectsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/browse/developer"
+              element={
+                <ProtectedRoute profile={selectedProfile}>
+                  <DeveloperPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </AnimatePresence>
       <Toaster />
-    </Router>
+    </>
   );
 }
 
-// Removed ProfileSpecificDashboard wrapper component
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+}
 
 export default App;

@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import ProfileSwitcher from './ProfileSwitcher';
 
 const Navbar = () => {
   const location = useLocation();
   const isRecruiter = location.pathname.startsWith('/browse/recruiter');
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // Get current profile from URL
+  const currentProfile = location.pathname.split('/')[2] || 'recruiter';
 
   // Handle scroll effect
   useEffect(() => {
@@ -60,29 +64,34 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* Mobile Menu Button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="text-white hover:text-red-600 transition-colors duration-200 focus:outline-none"
-                aria-label="Toggle menu"
-              >
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+            {/* Profile Switcher */}
+            <div className="flex items-center space-x-4">
+              <ProfileSwitcher currentProfile={currentProfile} />
+              
+              {/* Mobile Menu Button */}
+              <div className="md:hidden">
+                <button
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="text-white hover:text-red-600 transition-colors duration-200 focus:outline-none"
+                  aria-label="Toggle menu"
                 >
-                  {isOpen ? (
-                    <path d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path d="M4 6h16M4 12h16M4 18h16" />
-                  )}
-                </svg>
-              </button>
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    {isOpen ? (
+                      <path d="M6 18L18 6M6 6l12 12" />
+                    ) : (
+                      <path d="M4 6h16M4 12h16M4 18h16" />
+                    )}
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>

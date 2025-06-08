@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Info, X } from 'lucide-react';
+import { Play, Pause, Info, X, Volume2, VolumeX, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // Netflix-like font: Bebas Neue (add to index.html)
 // <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -13,27 +14,114 @@ const HERO_THUMBNAIL = '/HopeCore.png';
 const VIDEO_SRC = 'https://res.cloudinary.com/devtvoup1/video/upload/HopeCore_h2wr6x.mp4';
 
 const StalkerPage = () => {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const modalVideoRef = useRef(null);
+  const backgroundVideoRef = useRef(null);
+  const fullscreenContainerRef = useRef(null);
 
-  const handlePlay = () => {
+  const profiles = [
+    { id: 'recruiter', name: 'Recruiter', path: '/recruiter' },
+    { id: 'developer', name: 'Developer', path: '/developer' },
+    { id: 'stalker', name: 'Stalker', path: '/stalker' },
+    { id: 'adventurer', name: 'Adventurer', path: '/adventurer' }
+  ];
+
+  // Center play/pause button for background video
+  const handlePlayPause = () => {
+    if (backgroundVideoRef.current) {
+      if (backgroundVideoRef.current.paused) {
+        backgroundVideoRef.current.play();
+        setIsPlaying(true);
+      } else {
+        backgroundVideoRef.current.pause();
+        setIsPlaying(false);
+      }
+    }
+  };
+
+  // Open fullscreen modal and play video
+  const handleOpenFullscreen = () => {
     setShowModal(true);
     setTimeout(() => {
+      if (fullscreenContainerRef.current) {
+        if (fullscreenContainerRef.current.requestFullscreen) {
+          fullscreenContainerRef.current.requestFullscreen();
+        } else if (fullscreenContainerRef.current.webkitRequestFullscreen) {
+          fullscreenContainerRef.current.webkitRequestFullscreen();
+        } else if (fullscreenContainerRef.current.mozRequestFullScreen) {
+          fullscreenContainerRef.current.mozRequestFullScreen();
+        } else if (fullscreenContainerRef.current.msRequestFullscreen) {
+          fullscreenContainerRef.current.msRequestFullscreen();
+        }
+      }
       if (modalVideoRef.current) {
         modalVideoRef.current.muted = false;
         modalVideoRef.current.play();
       }
-    }, 200);
+    }, 100);
   };
 
-  const handleClose = () => {
+  // Close fullscreen modal
+  const handleCloseFullscreen = () => {
     setShowModal(false);
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    }
     if (modalVideoRef.current) {
       modalVideoRef.current.pause();
       modalVideoRef.current.currentTime = 0;
       modalVideoRef.current.muted = true;
     }
   };
+
+  // Listen for fullscreen change to close modal if user exits fullscreen
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setShowModal(false);
+      }
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, []);
+
+  // Toggle mute for both background and modal video
+  const toggleMute = () => {
+    setIsMuted((prev) => {
+      const newMuted = !prev;
+      if (backgroundVideoRef.current) {
+        backgroundVideoRef.current.muted = newMuted;
+      }
+      if (modalVideoRef.current) {
+        modalVideoRef.current.muted = newMuted;
+      }
+      return newMuted;
+    });
+  };
+
+  const handleProfileSwitch = (path) => {
+    setShowProfileMenu(false);
+    navigate(path);
+  };
+
+  // Keep isPlaying state in sync with video events
+  useEffect(() => {
+    const video = backgroundVideoRef.current;
+    if (!video) return;
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+    return () => {
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+    };
+  }, []);
 
   return (
     <motion.div
@@ -43,25 +131,58 @@ const StalkerPage = () => {
       className="min-h-screen bg-black flex flex-col"
       style={{ minHeight: '100vh' }}
     >
+      {/* Profile Menu Button */}
+      <button
+        onClick={() => setShowProfileMenu(!showProfileMenu)}
+        className="absolute top-4 right-4 z-40 p-2 rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-all"
+      >
+        <User className="w-6 h-6 text-white" />
+      </button>
+
+      {/* Profile Menu Dropdown */}
+      <AnimatePresence>
+        {showProfileMenu && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-16 right-4 z-40 bg-black/80 backdrop-blur-md rounded-lg shadow-xl border border-white/10 overflow-hidden"
+          >
+            {profiles.map((profile) => (
+              <button
+                key={profile.id}
+                onClick={() => handleProfileSwitch(profile.path)}
+                className="w-full px-6 py-3 text-left text-white hover:bg-white/10 transition-colors flex items-center gap-3"
+              >
+                <div className="w-8 h-8 rounded-md bg-[#e50914]" />
+                <span>{profile.name}</span>
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Netflix-style Hero Section */}
-      <div className="relative w-full h-[65vh] min-h-[340px] flex items-end justify-start overflow-hidden">
+      <div className="relative w-full h-[85vh] min-h-[500px] flex items-end justify-start overflow-hidden">
         {/* Video as background */}
         <video
+          ref={backgroundVideoRef}
           src={VIDEO_SRC}
           className="absolute inset-0 w-full h-full object-cover object-center z-0"
-          style={{ filter: 'brightness(0.55) blur(0px)' }}
+          style={{ filter: 'brightness(0.65)' }}
           autoPlay
           loop
-          muted
           playsInline
           poster={HERO_THUMBNAIL}
+          muted={isMuted}
         />
-        {/* Dramatic vignette and gradient overlays */}
+        
+        {/* Subtle gradient overlay */}
         <div className="absolute inset-0 z-10 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.45) 60%, transparent 100%)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 100%)',
         }} />
-        <div className="absolute inset-0 z-20 bg-gradient-to-t from-black/95 via-black/60 to-transparent" />
-        {/* Animated Overlayed Content - bottom left on desktop, centered on mobile */}
+
+        {/* Content overlay */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -100,7 +221,7 @@ const StalkerPage = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xs sm:max-w-none sm:w-auto">
             <button
-              onClick={handlePlay}
+              onClick={handleOpenFullscreen}
               className="flex items-center justify-center w-full sm:w-auto px-10 py-4 bg-white text-black font-bold rounded-full hover:bg-gray-200 transition-all text-xl shadow-2xl netflix-btn"
               style={{ fontWeight: 800, fontSize: '1.35rem', letterSpacing: '0.01em', boxShadow: '0 4px 24px 0 #e5091440' }}
             >
@@ -115,31 +236,24 @@ const StalkerPage = () => {
         </motion.div>
       </div>
 
-      {/* Modal Video Player Overlay */}
+      {/* Fullscreen Modal Video Player Overlay */}
       <AnimatePresence>
         {showModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md"
-            onClick={handleClose}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/100"
+            style={{ background: 'black' }}
           >
-            <motion.div
-              initial={{ scale: 0.96, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.96, opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="relative w-full max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-[#e50914] bg-black/80 backdrop-blur-lg"
-              onClick={e => e.stopPropagation()}
-            >
+            <div ref={fullscreenContainerRef} className="relative w-full h-full flex items-center justify-center">
               {/* Close Button */}
               <button
-                className="absolute top-4 right-4 z-50 p-2 bg-black/60 hover:bg-black/80 rounded-full text-white shadow-lg"
-                onClick={handleClose}
+                className="absolute top-6 left-6 z-50 p-3 bg-black/60 hover:bg-black/80 rounded-full text-white shadow-lg"
+                onClick={handleCloseFullscreen}
                 aria-label="Close"
               >
-                <X className="w-6 h-6" />
+                <X className="w-8 h-8" />
               </button>
               {/* Video Player with Controls */}
               <video
@@ -147,10 +261,10 @@ const StalkerPage = () => {
                 src={VIDEO_SRC}
                 controls
                 autoPlay
-                className="w-full h-full object-contain bg-black rounded-2xl"
+                className="w-full h-full object-contain bg-black"
                 style={{ minHeight: 220, background: 'black' }}
               />
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
