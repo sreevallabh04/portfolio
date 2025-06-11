@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import SimpleContentRow from '@/components/SimpleContentRow';
 import { Button } from '@/components/ui/button';
 import * as anime from 'animejs';
+import { Github } from 'lucide-react';
 
 const Dashboard = () => {
   const { profile } = useParams();
@@ -296,8 +297,9 @@ const Dashboard = () => {
               <Button onClick={() => window.open('/resume.pdf', '_blank')} className="bg-white text-black px-6 py-3 text-lg font-semibold rounded-md hover:bg-gray-200 transition-colors duration-200">
                 Resume
               </Button>
-              <Button onClick={() => window.open(`https://${content.banner.contact.linkedin}`, '_blank', 'noopener,noreferrer')} className="border-white/70 text-white hover:bg-white/20 px-6 py-3 text-lg font-semibold rounded-md bg-white/10 backdrop-blur-sm transition-colors duration-200">
-                LinkedIn
+              <Button onClick={() => window.open(`https://${content.banner.contact.github}`, '_blank', 'noopener,noreferrer')} className="border-white/70 text-white hover:bg-white/20 px-6 py-3 text-lg font-semibold rounded-md bg-white/10 backdrop-blur-sm transition-colors duration-200 flex items-center gap-2">
+                <Github size={20} />
+                GitHub
               </Button>
             </div>
           )}
