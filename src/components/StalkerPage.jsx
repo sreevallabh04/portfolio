@@ -10,7 +10,7 @@ const HERO_TITLE = 'HopeCore';
 const HERO_TYPE = 'Film';
 const HERO_GENRES = ['Slick', 'Suspenseful', 'Thriller', 'Conspiracy', 'Trailer'];
 const HERO_DESCRIPTION = `Sometimes writes bugs just to fix them and feel productive. Gym rat. Code addict. Meme lord in training.`;
-const HERO_THUMBNAIL = '/HopeCore.png';
+const HERO_THUMBNAIL = 'HopeCore.png';
 const VIDEO_SRC = 'https://res.cloudinary.com/devtvoup1/video/upload/HopeCore_h2wr6x.mp4';
 const FALLBACK_VIDEO_SRC = 'https://res.cloudinary.com/devtvoup1/video/upload/v1710864000/HopeCore_h2wr6x.mp4';
 
