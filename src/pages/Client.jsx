@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import SplitText from '../components/SplitText';
+import BlurText from '../components/BlurText';
 
 const services = {
   'web-dev': {
@@ -436,17 +437,13 @@ const Client = () => {
       {/* Header */}
       <div className="bg-gradient-to-r from-black to-red-900 py-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <SplitText
+          <BlurText
             text="Your Digital Vision, My Expertise"
+            delay={150}
+            animateBy="words"
+            direction="top"
+            onAnimationComplete={() => console.log('Animation completed!')}
             className="text-4xl md:text-6xl font-bold text-white mb-6"
-            delay={50}
-            duration={0.5}
-            ease="power3.out"
-            splitType="words"
-            from={{ opacity: 0, y: 30 }}
-            to={{ opacity: 1, y: 0 }}
-            threshold={0.1}
-            textAlign="center"
           />
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Professional web development, mobile apps, ML models, and AI agents. Choose your service and let's build something amazing.
