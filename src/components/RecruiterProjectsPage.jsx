@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, Github, ChevronRight, ChevronLeft } from 'lucide-react';
+import { ExternalLink, Github, ChevronRight, ChevronLeft, X, Calendar, Code, Folder } from 'lucide-react';
 
 // Projects data from Dashboard recruiter section
 const projects = [
@@ -82,11 +82,20 @@ const categories = [
 
 const RecruiterProjectsPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedProject, setSelectedProject] = useState(null);
   const featuredProject = projects.find(p => p.title === "Metic Synergy Website");
 
   const filteredProjects = selectedCategory === "All" 
     ? projects 
     : projects.filter(project => project.category === selectedCategory);
+
+  const openProjectModal = (project) => {
+    setSelectedProject(project);
+  };
+
+  const closeProjectModal = () => {
+    setSelectedProject(null);
+  };
 
   return (
     <motion.div
@@ -164,7 +173,7 @@ const RecruiterProjectsPage = () => {
               key={idx}
               whileHover={{ scale: 1.03, zIndex: 30 }}
               className="relative bg-zinc-900 rounded-md overflow-hidden shadow-2xl cursor-pointer group"
-              onClick={() => project.link && window.open(project.link, '_blank', 'noopener,noreferrer')}
+              onClick={() => openProjectModal(project)}
             >
               {/* Project Image */}
               <div className="aspect-[16/9] relative">
@@ -220,6 +229,137 @@ const RecruiterProjectsPage = () => {
           ))}
         </div>
       </div>
+
+      {/* Project Modal */}
+      <AnimatePresence>
+        {selectedProject && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={closeProjectModal}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-zinc-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={closeProjectModal}
+                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+              >
+                <X size={20} className="text-white" />
+              </button>
+
+              {/* Project Image Header */}
+              <div className="relative h-64 md:h-80 overflow-hidden">
+                <img
+                  src={selectedProject.imageUrl}
+                  alt={selectedProject.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/60 to-transparent" />
+                
+                {/* Project Header Info */}
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="flex items-center gap-2 text-sm text-gray-300 mb-2">
+                    <Calendar size={16} />
+                    <span>{selectedProject.period}</span>
+                    <span className="mx-2">•</span>
+                    <span>3 Months</span>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                    {selectedProject.title}
+                  </h2>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => window.open(selectedProject.link, '_blank')}
+                      className="px-6 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
+                    >
+                      <ExternalLink size={18} />
+                      View
+                    </motion.button>
+                    {selectedProject.github && (
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => window.open(selectedProject.github, '_blank')}
+                        className="px-6 py-2.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+                      >
+                        <Github size={18} />
+                        GitHub
+                      </motion.button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Project Content */}
+              <div className="p-6 md:p-8">
+                {/* Featured Badge */}
+                <div className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium mb-6">
+                  <span className="w-2 h-2 bg-white rounded-full"></span>
+                  #1 in Projects Today
+                </div>
+
+                {/* Project Description */}
+                <div className="grid md:grid-cols-3 gap-8">
+                  <div className="md:col-span-2">
+                    <h3 className="text-xl font-semibold text-white mb-4">Project Overview</h3>
+                    <p className="text-gray-300 leading-relaxed whitespace-pre-line">
+                      {selectedProject.description}
+                    </p>
+                    
+                    <div className="flex items-center gap-4 mt-6 text-sm text-gray-400">
+                      <span>{selectedProject.period}</span>
+                      <span>•</span>
+                      <span>3 Months</span>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    {/* Tech Stack */}
+                    <div className="mb-6">
+                      <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                        <Code size={18} className="text-red-400" />
+                        Tech Stack:
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.techStack.split(', ').map((tech, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-red-600/20 text-red-400 rounded-full text-sm"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Area */}
+                    <div>
+                      <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                        <Folder size={18} className="text-blue-400" />
+                        Area:
+                      </h4>
+                      <span className="text-gray-300">{selectedProject.category}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

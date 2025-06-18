@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, Github, ChevronLeft, ChevronRight } from 'lucide-react';
 
-const SimpleContentRow = ({ title, items, isSkills }) => {
+const SimpleContentRow = ({ title, items, isSkills, onProjectClick }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [isHoveringRow, setIsHoveringRow] = useState(false);
   const scrollRef = useRef(null);
@@ -19,8 +19,11 @@ const SimpleContentRow = ({ title, items, isSkills }) => {
       return;
     }
     
-    // If there's a project link, navigate to it
-    if (item.link) {
+    // If there's an onProjectClick callback and the item has techStack (is a project), use the modal
+    if (onProjectClick && item.techStack) {
+      onProjectClick(item);
+    } else if (item.link) {
+      // Otherwise, navigate to the link
       window.open(item.link, '_blank', 'noopener,noreferrer');
     }
   };

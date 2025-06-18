@@ -1,17 +1,29 @@
 import React, { useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import SimpleContentRow from '@/components/SimpleContentRow';
 import { Button } from '@/components/ui/button';
 import * as anime from 'animejs';
-import { Github } from 'lucide-react';
+import { Github, ExternalLink, X, Calendar, Code, Folder } from 'lucide-react';
 
 const Dashboard = () => {
   const { profile } = useParams();
   const [showVideo, setShowVideo] = useState(false);
   const [pinDigits, setPinDigits] = useState(['', '', '', '']);
   const [pinError, setPinError] = useState('');
+  const [selectedProject, setSelectedProject] = useState(null);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
+
+  const openProjectModal = (item) => {
+    // Open modal for projects, experience, and education
+    if (item.techStack || item.subtitle || item.description) {
+      setSelectedProject(item);
+    }
+  };
+
+  const closeProjectModal = () => {
+    setSelectedProject(null);
+  };
 
   const getProfileContent = () => {
     if (profile !== 'recruiter') {
@@ -48,7 +60,8 @@ const Dashboard = () => {
               techStack: "React, TypeScript, Tailwind CSS, Framer Motion, Leaflet",
               imageUrl: "https://i.ibb.co/RGcgMwXL/telangana2.jpg",
               link: "https://quiznetic.vercel.app/",
-              github: "https://github.com/sreevallabh04/Quiznetic"
+              github: "https://github.com/sreevallabh04/Quiznetic",
+              category: "Web Development"
             },
             {
               title: "Metic Synergy Website",
@@ -56,7 +69,8 @@ const Dashboard = () => {
               description: "Responsive corporate website using NextJS, Firebase, and Tailwind CSS.",
               techStack: "NextJS, Firebase, Tailwind CSS",
               imageUrl: "https://i.postimg.cc/xC0WrB6B/logo.png",
-              link: "https://meticsynergy.com"
+              link: "https://meticsynergy.com",
+              category: "Web Development"
             },
             {
               title: "VHTOP - Hostel Management Suite",
@@ -64,7 +78,8 @@ const Dashboard = () => {
               description: "Management suite for hostel students integrating carpooling and various utilities.",
               techStack: "NextJS, Firebase, React",
               imageUrl: "https://i.postimg.cc/ZqzGHWpb/vitlogo.jpg",
-              link: "https://vhtop-six.vercel.app/"
+              link: "https://vhtop-six.vercel.app/",
+              category: "Web Development"
             },
             {
               title: "Sarah - AI-Driven Virtual Assistant",
@@ -72,7 +87,8 @@ const Dashboard = () => {
               description: "Open-source, AI-powered virtual assistant with speech recognition, NLP, and automation.",
               techStack: "Python, Machine Learning, NLP",
               imageUrl: "https://i.postimg.cc/yNhwb7yF/Sarah-AI-agent.jpg",
-              link: "https://github.com/sreevallabh04/AIzara"
+              link: "https://github.com/sreevallabh04/AIzara",
+              category: "AI/ML"
             },
             {
               title: "AI integrated Blockchain voting system",
@@ -80,7 +96,8 @@ const Dashboard = () => {
               description: "Voting platform combining blockchain with AI for secure and intelligent elections.",
               techStack: "Blockchain, AI, Solidity, ZKP, Groq LLM",
               imageUrl: "https://i.postimg.cc/qvKf2stD/AIin-Blockchain.png",
-              link: "https://github.com/sreevallabh04/AI-Integrated-Advanced-Blockchain-Voting-system"
+              link: "https://github.com/sreevallabh04/AI-Integrated-Advanced-Blockchain-Voting-system",
+              category: "Blockchain"
             }
           ]
         },
@@ -91,15 +108,20 @@ const Dashboard = () => {
               title: "Research Intern",
               subtitle: "Agriculture Domain Research - VIT Chennai",
               period: "Jan. 2025 - Present",
-              description: "Classification of spongy tissue disorder in mangoes using deep learning.",
-              imageUrl: "https://i.postimg.cc/ZqzGHWpb/vitlogo.jpg"
+              description: "Classification of spongy tissue disorder in mangoes using deep learning.\n\nKey Responsibilities:\n• Developing CNN models for fruit disease detection\n• Data preprocessing and augmentation techniques\n• Model optimization and performance analysis\n• Research paper preparation and documentation\n\nTechnologies used: Python, TensorFlow, OpenCV, NumPy, Pandas, Matplotlib",
+              techStack: "Python, TensorFlow, OpenCV, NumPy, Pandas, Matplotlib",
+              imageUrl: "https://i.postimg.cc/ZqzGHWpb/vitlogo.jpg",
+              category: "Research & AI/ML"
             },
             {
               title: "Freelance Web Developer",
               subtitle: "Metic Synergy Website",
               period: "Dec. 2024 - Apr. 2025",
-              description: "Developed interactive corporate website with CMS and SEO improvements.",
-              imageUrl: "https://i.ibb.co/xKvG4qPV/IMG-1949.jpg"
+              description: "Developed interactive corporate website with CMS and SEO improvements.\n\nKey Achievements:\n• Built responsive corporate website from scratch\n• Implemented custom CMS for content management\n• SEO optimization resulting in 40% traffic increase\n• Integrated Firebase for real-time data management\n• Mobile-first design with 95+ PageSpeed score\n\nDelivered modern, scalable web solution for corporate client.",
+              techStack: "NextJS, Firebase, Tailwind CSS, SEO, CMS",
+              imageUrl: "https://i.ibb.co/xKvG4qPV/IMG-1949.jpg",
+              category: "Web Development",
+              link: "https://meticsynergy.com"
             }
           ]
         },
@@ -313,9 +335,141 @@ const Dashboard = () => {
             title={row.title} 
             items={row.items} 
             isSkills={row.isSkills}
+            onProjectClick={openProjectModal}
           />
         ))}
       </div>
+
+      {/* Project Modal */}
+      <AnimatePresence>
+        {selectedProject && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={closeProjectModal}
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-zinc-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={closeProjectModal}
+                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+              >
+                <X size={20} className="text-white" />
+              </button>
+
+              {/* Project Image Header */}
+              <div className="relative h-64 md:h-80 overflow-hidden">
+                <img
+                  src={selectedProject.imageUrl}
+                  alt={selectedProject.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/60 to-transparent" />
+                
+                {/* Project Header Info */}
+                <div className="absolute bottom-6 left-6 right-6">
+                  <div className="flex items-center gap-2 text-sm text-gray-300 mb-2">
+                    <Calendar size={16} />
+                    <span>{selectedProject.period}</span>
+                    <span className="mx-2">•</span>
+                    <span>3 Months</span>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                    {selectedProject.title}
+                  </h2>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => window.open(selectedProject.link, '_blank')}
+                      className="px-6 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
+                    >
+                      <ExternalLink size={18} />
+                      View
+                    </motion.button>
+                    {selectedProject.github && (
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => window.open(selectedProject.github, '_blank')}
+                        className="px-6 py-2.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+                      >
+                        <Github size={18} />
+                        GitHub
+                      </motion.button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Project Content */}
+              <div className="p-6 md:p-8">
+                {/* Featured Badge */}
+                <div className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium mb-6">
+                  <span className="w-2 h-2 bg-white rounded-full"></span>
+                  #1 in Projects Today
+                </div>
+
+                {/* Project Description */}
+                <div className="grid md:grid-cols-3 gap-8">
+                  <div className="md:col-span-2">
+                    <h3 className="text-xl font-semibold text-white mb-4">Project Overview</h3>
+                    <p className="text-gray-300 leading-relaxed whitespace-pre-line">
+                      {selectedProject.description}
+                    </p>
+                    
+                    <div className="flex items-center gap-4 mt-6 text-sm text-gray-400">
+                      <span>{selectedProject.period}</span>
+                      <span>•</span>
+                      <span>3 Months</span>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    {/* Tech Stack */}
+                    <div className="mb-6">
+                      <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                        <Code size={18} className="text-red-400" />
+                        Tech Stack:
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.techStack.split(', ').map((tech, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-red-600/20 text-red-400 rounded-full text-sm"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Area */}
+                    <div>
+                      <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                        <Folder size={18} className="text-blue-400" />
+                        Area:
+                      </h4>
+                      <span className="text-gray-300">{selectedProject.category}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
