@@ -13,6 +13,8 @@ const ContactPage = lazy(() => import('@/components/ContactPage'));
 const StalkerPage = lazy(() => import('@/components/StalkerPage'));
 const RecruiterProjectsPage = lazy(() => import('@/components/RecruiterProjectsPage'));
 const DeveloperPage = lazy(() => import('@/components/DeveloperPage'));
+const Client = lazy(() => import('@/pages/Client'));
+const Terms = lazy(() => import('@/pages/Terms'));
 
 // Loading component for route transitions
 const LoadingSpinner = () => (
@@ -168,6 +170,15 @@ function AppContent() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/browse/client"
+              element={
+                <ProtectedRoute profile={selectedProfile}>
+                  <Client />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/terms" element={<Terms />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

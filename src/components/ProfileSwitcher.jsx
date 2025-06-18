@@ -22,9 +22,9 @@ const profiles = [
     avatar: '/avatars/avatar3.jpeg'
   },
   { 
-    id: 'adventurer', 
-    name: 'Adventurer',
-    color: 'bg-yellow-500',
+    id: 'client', 
+    name: 'Client',
+    color: 'bg-blue-600',
     avatar: '/avatars/avatar4.jpeg'
   }
 ];
