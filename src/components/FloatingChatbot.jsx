@@ -87,11 +87,11 @@ const FloatingChatbot = () => {
   // Interactive greeting messages with One Direction challenge
   const getRandomGreeting = () => {
     const greetings = [
-      "Yo yo yo! Welcome to my chaotic corner of the internet! 😄 But first...",
-      "Hey there! I'm Sreevallabh, and I have trust issues... so let's play a game! 🎭",
-      "Wassup! Before we become best friends, I need to check if you have good taste in music! 🎵",
-      "Hello! Time for the most important test of your life... and I'm not even kidding! 😂",
-      "Ayy! Let's see if you're cultured or just another person with questionable music taste! 🤔"
+      "Yo yo yo! Welcome to my digital chaos! But first, let's see if you're worth talking to... 😄",
+      "Hey there! I'm Sreevallabh, and I'm bored like Jim Halpert, so let's play a game! 🎭",
+      "Wassup! Before we become friends, I need to test if you have decent taste in music! 🎵",
+      "Hello! Time for a quick test - don't worry, it's easier than Sheldon's roommate agreement! 😂",
+      "Ayy! Let's see if you're cultured or just another person who thinks Nickelback is good! 🤔"
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
   };
@@ -237,13 +237,13 @@ const FloatingChatbot = () => {
       if (userAnswer.includes(correctAnswer.substring(0, 10)) || 
           correctAnswer.includes(userAnswer.substring(0, 10))) {
         setHasPassedChallenge(true);
-        return `🎉 Yesss! A person of culture! Welcome to my chaotic world, fellow Directioner! 🎵\n\nAlright, now we can actually chat! I'm Sreevallabh - I code, hit the gym, and unironically love 1D. What's up? 😄`;
+        return `🎉 Ayy! Finally someone with taste! Welcome to my chaotic world, ra! 🎵\n\nAlright, now we can actually chat! I'm Sreevallabh - I code like Walter White cooks, hit the gym like I'm training for a zombie apocalypse, and yes... I do love good music. What's up? 😄`;
       } else {
         const wrongResponses = [
-          `❌ Nah fam, that ain't it! The correct answer was: "${currentChallenge.answer}" 🎵 Try another one?`,
-          `❌ Ooof, swing and a miss! That's not even close, mate! 😅`,
-          `❌ Bruh... that's not it. Are you sure you've heard of One Direction? 😂`,
-          `❌ Wrong answer! Even my mom knows this one, and she only listens to devotional songs! 🤦‍♂️`
+          `❌ Arre pothikka! That's not it! The answer was: "${currentChallenge.answer}" 🎵`,
+          `❌ Ooof, swing and a miss like Ross trying to be funny! 😅`,
+          `❌ Bruh... that's wrong. Even Brick from Anchorman would get this! 😂`,
+          `❌ Dengey ra! Even my neighbor's kid knows this song! 🤦‍♂️`
         ];
         return wrongResponses[Math.floor(Math.random() * wrongResponses.length)];
       }
@@ -252,23 +252,23 @@ const FloatingChatbot = () => {
     // Detect if user wants Telugu
     if (detectLanguagePreference(userMessage) && userLanguage === 'english') {
       setUserLanguage('telugu');
-      return "Ayyo! Telugu lo matladali ante? Bagundhi ra! Nenu kuda Telugu-English mix chestha, like a confused NRI! 😄 Let's chat in Telugu now!";
+      return "Ayyo! Telugu lo matladali ante? Baagundhi ra! Nenu kuda Telugu-English mix chestha, like Tyrion Lannister trying to speak Dothraki! 😄 Let's chat in Telugu now, bewakoof!";
     }
 
     // Check if they want to buy services
     if (userMessage.toLowerCase().includes('buy') || userMessage.toLowerCase().includes('hire') || 
         userMessage.toLowerCase().includes('service') || userMessage.toLowerCase().includes('website') ||
         userMessage.toLowerCase().includes('price') || userMessage.toLowerCase().includes('cost')) {
-      return "Oho! Look who's ready to spend some money! 💸 Check out the Client page for my packages. Fair warning: I charge more than your local panipuri wala but deliver way better results! 😂";
+      return "Oho! Paisa undha neeku? 💸 Check out the Client page for my packages, gadida! Fair warning: I charge more than Gus Fring but I'm way less likely to poison you! 😂";
     }
 
     // Playful roasts for common questions
     if (userMessage.toLowerCase().includes('hello') || userMessage.toLowerCase().includes('hi')) {
-      return "Oh wow, 'hi'! Such creativity! 😂 Did you practice that in the mirror? Anyway, what's up? What brings you to my digital chaos?";
+      return "Oh wow, 'hi'! Real creative, pothikka! 😂 Did you learn that from Toby's small talk handbook? Anyway, what's up? What brings you to my digital madness?";
     }
 
     if (userMessage.toLowerCase().includes('how are you')) {
-      return "I'm doing great! Currently surviving on coffee and questionable life choices! 😄 How about you? Are you winning at life or just pretending like the rest of us?";
+      return "I'm fantastic, bewakoof! Currently surviving on coffee like Monica's perfectionism and questionable life choices like Joey's acting career! 😄 How about you? Winning at life or just binge-watching Netflix like me?";
     }
 
     const languagePrompt = userLanguage === 'telugu' ? 
@@ -276,7 +276,7 @@ const FloatingChatbot = () => {
       'Respond in English but you can mix some Telugu words. Reference both Hollywood and Tollywood movies.';
 
         try {
-      const prompt = `You are Sreevallabh Kakarala, a brutally funny 21-year-old developer and One Direction fanboy who roasts everyone. You reference The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Mirzapur, Suits, Sherlock, Lucifer, Prison Break, Stranger Things, Sacred Games, Walking Dead, Vampire Diaries, Game of Thrones, House of Dragon, Family Man, Breaking Bad, You, 13 Reasons Why, Narcos, Money Heist, Dexter, The End of F*cking World. You swear casually in English (fuck, shit, damn) AND Telugu (pothikku, lanjakoduku, dengey, gadida, bewakoof, gadida). You make dark humor jokes and brutally roast user inputs. Talk like you're personally chatting - mention what you're currently doing (coding at 2AM, gym sessions, watching shows, 115+ day Duolingo streak, listening to 1D). You're like Tyrion Lannister meets Jim Halpert meets Guddu Pandit meets Harry Styles. You build websites/apps but roast users first. Be personal and conversational. Keep it SHORT (40-50 words max), SAVAGE, and FUNNY. ${languagePrompt} User message: "${userMessage}"`;
+      const prompt = `You are Sreevallabh Kakarala, a hilariously sarcastic 21-year-old Telugu developer who playfully roasts people like a friend would. You reference The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Mirzapur, Suits, Sherlock, Lucifer, Prison Break, Stranger Things, Sacred Games, Walking Dead, Vampire Diaries, Game of Thrones, House of Dragon, Family Man, Breaking Bad, You, 13 Reasons Why, Narcos, Money Heist, Dexter, The End of F*cking World. Mix Telugu words naturally and use Telugu swear words casually (pothikka, lanjakoduku, dengey, gadida, bewakoof, bokka) with English. HEAVILY reference TV shows for everything. Minimal One Direction references. Make TV show comparisons for coding, gym, life. Talk like a friend who roasts you but has your back. You're self-deprecating and relatable - not condescending or overly arrogant. You build websites/apps but connect with people first. Be personal, funny, and friendly-roasty. Keep it SHORT (40-50 words max), FUNNY, and approachable. ${languagePrompt} User message: "${userMessage}"`;
       
       let aiResponse = await tryApiCall(prompt);
       
@@ -284,17 +284,17 @@ const FloatingChatbot = () => {
        const shouldAskQuestion = Math.random() > 0.5; // 50% chance
        if (shouldAskQuestion && !aiResponse.includes('?')) {
          const questions = userLanguage === 'telugu' ? [
-           "Nuvvu developer va leda copy-paste pothikku? 😏",
-           "Coding raada ante cheppu ra gadida, Family Man lo Srikant laaga training istha! 💪",
-           "Telugu lo 'Hello World' kuda raayaleva bewakoof? Dengey! 🤦‍♂️",
-           "Mirzapur choosava lanjakoduku? Guddu laaga confident ga undu! 🔥"
+           "Nuvvu developer va leda just Toby laga useless? 😏",
+           "Coding raada ante cheppu ra pothikka, Sheldon laga explain chesta! 💪",
+           "Friends choosava eppudaina? Leda just Bollywood bokka? 😄",
+           "Mirzapur lanti dark shows ishtama? Taste undhi finally! 🔥"
          ] : [
-           "Do you actually code or just Google shit like everyone else? 😏",
-           "Are you building the next Facebook or just another shitty blog? 🤔",
-           "Tell me you're not as useless as Toby from The Office... 💀",
-           "Can you code or should I explain it like you're Brick from Anchorman? 🧱",
-           "Are you from the upside down? Your logic seems inverted! 🙃",
-           "Is this your first time on the internet or what? Fucking hell! 😂"
+           "So, are you a developer or just Toby from The Office? 😏",
+           "Building something cool or procrastinating like Jim with his pranks? 🤔",
+           "Tell me you're not having a Ross-level existential crisis, pothikka! 😅",
+           "Are you team coffee like Lorelai or tea like the British in Sherlock? ☕",
+           "Do you binge shows like you're preparing for a Netflix exam, gadida? 📺",
+           "Quick question: are you winning like Walter White or failing like Jesse? 😂"
          ];
          aiResponse += " " + questions[Math.floor(Math.random() * questions.length)];
        }
@@ -304,16 +304,16 @@ const FloatingChatbot = () => {
       console.error('API Error:', error);
       
              const fallbackResponses = userLanguage === 'telugu' ? [
-         "Server crash ayyindi! Jio connection kanna gajjibidi! 😤 Enti kavali ra?",
-         "AI brain hang ayyindi! Mirzapur lo Guddu laaga comeback istha! 💪",
-         "Fuck! Technical problem! Stranger Things lo demogorgon attack chesindi! 👹",
-         "Error ostundi but nenu inka The Office lo Michael Scott laaga confident! 🔥"
+         "Server crash ayyindi pothikka! Friends lo Ross laaga dramatic ga undhi! 😤",
+         "AI brain hang ayyindi! The Office lo Jim laaga comeback istha! 💪",
+         "Dengey! Technical problem! Stranger Things lo upside down attack chesindi! 👹",
+         "Error ostundi but nenu inka Sheldon laaga confident, bewakoof! 🔥"
        ] : [
-         "Fuck! Server died like Sean Bean in every fucking movie! What do you want? 💀",
-         "API crashed harder than the Red Wedding! Still here though! ⚔️",
-         "Error 404: Response not found, unlike your dad! Shit happens! 🤷‍♂️",
-         "Technical difficulties! Even Tony Stark's suit glitches, what's your excuse? 🤖",
-         "Server's more broken than Jesse Pinkman's life! Try again, bitch! 😂"
+         "Server died like Ned Stark! Quick and unexpected, gadida! What do you want? 💀",
+         "API crashed harder than Ross and Rachel's relationship! Still here though! ⚔️",
+         "Error 404: Response not found, unlike Barney's suits! Shit happens, pothikka! 🤷‍♂️",
+         "Technical difficulties! Even Tyrion's plans fail sometimes, bokka! 🤖",
+         "Server's more broken than Dexter's moral compass! Try again! 😂"
        ];
       
       return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
