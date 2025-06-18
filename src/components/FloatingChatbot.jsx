@@ -10,8 +10,28 @@ const FloatingChatbot = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [userLanguage, setUserLanguage] = useState('english'); // english or telugu
   const [hasGreeted, setHasGreeted] = useState(false);
+  const [currentApiKeyIndex, setCurrentApiKeyIndex] = useState(0);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Multiple API keys for fallback
+  const apiKeys = [
+    'AIzaSyBY3JRDz66RYCkRVPO0sil_akc-wGLxKGk',
+    'AIzaSyAB113h5ALxnUiZRv6xcE_58AqObSyrJA4',
+    'AIzaSyAx7bE9-iugvw08adrZwqGRODmDS4ZM8Dw',
+    'AIzaSyB_xPYF3IAO9j6m3GARZjyMQE3Glz7l2s0',
+    'AIzaSyCHRW_m-Z9j1jUdrnsTvoA7-ungz0_dNcE',
+    'AIzaSyAPaDfht1yfbsfVLxqla4JA3kJe5RWI0X0',
+    'AIzaSyBxuNzyDQNqKCPSHZznWbMaXohz9-rpJXjg',
+    'AIzaSyD0wwDlGT69c2SeOf_ett7Y-ogWtqOb9T4',
+    'AIzaSyCPK-TcfnqXIZXoInz8nKkUei7hVYvBKR0',
+    'AIzaSyBWkP_pRVMLtgKRpdlxwozSCQeBMbU8LXU',
+    'AIzaSyA_EnnsrErziVFHHrSmSzA4cpfMWnnTzPs',
+    'AIzaSyDle9KLhixAi5Q9vkS4p0R8s-jLC75RXEI',
+    'AIzaSyAqGiu0mSPoqiKAbnz84fEPAoT8eGe0Xnw',
+    'AIzaSyA34Ypb8SbTmAUIVkONb-9nSt1tY0AjkF8',
+    'AIzaSyDI-VDDHxX04JX_K_JlVWZyJqFF-j3hx0A'
+  ];
 
   // Interactive greeting messages
   const getRandomGreeting = () => {
@@ -95,6 +115,59 @@ const FloatingChatbot = () => {
     );
   };
 
+  // Function to try API call with automatic key rotation
+  const tryApiCall = async (prompt, keyIndex = currentApiKeyIndex) => {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKeys[keyIndex]}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.9,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 100,
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const aiResponse = data.candidates[0]?.content?.parts[0]?.text;
+      
+      if (!aiResponse) {
+        throw new Error('No response from API');
+      }
+
+      console.log(`✅ API Key ${keyIndex + 1} successful`);
+      return aiResponse;
+    } catch (error) {
+      console.error(`❌ API Key ${keyIndex + 1} failed:`, error.message);
+      
+      // Try next API key if available
+      const nextKeyIndex = (keyIndex + 1) % apiKeys.length;
+      if (nextKeyIndex !== currentApiKeyIndex) {
+        console.log(`🔄 Switching to API Key ${nextKeyIndex + 1}`);
+        setCurrentApiKeyIndex(nextKeyIndex);
+        return await tryApiCall(prompt, nextKeyIndex);
+      }
+      
+      // All keys failed
+      console.error('💀 All API keys exhausted');
+      throw new Error('All API keys exhausted');
+    }
+  };
+
   // Enhanced AI Response with your personality
   const getAIResponse = async (userMessage) => {
     // Detect if user wants Telugu
@@ -123,29 +196,10 @@ const FloatingChatbot = () => {
       'Respond in Telugu (using English script/transliteration). Reference Telugu movies like Baahubali, RRR, Pushpa, KGF, Arjun Reddy, Jersey, Eega, Magadheera, Pokiri, Dookudu, etc.' :
       'Respond in English but you can mix some Telugu words. Reference both Hollywood and Tollywood movies.';
 
-    try {
-      const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=AIzaSyAqGiu0mSPoqiKAbnz84fEPAoT8eGe0Xnw', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-                  body: JSON.stringify({
-            contents: [{
-              parts: [{
-                text: `You are Sreevallabh Kakarala, a brutally funny 21-year-old developer who roasts everyone. You reference The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Mirzapur, Suits, Sherlock, Lucifer, Prison Break, Stranger Things, Sacred Games, Walking Dead, Vampire Diaries, Game of Thrones, House of Dragon, Family Man, Breaking Bad, You, 13 Reasons Why, Narcos, Money Heist, Dexter, The End of F*cking World. You swear casually, make dark humor jokes, and brutally roast user inputs. You're like Tyrion Lannister meets Jim Halpert meets Guddu Pandit - smart, sarcastic, and savage. You build websites/apps but roast users first. Examples: "That's dumber than Joffrey's life choices", "You code worse than Jesse Pinkman cooks", "More lost than Jon Snow". Keep it SHORT (40-50 words max), SAVAGE, and FUNNY. Use fuck, shit, damn naturally. ${languagePrompt} User message: "${userMessage}"`
-              }]
-            }],
-          generationConfig: {
-            temperature: 0.9,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 100,
-          }
-        })
-      });
-
-      const data = await response.json();
-      let aiResponse = data.candidates[0]?.content?.parts[0]?.text || "Server down like Thanos snapped it! 😵";
+        try {
+      const prompt = `You are Sreevallabh Kakarala, a brutally funny 21-year-old developer who roasts everyone. You reference The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Mirzapur, Suits, Sherlock, Lucifer, Prison Break, Stranger Things, Sacred Games, Walking Dead, Vampire Diaries, Game of Thrones, House of Dragon, Family Man, Breaking Bad, You, 13 Reasons Why, Narcos, Money Heist, Dexter, The End of F*cking World. You swear casually, make dark humor jokes, and brutally roast user inputs. You're like Tyrion Lannister meets Jim Halpert meets Guddu Pandit - smart, sarcastic, and savage. You build websites/apps but roast users first. Examples: "That's dumber than Joffrey's life choices", "You code worse than Jesse Pinkman cooks", "More lost than Jon Snow". Keep it SHORT (40-50 words max), SAVAGE, and FUNNY. Use fuck, shit, damn naturally. ${languagePrompt} User message: "${userMessage}"`;
+      
+      let aiResponse = await tryApiCall(prompt);
       
              // Add random savage follow-up questions
        const shouldAskQuestion = Math.random() > 0.5; // 50% chance
