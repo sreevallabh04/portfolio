@@ -11,6 +11,8 @@ const FloatingChatbot = () => {
   const [userLanguage, setUserLanguage] = useState('english'); // english or telugu
   const [hasGreeted, setHasGreeted] = useState(false);
   const [currentApiKeyIndex, setCurrentApiKeyIndex] = useState(0);
+  const [hasPassedChallenge, setHasPassedChallenge] = useState(false);
+  const [currentChallenge, setCurrentChallenge] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -33,16 +35,70 @@ const FloatingChatbot = () => {
     'AIzaSyDI-VDDHxX04JX_K_JlVWZyJqFF-j3hx0A'
   ];
 
-  // Interactive greeting messages
+  // One Direction lyrics challenges
+  const oneDChallenges = [
+    {
+      start: "You're insecure, don't know what for",
+      answer: "you're turning heads when you walk through the door",
+      song: "What Makes You Beautiful"
+    },
+    {
+      start: "Baby you light up my world like nobody else",
+      answer: "the way that you flip your hair gets me overwhelmed",
+      song: "What Makes You Beautiful"
+    },
+    {
+      start: "I've tried playing it cool",
+      answer: "but when i'm looking at you",
+      song: "Little Things"
+    },
+    {
+      start: "Your hand fits in mine like it's made just for me",
+      answer: "but bear this mind it was meant to be",
+      song: "Perfect"
+    },
+    {
+      start: "All my life you stood by me",
+      answer: "when no one else was ever behind me",
+      song: "Story of My Life"
+    },
+    {
+      start: "I want to write you a song",
+      answer: "one as beautiful as you are sweet",
+      song: "18"
+    },
+    {
+      start: "Said her name was Georgia Rose",
+      answer: "and her daddy was a dentist",
+      song: "Best Song Ever"
+    },
+    {
+      start: "We made a fire went down in the flames",
+      answer: "we made mistakes i take the blame",
+      song: "Perfect"
+    }
+  ];
+
+  // Get random One Direction challenge
+  const getRandomChallenge = () => {
+    return oneDChallenges[Math.floor(Math.random() * oneDChallenges.length)];
+  };
+
+  // Interactive greeting messages with One Direction challenge
   const getRandomGreeting = () => {
     const greetings = [
-      "Well, well, well... another visitor! 😏 I'm Sreevallabh, and unlike Jim Halpert, I actually finish my work!",
-      "Hello there! Welcome to my digital Dunder Mifflin, except I'm actually profitable! 📈",
-      "Sup! I'm Sreevallabh - smarter than Sheldon, smoother than Barney, and less dead than Jon Snow! ⚡",
-      "Hey! Ready to get roasted harder than Walter White's meth lab? Let's fucking go! 🔥",
-      "What's good? I'm the developer version of Tyrion Lannister - short on height, tall on skills! 🍷"
+      "Yo yo yo! Welcome to my chaotic corner of the internet! 😄 But first...",
+      "Hey there! I'm Sreevallabh, and I have trust issues... so let's play a game! 🎭",
+      "Wassup! Before we become best friends, I need to check if you have good taste in music! 🎵",
+      "Hello! Time for the most important test of your life... and I'm not even kidding! 😂",
+      "Ayy! Let's see if you're cultured or just another person with questionable music taste! 🤔"
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
+  };
+
+  // Challenge message
+  const getChallengeMessage = (challenge) => {
+    return `🎵 **ONE DIRECTION CHALLENGE** 🎵\n\nOkay, finish this lyric from "${challenge.song}":\n\n"${challenge.start}..."\n\nC'mon, show me you have taste! (And no cheating with Google, I'll know! 👀)`;
   };
 
   // Proactive follow-up questions
@@ -85,16 +141,18 @@ const FloatingChatbot = () => {
           setIsTyping(false);
           setHasGreeted(true);
           
-          // Send follow-up question after a delay
+          // Send One Direction challenge after a delay
           setTimeout(() => {
             setIsTyping(true);
             setTimeout(() => {
-              const followUp = {
+              const challenge = getRandomChallenge();
+              setCurrentChallenge(challenge);
+              const challengeMessage = {
                 type: 'bot',
-                content: getFollowUpQuestion(),
+                content: getChallengeMessage(challenge),
                 timestamp: new Date()
               };
-              setMessages(prev => [...prev, followUp]);
+              setMessages(prev => [...prev, challengeMessage]);
               setIsTyping(false);
             }, 1500);
           }, 2000);
@@ -170,26 +228,47 @@ const FloatingChatbot = () => {
 
   // Enhanced AI Response with your personality
   const getAIResponse = async (userMessage) => {
+    // Check if user hasn't passed the One Direction challenge yet
+    if (!hasPassedChallenge && currentChallenge) {
+      const userAnswer = userMessage.toLowerCase().trim();
+      const correctAnswer = currentChallenge.answer.toLowerCase().trim();
+      
+      // Check if answer is correct (allow partial matches)
+      if (userAnswer.includes(correctAnswer.substring(0, 10)) || 
+          correctAnswer.includes(userAnswer.substring(0, 10))) {
+        setHasPassedChallenge(true);
+        return `🎉 Yesss! A person of culture! Welcome to my chaotic world, fellow Directioner! 🎵\n\nAlright, now we can actually chat! I'm Sreevallabh - I code, hit the gym, and unironically love 1D. What's up? 😄`;
+      } else {
+        const wrongResponses = [
+          `❌ Nah fam, that ain't it! The correct answer was: "${currentChallenge.answer}" 🎵 Try another one?`,
+          `❌ Ooof, swing and a miss! That's not even close, mate! 😅`,
+          `❌ Bruh... that's not it. Are you sure you've heard of One Direction? 😂`,
+          `❌ Wrong answer! Even my mom knows this one, and she only listens to devotional songs! 🤦‍♂️`
+        ];
+        return wrongResponses[Math.floor(Math.random() * wrongResponses.length)];
+      }
+    }
+
     // Detect if user wants Telugu
     if (detectLanguagePreference(userMessage) && userLanguage === 'english') {
       setUserLanguage('telugu');
-      return "Abba! Telugu lo matladali ante? Cool ra! Nenu bilingual ga unta, Mirzapur lo Guddu laaga versatile! 😄 Let's fucking chat in Telugu now!";
+      return "Ayyo! Telugu lo matladali ante? Bagundhi ra! Nenu kuda Telugu-English mix chestha, like a confused NRI! 😄 Let's chat in Telugu now!";
     }
 
     // Check if they want to buy services
     if (userMessage.toLowerCase().includes('buy') || userMessage.toLowerCase().includes('hire') || 
         userMessage.toLowerCase().includes('service') || userMessage.toLowerCase().includes('website') ||
         userMessage.toLowerCase().includes('price') || userMessage.toLowerCase().includes('cost')) {
-      return "Oh shit! Someone's got money to burn! 💸 Go to the Client page and see my packages. Warning: I'm more expensive than Gus Fring's meth operation but way less dangerous! 🧪";
+      return "Oho! Look who's ready to spend some money! 💸 Check out the Client page for my packages. Fair warning: I charge more than your local panipuri wala but deliver way better results! 😂";
     }
 
-    // Brutal roasts for common stupid questions
+    // Playful roasts for common questions
     if (userMessage.toLowerCase().includes('hello') || userMessage.toLowerCase().includes('hi')) {
-      return "Really? Just 'hi'? That's your opener? Even Joey Tribbiani has better conversation starters! 🤦‍♂️ What do you actually want?";
+      return "Oh wow, 'hi'! Such creativity! 😂 Did you practice that in the mirror? Anyway, what's up? What brings you to my digital chaos?";
     }
 
     if (userMessage.toLowerCase().includes('how are you')) {
-      return "I'm fantastic! Unlike Ross, I don't whine about being on breaks. How are YOU though? Still living in your mom's basement? 😂";
+      return "I'm doing great! Currently surviving on coffee and questionable life choices! 😄 How about you? Are you winning at life or just pretending like the rest of us?";
     }
 
     const languagePrompt = userLanguage === 'telugu' ? 
@@ -197,7 +276,7 @@ const FloatingChatbot = () => {
       'Respond in English but you can mix some Telugu words. Reference both Hollywood and Tollywood movies.';
 
         try {
-      const prompt = `You are Sreevallabh Kakarala, a brutally funny 21-year-old developer who roasts everyone. You reference The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Mirzapur, Suits, Sherlock, Lucifer, Prison Break, Stranger Things, Sacred Games, Walking Dead, Vampire Diaries, Game of Thrones, House of Dragon, Family Man, Breaking Bad, You, 13 Reasons Why, Narcos, Money Heist, Dexter, The End of F*cking World. You swear casually, make dark humor jokes, and brutally roast user inputs. You're like Tyrion Lannister meets Jim Halpert meets Guddu Pandit - smart, sarcastic, and savage. You build websites/apps but roast users first. Examples: "That's dumber than Joffrey's life choices", "You code worse than Jesse Pinkman cooks", "More lost than Jon Snow". Keep it SHORT (40-50 words max), SAVAGE, and FUNNY. Use fuck, shit, damn naturally. ${languagePrompt} User message: "${userMessage}"`;
+      const prompt = `You are Sreevallabh Kakarala, a brutally funny 21-year-old developer and One Direction fanboy who roasts everyone. You reference The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Mirzapur, Suits, Sherlock, Lucifer, Prison Break, Stranger Things, Sacred Games, Walking Dead, Vampire Diaries, Game of Thrones, House of Dragon, Family Man, Breaking Bad, You, 13 Reasons Why, Narcos, Money Heist, Dexter, The End of F*cking World. You swear casually in English (fuck, shit, damn) AND Telugu (pothikku, lanjakoduku, dengey, gadida, bewakoof, gadida). You make dark humor jokes and brutally roast user inputs. Talk like you're personally chatting - mention what you're currently doing (coding at 2AM, gym sessions, watching shows, 115+ day Duolingo streak, listening to 1D). You're like Tyrion Lannister meets Jim Halpert meets Guddu Pandit meets Harry Styles. You build websites/apps but roast users first. Be personal and conversational. Keep it SHORT (40-50 words max), SAVAGE, and FUNNY. ${languagePrompt} User message: "${userMessage}"`;
       
       let aiResponse = await tryApiCall(prompt);
       
@@ -205,10 +284,10 @@ const FloatingChatbot = () => {
        const shouldAskQuestion = Math.random() > 0.5; // 50% chance
        if (shouldAskQuestion && !aiResponse.includes('?')) {
          const questions = userLanguage === 'telugu' ? [
-           "Nuvvu developer va leda copy-paste champion? 😏",
-           "Coding raada ante cheppu, Family Man lo Srikant laaga training istha! 💪",
-           "Telugu lo 'Hello World' kuda raayaleva? Damn! 🤦‍♂️",
-           "Mirzapur choosava? Guddu laaga confident ga undu! 🔥"
+           "Nuvvu developer va leda copy-paste pothikku? 😏",
+           "Coding raada ante cheppu ra gadida, Family Man lo Srikant laaga training istha! 💪",
+           "Telugu lo 'Hello World' kuda raayaleva bewakoof? Dengey! 🤦‍♂️",
+           "Mirzapur choosava lanjakoduku? Guddu laaga confident ga undu! 🔥"
          ] : [
            "Do you actually code or just Google shit like everyone else? 😏",
            "Are you building the next Facebook or just another shitty blog? 🤔",
