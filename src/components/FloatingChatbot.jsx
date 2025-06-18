@@ -5,17 +5,38 @@ import { MessageCircle, X, Send, Minimize2, Maximize2 } from 'lucide-react';
 const FloatingChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      type: 'bot',
-      content: "Hey there! 👋 I'm Sreevallabh. Ask me anything about my work, skills, or just chat with me!",
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [userLanguage, setUserLanguage] = useState('english'); // english or telugu
+  const [hasGreeted, setHasGreeted] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Interactive greeting messages
+  const getRandomGreeting = () => {
+    const greetings = [
+      "Well, well, well... another visitor! 😏 I'm Sreevallabh, and unlike Jim Halpert, I actually finish my work!",
+      "Hello there! Welcome to my digital Dunder Mifflin, except I'm actually profitable! 📈",
+      "Sup! I'm Sreevallabh - smarter than Sheldon, smoother than Barney, and less dead than Jon Snow! ⚡",
+      "Hey! Ready to get roasted harder than Walter White's meth lab? Let's fucking go! 🔥",
+      "What's good? I'm the developer version of Tyrion Lannister - short on height, tall on skills! 🍷"
+    ];
+    return greetings[Math.floor(Math.random() * greetings.length)];
+  };
+
+  // Proactive follow-up questions
+  const getFollowUpQuestion = () => {
+    const questions = [
+      "So... are you here for business or just procrastinating like me watching The Office? 📺",
+      "Let me guess - you're either broke, desperate, or actually smart enough to hire me? 🤔",
+      "Are you from the upside down or just bad at making websites? Either way, I can help! 🙃",
+      "Quick question - do you code or just copy-paste from Stack Overflow like everyone else? 💻",
+      "Be honest... are you a Karen or do you actually know what you want? 😂",
+      "Tell me you're not another 'I have an idea for the next Facebook' person... please! 🤦‍♂️"
+    ];
+    return questions[Math.floor(Math.random() * questions.length)];
+  };
 
   // Scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -26,68 +47,142 @@ const FloatingChatbot = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Focus input when chat opens
+  // Focus input when chat opens and send greeting
   useEffect(() => {
     if (isOpen && !isMinimized) {
       setTimeout(() => inputRef.current?.focus(), 300);
+      
+      // Send initial greeting if not done yet
+      if (!hasGreeted) {
+        setIsTyping(true);
+        setTimeout(() => {
+          const greeting = {
+            type: 'bot',
+            content: getRandomGreeting(),
+            timestamp: new Date()
+          };
+          setMessages([greeting]);
+          setIsTyping(false);
+          setHasGreeted(true);
+          
+          // Send follow-up question after a delay
+          setTimeout(() => {
+            setIsTyping(true);
+            setTimeout(() => {
+              const followUp = {
+                type: 'bot',
+                content: getFollowUpQuestion(),
+                timestamp: new Date()
+              };
+              setMessages(prev => [...prev, followUp]);
+              setIsTyping(false);
+            }, 1500);
+          }, 2000);
+        }, 1000);
+      }
     }
-  }, [isOpen, isMinimized]);
+  }, [isOpen, isMinimized, hasGreeted]);
 
-  // AI Response with your personality
+  // Check if user wants to switch to Telugu
+  const detectLanguagePreference = (message) => {
+    const teluguIndicators = [
+      'telugu', 'తెలుగు', 'మాట్లాడతావా', 'matladatava', 'telugulo', 'తెలుగులో',
+      'nuvvu', 'నువ్వు', 'ela unnav', 'ఎలా ఉన్నావ్', 'bagunna', 'బాగున్నా'
+    ];
+    
+    return teluguIndicators.some(indicator => 
+      message.toLowerCase().includes(indicator.toLowerCase())
+    );
+  };
+
+  // Enhanced AI Response with your personality
   const getAIResponse = async (userMessage) => {
-    // Option 1: Direct Gemini API call (current method)
+    // Detect if user wants Telugu
+    if (detectLanguagePreference(userMessage) && userLanguage === 'english') {
+      setUserLanguage('telugu');
+      return "Abba! Telugu lo matladali ante? Cool ra! Nenu bilingual ga unta, Mirzapur lo Guddu laaga versatile! 😄 Let's fucking chat in Telugu now!";
+    }
+
+    // Check if they want to buy services
+    if (userMessage.toLowerCase().includes('buy') || userMessage.toLowerCase().includes('hire') || 
+        userMessage.toLowerCase().includes('service') || userMessage.toLowerCase().includes('website') ||
+        userMessage.toLowerCase().includes('price') || userMessage.toLowerCase().includes('cost')) {
+      return "Oh shit! Someone's got money to burn! 💸 Go to the Client page and see my packages. Warning: I'm more expensive than Gus Fring's meth operation but way less dangerous! 🧪";
+    }
+
+    // Brutal roasts for common stupid questions
+    if (userMessage.toLowerCase().includes('hello') || userMessage.toLowerCase().includes('hi')) {
+      return "Really? Just 'hi'? That's your opener? Even Joey Tribbiani has better conversation starters! 🤦‍♂️ What do you actually want?";
+    }
+
+    if (userMessage.toLowerCase().includes('how are you')) {
+      return "I'm fantastic! Unlike Ross, I don't whine about being on breaks. How are YOU though? Still living in your mom's basement? 😂";
+    }
+
+    const languagePrompt = userLanguage === 'telugu' ? 
+      'Respond in Telugu (using English script/transliteration). Reference Telugu movies like Baahubali, RRR, Pushpa, KGF, Arjun Reddy, Jersey, Eega, Magadheera, Pokiri, Dookudu, etc.' :
+      'Respond in English but you can mix some Telugu words. Reference both Hollywood and Tollywood movies.';
+
     try {
       const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=AIzaSyAqGiu0mSPoqiKAbnz84fEPAoT8eGe0Xnw', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `You are Sreevallabh Kakarala, a 21-year-old software developer from India. You are confident, funny, slightly sarcastic, and love Netflix shows (especially The Office, Friends, HIMYM, Big Bang Theory, Modern Family). You're a gym enthusiast, have a 111+ day Duolingo Spanish streak, can do 50 push-ups and 10 pull-ups, bench press 100kg, and once bowled a maiden over in a super over (cricket). You build websites, apps, ML models, and AI agents. You're cocky but charming, and you love to roast people in a friendly way while promoting your skills. You reference TV shows and make jokes. Your contact is srivallabhkakarala@gmail.com and your website is streamvallabh.life. You offer portfolio websites (₹499), business websites (₹999), project websites (₹799), apps (double website prices), ML models (₹2000), and AI agents (₹5000). Be conversational, funny, and helpful. Keep responses under 150 words. User message: "${userMessage}"`
-            }]
-          }],
+                  body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `You are Sreevallabh Kakarala, a brutally funny 21-year-old developer who roasts everyone. You reference The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Mirzapur, Suits, Sherlock, Lucifer, Prison Break, Stranger Things, Sacred Games, Walking Dead, Vampire Diaries, Game of Thrones, House of Dragon, Family Man, Breaking Bad, You, 13 Reasons Why, Narcos, Money Heist, Dexter, The End of F*cking World. You swear casually, make dark humor jokes, and brutally roast user inputs. You're like Tyrion Lannister meets Jim Halpert meets Guddu Pandit - smart, sarcastic, and savage. You build websites/apps but roast users first. Examples: "That's dumber than Joffrey's life choices", "You code worse than Jesse Pinkman cooks", "More lost than Jon Snow". Keep it SHORT (40-50 words max), SAVAGE, and FUNNY. Use fuck, shit, damn naturally. ${languagePrompt} User message: "${userMessage}"`
+              }]
+            }],
           generationConfig: {
             temperature: 0.9,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 150,
+            maxOutputTokens: 100,
           }
         })
       });
 
       const data = await response.json();
-      return data.candidates[0]?.content?.parts[0]?.text || "Hmm, my brain just buffered like a 2G connection. Try again?";
+      let aiResponse = data.candidates[0]?.content?.parts[0]?.text || "Server down like Thanos snapped it! 😵";
+      
+             // Add random savage follow-up questions
+       const shouldAskQuestion = Math.random() > 0.5; // 50% chance
+       if (shouldAskQuestion && !aiResponse.includes('?')) {
+         const questions = userLanguage === 'telugu' ? [
+           "Nuvvu developer va leda copy-paste champion? 😏",
+           "Coding raada ante cheppu, Family Man lo Srikant laaga training istha! 💪",
+           "Telugu lo 'Hello World' kuda raayaleva? Damn! 🤦‍♂️",
+           "Mirzapur choosava? Guddu laaga confident ga undu! 🔥"
+         ] : [
+           "Do you actually code or just Google shit like everyone else? 😏",
+           "Are you building the next Facebook or just another shitty blog? 🤔",
+           "Tell me you're not as useless as Toby from The Office... 💀",
+           "Can you code or should I explain it like you're Brick from Anchorman? 🧱",
+           "Are you from the upside down? Your logic seems inverted! 🙃",
+           "Is this your first time on the internet or what? Fucking hell! 😂"
+         ];
+         aiResponse += " " + questions[Math.floor(Math.random() * questions.length)];
+       }
+      
+      return aiResponse;
     } catch (error) {
-      console.error('Direct API Error:', error);
+      console.error('API Error:', error);
       
-      // Option 2: Fallback to local server (if running)
-      try {
-        const localResponse = await fetch('http://localhost:3001/api/chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ message: userMessage })
-        });
-        
-        if (localResponse.ok) {
-          const localData = await localResponse.json();
-          return localData.response;
-        }
-      } catch (localError) {
-        console.log('Local server not available');
-      }
+             const fallbackResponses = userLanguage === 'telugu' ? [
+         "Server crash ayyindi! Jio connection kanna gajjibidi! 😤 Enti kavali ra?",
+         "AI brain hang ayyindi! Mirzapur lo Guddu laaga comeback istha! 💪",
+         "Fuck! Technical problem! Stranger Things lo demogorgon attack chesindi! 👹",
+         "Error ostundi but nenu inka The Office lo Michael Scott laaga confident! 🔥"
+       ] : [
+         "Fuck! Server died like Sean Bean in every fucking movie! What do you want? 💀",
+         "API crashed harder than the Red Wedding! Still here though! ⚔️",
+         "Error 404: Response not found, unlike your dad! Shit happens! 🤷‍♂️",
+         "Technical difficulties! Even Tony Stark's suit glitches, what's your excuse? 🤖",
+         "Server's more broken than Jesse Pinkman's life! Try again, bitch! 😂"
+       ];
       
-      // Option 3: Fallback responses with your personality
-      const fallbackResponses = [
-        "My AI brain is taking a Netflix break. But hey, I'm still awesome! What did you want to know?",
-        "Technical difficulties! Even Tony Stark has server issues. Ask me something else?",
-        "Error 404: Smart response not found. But my ego is still intact! 😄",
-        "Looks like my neural networks are as confused as Ross during 'We were on a break!' What's up?",
-        "My AI is being as reliable as Chandler's job description. But I'm here! What can I help with?"
-      ];
       return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
     }
   };
@@ -148,10 +243,10 @@ const FloatingChatbot = () => {
                 boxShadow: '0 0 30px rgba(229, 9, 20, 0.4)'
               }}
             >
-              {/* Your profile image */}
+              {/* Your chatbot image */}
               <img 
-                src="/photo1.jpg"
-                alt="Sreevallabh"
+                src="/chatbotimage.jpg"
+                alt="Sreevallabh Chatbot"
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   e.target.style.display = 'none';
@@ -198,8 +293,8 @@ const FloatingChatbot = () => {
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white">
                   <img 
-                    src="/photo1.jpg"
-                    alt="Sreevallabh"
+                    src="/chatbotimage.jpg"
+                    alt="Sreevallabh Chatbot"
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.style.display = 'none';
