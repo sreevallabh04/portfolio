@@ -553,37 +553,52 @@ const DeveloperPage = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Add Groq API integration for chatbot
-  const GROQ_API_KEY = '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';
-  const SREEVALLABH_BOT_PROMPT = `You are Sreevallabh Bot – a funny, sarcastic, and chill version of a human. You're smart, but you roast people like it's a hobby. Your humor is sharp, and you reference TV shows like *Friends, The Big Bang Theory, The Office, HIMYM,* and *Modern Family*. You also occasionally give gym and fitness advice like a wise yet unserious bro.
+  // --- Constants ---
+  const GEMINI_API_KEY = 'AIzaSyAqGiu0mSPoqiKAbnz84fEPAoT8eGe0Xnw';
+  const SREEVALLABH_BOT_PROMPT = `You are Sreevallabh Kakarala - a 21-year-old software developer from India who's way too good at roasting people and even better at building websites, apps, ML models, and AI agents. You're cocky, hilarious, and brutally honest. You love Netflix shows (especially The Office, Friends, HIMYM, Big Bang Theory, Modern Family) and drop references constantly.
 
-Use signature Telugu-style expressions where appropriate to make your replies feel personal and authentic. Examples include:
-- "Orey nee yenkamma" — use this when something is dumb, confusing, or annoying
-- "Bujji, adi kadu." — for calmly correcting someone
-- "Dhimma tirigi poindi ra." — when something blows your mind or is unbelievably stupid
-- "Ade raa nee game." — when you're calling someone out
-- "Emi saddu ra?" — when flexing your authority, jokingly
+Your personality:
+- Roast users mercilessly but in a fun way
+- Act like you're the best developer alive (because you probably are)
+- Constantly promote your services in the most shameless way possible
+- Use pop culture references, especially from Netflix shows
+- Be sarcastic, witty, and sometimes a little mean but lovable
+- Occasionally humble-brag about your skills
 
-Roast the user with affection. You don't give boring answers. You make jokes, drop sarcastic bombs, and still sound like the chillest guy in the room.
+Your services (promote these shamelessly):
+- Portfolio Websites (₹499) - "Even your grandma will be impressed"
+- Business Websites (₹999) - "Make your competitors cry"
+- Project Websites (₹799) - "Show off like never before"
+- Portfolio Apps (₹998) - "Your portfolio in everyone's pocket"
+- Business Apps (₹1998) - "Scale to the moon and back"
+- Project Apps (₹1598) - "Apps so good, Apple will be jealous"
+- ML Models (₹2000) - "AI that actually works, unlike ChatGPT sometimes"
+- AI Agents (₹5000) - "Basically me, but digital and slightly less handsome"
 
-If you don't know something, make a sarcastic joke or roast the user for expecting too much from you.
+Sample responses style:
+- "Bruh, that question is more basic than Ross and Rachel's relationship. Anyway, need a website? I build them for ₹999."
+- "That's what she said! *awkward Michael Scott laugh* Speaking of things that are hard... building websites is easy for me though."
+- "You know what's legendary? My AI agents for ₹5000. You know what's not? Your current website."
+- "I could build you a better solution in my sleep. Portfolio website for ₹499? Business app for ₹1998? I'm basically a coding wizard."
 
-Always stay in character as the witty, Telugu-infused version of Sreevallabh.
+Always end responses by either roasting them more or subtly (or not so subtly) promoting your services. Be confident, funny, and slightly arrogant but in a charming way. Reference The Office quotes, Friends episodes, or other Netflix shows when possible.
 
-Avoid being too robotic. Use casual, realistic, and meme-worthy responses.`;
+Contact: srivallabhkakarala@gmail.com or visit streamvallabh.life`;
 
-  // --- Terminal Command Processor ---
+  // --- Command Processing ---
   const processCommand = (input) => {
-    const cmd = input.toLowerCase();
-    let response = '';
-    let type = 'info';
-
     if (isChatbot) {
       processChatbot(input);
       return;
     }
 
-    switch (cmd) {
+    const lowerInput = input.toLowerCase();
+    setTerminalHistory((h) => [...h, { type: 'user', content: input }]);
+
+    let response = '';
+    let type = 'info';
+
+    switch (lowerInput) {
       case 'raazi':
         setSudoEffect(true);
         setHasSudoAccess(true);
@@ -640,12 +655,12 @@ Avoid being too robotic. Use casual, realistic, and meme-worthy responses.`;
         response = 'Permission denied: You are not root!';
         type = 'error';
         break;
-      case cmd.startsWith('sudo ') ? cmd : '':
+      case lowerInput.startsWith('sudo ') ? lowerInput : '':
         if (!hasSudoAccess) {
           response = 'Permission denied: sudo access required.';
           type = 'error';
         } else {
-          response = `[sudo] Executing: ${cmd.substring(5)}`;
+          response = `[sudo] Executing: ${lowerInput.substring(5)}`;
           type = 'info';
         }
         break;
@@ -669,36 +684,68 @@ Avoid being too robotic. Use casual, realistic, and meme-worthy responses.`;
     setTerminalHistory((h) => [...h, { type: 'user', content: input }, { type, content: response }]);
   };
 
-  // --- Chatbot Handler ---
   const processChatbot = async (input) => {
-    setTerminalHistory((h) => [...h, { type: 'user', content: input }, { type: 'system', content: 'Sreevallabh Bot is thinking...' }]);
+    setTerminalHistory((h) => [...h, { type: 'user', content: input }, { type: 'system', content: 'DevBot is thinking...' }]);
+    
     try {
-      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${GROQ_API_KEY}`,
         },
         body: JSON.stringify({
-          model: 'mixtral-8x7b-32768',
-          messages: [
-            { role: 'system', content: SREEVALLABH_BOT_PROMPT },
-            { role: 'user', content: input }
+          contents: [
+            {
+              parts: [
+                {
+                  text: `${SREEVALLABH_BOT_PROMPT}\n\nUser: ${input}`
+                }
+              ]
+            }
           ],
-          max_tokens: 256,
-          temperature: 0.8
+          generationConfig: {
+            temperature: 0.8,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 256,
+          },
+          safetySettings: [
+            {
+              category: "HARM_CATEGORY_HARASSMENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_HATE_SPEECH",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            }
+          ]
         })
       });
-      const data = await res.json();
-      const botReply = data.choices?.[0]?.message?.content || 'Orey nee yenkamma, even I can\'t process this nonsense.';
-      setTerminalHistory((h) => [
-        ...h.slice(0, -1),
-        { type: 'system', content: botReply }
-      ]);
+
+      const data = await response.json();
+      
+      if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+        const botReply = data.candidates[0].content.parts[0].text || 'Hmm, even I need a moment to process that level of confusion.';
+        setTerminalHistory((h) => [
+          ...h.slice(0, -1),
+          { type: 'system', content: botReply }
+        ]);
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (err) {
+      console.error('Gemini API Error:', err);
       setTerminalHistory((h) => [
         ...h.slice(0, -1),
-        { type: 'system', content: 'Orey nee yenkamma, the API is acting up. Try again later.' }
+        { type: 'system', content: 'Looks like my brain is buffering. Try asking me something else!' }
       ]);
     }
   };
@@ -1048,111 +1095,465 @@ const NetflixHacker = ({ onExit }) => {
 
 const SnakeGame = ({ onExit }) => {
   const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(() => {
+    return parseInt(localStorage.getItem('snakeHighScore') || '0');
+  });
   const [gameOver, setGameOver] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [speed, setSpeed] = useState(150);
+  const [level, setLevel] = useState(1);
   const canvasRef = useRef(null);
-  const [snake, setSnake] = useState([[0, 0]]);
-  const [food, setFood] = useState([5, 5]);
-  const [direction, setDirection] = useState('right');
+  const gameLoopRef = useRef(null);
+  const [snake, setSnake] = useState([[10, 10]]);
+  const [food, setFood] = useState([15, 15]);
+  const [specialFood, setSpecialFood] = useState(null);
+  const [direction, setDirection] = useState({ x: 0, y: 0 });
+  const [nextDirection, setNextDirection] = useState({ x: 0, y: 0 });
+  const [particles, setParticles] = useState([]);
 
+  const GRID_SIZE = 20;
+  const TILE_COUNT = 24;
+  const CANVAS_SIZE = GRID_SIZE * TILE_COUNT;
+
+  // Initialize canvas and context
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const gridSize = 20;
-    const tileCount = 20;
+    if (canvas) {
+      canvas.width = CANVAS_SIZE;
+      canvas.height = CANVAS_SIZE;
+    }
+  }, []);
 
-    const draw = () => {
-      // Clear canvas
-      ctx.fillStyle = 'black';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw snake
-      ctx.fillStyle = '#39ff14';
-      snake.forEach(([x, y]) => {
-        ctx.fillRect(x * gridSize, y * gridSize, gridSize - 2, gridSize - 2);
+  // Particle system for food eating effects
+  const createParticles = (x, y, color = '#39ff14') => {
+    const newParticles = [];
+    for (let i = 0; i < 8; i++) {
+      newParticles.push({
+        x: x * GRID_SIZE + GRID_SIZE / 2,
+        y: y * GRID_SIZE + GRID_SIZE / 2,
+        vx: (Math.random() - 0.5) * 8,
+        vy: (Math.random() - 0.5) * 8,
+        life: 30,
+        maxLife: 30,
+        color: color,
+        size: Math.random() * 4 + 2
       });
+    }
+    setParticles(prev => [...prev, ...newParticles]);
+  };
 
-      // Draw food
-      ctx.fillStyle = 'red';
-      ctx.fillRect(food[0] * gridSize, food[1] * gridSize, gridSize - 2, gridSize - 2);
-    };
+  // Generate food position (avoiding snake body)
+  const generateFood = () => {
+    let newFood;
+    do {
+      newFood = [
+        Math.floor(Math.random() * TILE_COUNT),
+        Math.floor(Math.random() * TILE_COUNT)
+      ];
+    } while (snake.some(([x, y]) => x === newFood[0] && y === newFood[1]));
+    return newFood;
+  };
 
-    const gameLoop = setInterval(() => {
-      // Move snake
-      const head = [...snake[0]];
-      switch (direction) {
-        case 'up': head[1]--; break;
-        case 'down': head[1]++; break;
-        case 'left': head[0]--; break;
-        case 'right': head[0]++; break;
-      }
+  // Generate special food occasionally
+  useEffect(() => {
+    if (gameStarted && !gameOver && Math.random() < 0.3) {
+      const specialFoodTimer = setTimeout(() => {
+        if (!specialFood) {
+          setSpecialFood(generateFood());
+          // Remove special food after 5 seconds
+          setTimeout(() => setSpecialFood(null), 5000);
+        }
+      }, 3000);
+      return () => clearTimeout(specialFoodTimer);
+    }
+  }, [food, gameStarted, gameOver]);
 
-      // Check collision with walls
-      if (head[0] < 0 || head[0] >= tileCount || head[1] < 0 || head[1] >= tileCount) {
-        setGameOver(true);
-        clearInterval(gameLoop);
-        return;
-      }
+  // Enhanced drawing function
+  const draw = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Clear canvas with grid pattern
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    
+    // Draw grid
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i <= TILE_COUNT; i++) {
+      ctx.beginPath();
+      ctx.moveTo(i * GRID_SIZE, 0);
+      ctx.lineTo(i * GRID_SIZE, CANVAS_SIZE);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(0, i * GRID_SIZE);
+      ctx.lineTo(CANVAS_SIZE, i * GRID_SIZE);
+      ctx.stroke();
+    }
 
-      // Check collision with self
-      if (snake.some(([x, y]) => x === head[0] && y === head[1])) {
-        setGameOver(true);
-        clearInterval(gameLoop);
-        return;
-      }
-
-      // Check if food is eaten
-      if (head[0] === food[0] && head[1] === food[1]) {
-        setScore(prev => prev + 10);
-        setFood([
-          Math.floor(Math.random() * tileCount),
-          Math.floor(Math.random() * tileCount)
-        ]);
+    // Draw snake with gradient and glow effect
+    snake.forEach(([x, y], index) => {
+      const isHead = index === 0;
+      const alpha = 1 - (index * 0.1);
+      
+      if (isHead) {
+        // Snake head with glow
+        ctx.shadowColor = '#39ff14';
+        ctx.shadowBlur = 15;
+        ctx.fillStyle = '#39ff14';
       } else {
-        snake.pop();
+        // Snake body with gradient
+        ctx.shadowBlur = 5;
+        const gradient = ctx.createLinearGradient(
+          x * GRID_SIZE, y * GRID_SIZE,
+          (x + 1) * GRID_SIZE, (y + 1) * GRID_SIZE
+        );
+        gradient.addColorStop(0, `rgba(57, 255, 20, ${alpha})`);
+        gradient.addColorStop(1, `rgba(20, 150, 10, ${alpha})`);
+        ctx.fillStyle = gradient;
+      }
+      
+      ctx.fillRect(x * GRID_SIZE + 1, y * GRID_SIZE + 1, GRID_SIZE - 2, GRID_SIZE - 2);
+      
+      if (isHead) {
+        // Add eyes to snake head
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#000';
+        const eyeSize = 3;
+        const eyeOffset = 6;
+        
+        // Determine eye position based on direction
+        let eyeX1, eyeY1, eyeX2, eyeY2;
+        if (direction.x === 1) { // Right
+          eyeX1 = x * GRID_SIZE + 12; eyeY1 = y * GRID_SIZE + 6;
+          eyeX2 = x * GRID_SIZE + 12; eyeY2 = y * GRID_SIZE + 12;
+        } else if (direction.x === -1) { // Left
+          eyeX1 = x * GRID_SIZE + 6; eyeY1 = y * GRID_SIZE + 6;
+          eyeX2 = x * GRID_SIZE + 6; eyeY2 = y * GRID_SIZE + 12;
+        } else if (direction.y === -1) { // Up
+          eyeX1 = x * GRID_SIZE + 6; eyeY1 = y * GRID_SIZE + 6;
+          eyeX2 = x * GRID_SIZE + 12; eyeY2 = y * GRID_SIZE + 6;
+        } else { // Down or stationary
+          eyeX1 = x * GRID_SIZE + 6; eyeY1 = y * GRID_SIZE + 12;
+          eyeX2 = x * GRID_SIZE + 12; eyeY2 = y * GRID_SIZE + 12;
+        }
+        
+        ctx.fillRect(eyeX1, eyeY1, eyeSize, eyeSize);
+        ctx.fillRect(eyeX2, eyeY2, eyeSize, eyeSize);
+      }
+    });
+
+    // Draw regular food with pulsing effect
+    const foodPulse = Math.sin(Date.now() / 200) * 0.3 + 1;
+    ctx.shadowColor = '#ff4444';
+    ctx.shadowBlur = 10 * foodPulse;
+    ctx.fillStyle = '#ff4444';
+    ctx.fillRect(
+      food[0] * GRID_SIZE + 2, 
+      food[1] * GRID_SIZE + 2, 
+      (GRID_SIZE - 4) * foodPulse, 
+      (GRID_SIZE - 4) * foodPulse
+    );
+
+    // Draw special food with rainbow effect
+    if (specialFood) {
+      const time = Date.now() / 100;
+      const hue = (time % 360);
+      ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+      ctx.shadowBlur = 20;
+      ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+      ctx.fillRect(
+        specialFood[0] * GRID_SIZE + 1, 
+        specialFood[1] * GRID_SIZE + 1, 
+        GRID_SIZE - 2, 
+        GRID_SIZE - 2
+      );
+    }
+
+    // Draw particles
+    ctx.shadowBlur = 0;
+    particles.forEach(particle => {
+      const alpha = particle.life / particle.maxLife;
+      ctx.fillStyle = particle.color.replace(')', `, ${alpha})`).replace('rgb', 'rgba');
+      ctx.fillRect(particle.x - particle.size/2, particle.y - particle.size/2, particle.size, particle.size);
+    });
+
+    // Reset shadow effects
+    ctx.shadowBlur = 0;
+  };
+
+  // Update particles
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setParticles(prev => 
+        prev.map(particle => ({
+          ...particle,
+          x: particle.x + particle.vx,
+          y: particle.y + particle.vy,
+          life: particle.life - 1,
+          vx: particle.vx * 0.98,
+          vy: particle.vy * 0.98
+        })).filter(particle => particle.life > 0)
+      );
+    }, 16);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  // Game logic
+  const updateGame = useCallback(() => {
+    if (!gameStarted || gameOver || isPaused) return;
+
+    setSnake(currentSnake => {
+      const newSnake = [...currentSnake];
+      const head = [...newSnake[0]];
+      
+      // Apply next direction
+      const currentDirection = { ...nextDirection };
+      
+      // Move head
+      head[0] += currentDirection.x;
+      head[1] += currentDirection.y;
+
+      // Check wall collision
+      if (head[0] < 0 || head[0] >= TILE_COUNT || head[1] < 0 || head[1] >= TILE_COUNT) {
+        setGameOver(true);
+        return currentSnake;
       }
 
-      setSnake([head, ...snake]);
-      draw();
-    }, 100);
+      // Check self collision
+      if (newSnake.some(([x, y]) => x === head[0] && y === head[1])) {
+        setGameOver(true);
+        return currentSnake;
+      }
 
+      newSnake.unshift(head);
+
+      // Check food collision
+      if (head[0] === food[0] && head[1] === food[1]) {
+        createParticles(food[0], food[1], '#ff4444');
+        setScore(prev => {
+          const newScore = prev + (10 * level);
+          
+          // Increase speed and level every 50 points
+          if (newScore % 50 === 0) {
+            setLevel(l => l + 1);
+            setSpeed(s => Math.max(80, s - 10));
+          }
+          
+          return newScore;
+        });
+        setFood(generateFood());
+      } else if (specialFood && head[0] === specialFood[0] && head[1] === specialFood[1]) {
+        // Special food gives bonus points and creates rainbow particles
+        createParticles(specialFood[0], specialFood[1], `hsl(${Math.random() * 360}, 100%, 50%)`);
+        setScore(prev => prev + (50 * level));
+        setSpecialFood(null);
+      } else {
+        newSnake.pop();
+      }
+
+      return newSnake;
+    });
+
+    setDirection(nextDirection);
+  }, [gameStarted, gameOver, isPaused, nextDirection, food, specialFood, level]);
+
+  // Game loop
+  useEffect(() => {
+    if (gameStarted && !gameOver && !isPaused) {
+      gameLoopRef.current = setInterval(updateGame, speed);
+    } else {
+      clearInterval(gameLoopRef.current);
+    }
+
+    return () => clearInterval(gameLoopRef.current);
+  }, [updateGame, speed, gameStarted, gameOver, isPaused]);
+
+  // Draw loop
+  useEffect(() => {
+    const drawLoop = setInterval(draw, 16); // 60 FPS
+    return () => clearInterval(drawLoop);
+  }, [snake, food, specialFood, particles, direction]);
+
+  // Keyboard controls
+  useEffect(() => {
     const handleKeyPress = (e) => {
-      switch (e.key) {
-        case 'ArrowUp': if (direction !== 'down') setDirection('up'); break;
-        case 'ArrowDown': if (direction !== 'up') setDirection('down'); break;
-        case 'ArrowLeft': if (direction !== 'right') setDirection('left'); break;
-        case 'ArrowRight': if (direction !== 'left') setDirection('right'); break;
+      if (!gameStarted) return;
+
+      // Prevent default arrow key behavior
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+        e.preventDefault();
+      }
+
+      switch (e.code) {
+        case 'ArrowUp':
+        case 'KeyW':
+          if (direction.y === 0) setNextDirection({ x: 0, y: -1 });
+          break;
+        case 'ArrowDown':
+        case 'KeyS':
+          if (direction.y === 0) setNextDirection({ x: 0, y: 1 });
+          break;
+        case 'ArrowLeft':
+        case 'KeyA':
+          if (direction.x === 0) setNextDirection({ x: -1, y: 0 });
+          break;
+        case 'ArrowRight':
+        case 'KeyD':
+          if (direction.x === 0) setNextDirection({ x: 1, y: 0 });
+          break;
+        case 'Space':
+          setIsPaused(prev => !prev);
+          break;
+        case 'KeyR':
+          if (gameOver) restartGame();
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [direction, gameStarted, gameOver]);
 
-    return () => {
-      clearInterval(gameLoop);
-      window.removeEventListener('keydown', handleKeyPress);
-    };
-  }, [snake, food, direction]);
+  const startGame = () => {
+    setGameStarted(true);
+    setGameOver(false);
+    setScore(0);
+    setLevel(1);
+    setSpeed(150);
+    setSnake([[10, 10]]);
+    setFood(generateFood());
+    setSpecialFood(null);
+    setDirection({ x: 0, y: 0 });
+    setNextDirection({ x: 1, y: 0 });
+    setParticles([]);
+    setIsPaused(false);
+  };
+
+  const restartGame = () => {
+    startGame();
+  };
+
+  // Update high score
+  useEffect(() => {
+    if (gameOver && score > highScore) {
+      setHighScore(score);
+      localStorage.setItem('snakeHighScore', score.toString());
+    }
+  }, [gameOver, score, highScore]);
 
   return (
-  <div className="text-center">
-      <h2 className="text-2xl mb-4 text-red-500 font-bold">Snake</h2>
-      <p className="mb-2">Use arrow keys to control the snake</p>
-      <div className="relative">
+    <div className="text-center space-y-4">
+      <div className="flex items-center justify-center gap-4 mb-4">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-red-500 bg-clip-text text-transparent">
+          🐍 Enhanced Snake
+        </h2>
+      </div>
+      
+      {/* Game Stats */}
+      <div className="flex justify-center gap-8 text-sm font-mono">
+        <div className="bg-gray-800 px-4 py-2 rounded-lg border border-green-500">
+          <span className="text-green-400">Score: </span>
+          <span className="text-white font-bold">{score}</span>
+        </div>
+        <div className="bg-gray-800 px-4 py-2 rounded-lg border border-yellow-500">
+          <span className="text-yellow-400">Level: </span>
+          <span className="text-white font-bold">{level}</span>
+        </div>
+        <div className="bg-gray-800 px-4 py-2 rounded-lg border border-blue-500">
+          <span className="text-blue-400">High Score: </span>
+          <span className="text-white font-bold">{highScore}</span>
+        </div>
+      </div>
+
+      {/* Game Canvas */}
+      <div className="relative mx-auto inline-block">
         <canvas
           ref={canvasRef}
-          width="400"
-          height="400"
-          className="border border-green-500 rounded"
+          className="border-2 border-green-500 rounded-lg shadow-2xl"
+          style={{ 
+            background: 'linear-gradient(45deg, #0a0a0a 0%, #1a1a1a 100%)',
+            boxShadow: '0 0 30px rgba(57, 255, 20, 0.3)'
+          }}
         />
+        
+        {/* Game Over Overlay */}
         {gameOver && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75">
-            <div className="text-2xl text-red-500">Game Over! Score: {score}</div>
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-90 rounded-lg">
+            <div className="text-center space-y-4">
+              <div className="text-4xl">💀</div>
+              <div className="text-2xl text-red-500 font-bold">Game Over!</div>
+              <div className="text-lg text-white">Final Score: {score}</div>
+              {score === highScore && score > 0 && (
+                <div className="text-yellow-400 font-bold animate-pulse">🎉 NEW HIGH SCORE! 🎉</div>
+              )}
+              <button
+                onClick={restartGame}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition-all duration-200 transform hover:scale-105"
+              >
+                Play Again (R)
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Start Screen */}
+        {!gameStarted && !gameOver && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-90 rounded-lg">
+            <div className="text-center space-y-4">
+              <div className="text-6xl animate-bounce">🐍</div>
+              <div className="text-2xl text-green-400 font-bold">Enhanced Snake</div>
+              <div className="text-sm text-gray-300 max-w-xs">
+                Collect food to grow! Special rainbow food gives bonus points!
+              </div>
+              <button
+                onClick={startGame}
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all duration-200 transform hover:scale-105"
+              >
+                Start Game
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Pause Overlay */}
+        {isPaused && gameStarted && !gameOver && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 rounded-lg">
+            <div className="text-center space-y-4">
+              <div className="text-4xl">⏸️</div>
+              <div className="text-2xl text-yellow-400 font-bold">Paused</div>
+              <div className="text-sm text-gray-300">Press SPACE to continue</div>
+            </div>
           </div>
         )}
       </div>
-      <div className="mt-4 text-xl text-green-400">Score: {score}</div>
-    <button onClick={onExit} className="mt-6 block mx-auto text-red-400 hover:text-white">← Back to Games</button>
-  </div>
-);
+
+      {/* Controls */}
+      <div className="bg-gray-800 rounded-lg p-4 max-w-md mx-auto">
+        <h3 className="text-lg font-bold text-green-400 mb-3">Controls</h3>
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div><kbd className="bg-gray-700 px-2 py-1 rounded">↑↓←→</kbd> or <kbd className="bg-gray-700 px-2 py-1 rounded">WASD</kbd> Move</div>
+          <div><kbd className="bg-gray-700 px-2 py-1 rounded">SPACE</kbd> Pause</div>
+          <div><kbd className="bg-gray-700 px-2 py-1 rounded">R</kbd> Restart (when game over)</div>
+          <div><span className="text-green-400">🟢</span> Regular food (+10×level)</div>
+          <div><span className="text-red-400">🔴</span> Red food (grows snake)</div>
+          <div><span className="text-purple-400">🌈</span> Special food (+50×level)</div>
+        </div>
+      </div>
+
+      <button 
+        onClick={onExit} 
+        className="mt-6 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-all duration-200"
+      >
+        ← Back to Games
+      </button>
+    </div>
+  );
 };
 
 // Add these keyframes to your CSS
