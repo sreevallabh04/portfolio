@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
 import ProfileSelection from '@/components/ProfileSelection';
 import Navbar from '@/components/Navbar';
+import FloatingChatbot from '@/components/FloatingChatbot';
 import { Toaster } from '@/components/ui/toaster';
 
 // Lazy load components for better performance
@@ -63,6 +64,21 @@ const EnterButton = ({ onClick }) => (
     Click to Enter
   </button>
 );
+
+// Component to conditionally show chatbot
+const ConditionalChatbot = () => {
+  const location = useLocation();
+  
+  // Don't show chatbot on recruiter pages OR profile selection page
+  const isRecruiterPage = location.pathname.includes('/browse/recruiter');
+  const isProfileSelectionPage = location.pathname === '/';
+  
+  if (isRecruiterPage || isProfileSelectionPage) {
+    return null;
+  }
+  
+  return <FloatingChatbot />;
+};
 
 function AppContent() {
   const [hasEntered, setHasEntered] = useState(false);
@@ -183,6 +199,7 @@ function AppContent() {
           </Routes>
         </Suspense>
       </AnimatePresence>
+      <ConditionalChatbot />
       <Toaster />
     </>
   );
