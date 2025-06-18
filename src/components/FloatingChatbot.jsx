@@ -22,30 +22,43 @@ const FloatingChatbot = () => {
   // Check if we're on client page (where cart button exists)
   const isClientPage = location.pathname.includes('/browse/client');
   
-  // Responsive positioning based on screen size and page
-  const getResponsivePosition = () => {
-    const isMobile = windowSize.width < 768;
-    const isTablet = windowSize.width >= 768 && windowSize.width < 1024;
-    
-    if (isMobile) {
-      // On mobile, position differently based on page
-      return isClientPage 
-        ? { bottom: '6rem', right: '1rem' } // Higher up to avoid cart button
-        : { bottom: '1.5rem', right: '1rem' };
-    } else if (isTablet) {
-      // On tablet, adjust horizontal positioning for client page
-      return isClientPage 
-        ? { bottom: '1.5rem', right: '5.5rem' } // Left of cart button
-        : { bottom: '1.5rem', right: '1.5rem' };
-    } else {
-      // Desktop - client page positions to left of cart
-      return isClientPage 
-        ? { bottom: '1.5rem', right: '5.5rem' } // Left of cart button
-        : { bottom: '1.5rem', right: '1.5rem' };
-    }
-  };
+     // Responsive positioning based on screen size and page
+   const getResponsivePosition = () => {
+     const isMobile = windowSize.width < 768;
+     const isTablet = windowSize.width >= 768 && windowSize.width < 1024;
+     
+     if (isMobile) {
+       // On mobile, position differently based on page
+       return isClientPage 
+         ? { bottom: '6rem', right: '1rem' } // Higher up to avoid cart button
+         : { bottom: '1.5rem', right: '1rem' };
+     } else if (isTablet) {
+       // On tablet, adjust horizontal positioning for client page
+       return isClientPage 
+         ? { bottom: '1.5rem', right: '5.5rem' } // Left of cart button
+         : { bottom: '1.5rem', right: '1.5rem' };
+     } else {
+       // Desktop - client page positions to left of cart
+       return isClientPage 
+         ? { bottom: '1.5rem', right: '5.5rem' } // Left of cart button
+         : { bottom: '1.5rem', right: '1.5rem' };
+     }
+   };
 
-  const responsivePosition = getResponsivePosition();
+   const responsivePosition = getResponsivePosition();
+   
+   // Adjust drag constraints based on responsive positioning
+   const getDragConstraints = (isButton = false) => {
+     const elementWidth = isButton ? 80 : (windowSize.width < 480 ? 288 : 320); // w-72 = 288px, w-80 = 320px
+     const elementHeight = isButton ? 80 : (isMinimized ? 80 : 500);
+     
+     return {
+       top: 0,
+       left: 0,
+       right: windowSize.width - elementWidth,
+       bottom: windowSize.height - elementHeight,
+     };
+   };
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -334,12 +347,7 @@ const FloatingChatbot = () => {
             drag
             dragMomentum={false}
             dragElastic={0.1}
-            dragConstraints={{
-              top: 0,
-              left: 0,
-              right: windowSize.width - 80,
-              bottom: windowSize.height - 80,
-            }}
+            dragConstraints={getDragConstraints(true)}
             initial={{ scale: 0, rotate: -180, x: 0, y: 0 }}
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: 180 }}
@@ -396,12 +404,7 @@ const FloatingChatbot = () => {
             drag
             dragMomentum={false}
             dragElastic={0.1}
-            dragConstraints={{
-              top: 0,
-              left: 0,
-              right: windowSize.width - 320,
-              bottom: windowSize.height - (isMinimized ? 80 : 500),
-            }}
+            dragConstraints={getDragConstraints(false)}
             initial={{ opacity: 0, y: 100, scale: 0.8, x: 0 }}
             animate={{ 
               opacity: 1, 
@@ -411,8 +414,12 @@ const FloatingChatbot = () => {
             }}
             exit={{ opacity: 0, y: 100, scale: 0.8 }}
             transition={{ type: "spring", stiffness: 200 }}
-            className="fixed bottom-6 right-6 w-80 bg-black/95 backdrop-blur-xl rounded-2xl border border-[#e50914]/30 shadow-2xl z-50 overflow-hidden"
+            className={`fixed bg-black/95 backdrop-blur-xl rounded-2xl border border-[#e50914]/30 shadow-2xl z-50 overflow-hidden ${
+              windowSize.width < 480 ? 'w-72' : 'w-80'
+            }`}
             style={{
+              bottom: responsivePosition.bottom,
+              right: responsivePosition.right,
               boxShadow: '0 0 50px rgba(229, 9, 20, 0.3)'
             }}
             onDragStart={() => setIsDragging(true)}
