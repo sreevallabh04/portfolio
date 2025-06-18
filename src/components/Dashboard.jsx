@@ -204,22 +204,29 @@ const Dashboard = () => {
               title: "Delhi Public School",
               subtitle: "Nacharam, Hyderabad",
               period: "June 2016 - March 2020",
-              description: "Completed secondary education.",
-              imageUrl: "https://i.ibb.co/Dg62kQ4b/download.png"
+              description: "Completed secondary education with focus on Science and Mathematics.\n\nKey Highlights:\n• Strong foundation in Mathematics and Science\n• Active participation in coding competitions\n• Leadership roles in school tech club\n• Consistent academic performance\n\nBuilt fundamental programming skills and developed passion for technology.",
+              techStack: "Mathematics, Physics, Chemistry, Computer Science",
+              imageUrl: "https://i.ibb.co/Dg62kQ4b/download.png",
+              category: "Secondary Education"
             },
             {
               title: "Excellencia Junior College",
               subtitle: "Shamirpet, Hyderabad",
               period: "June 2020 - March 2022",
-              description: "Focused on MPC stream for engineering entrances.",
-              imageUrl: "https://i.postimg.cc/p5P7W0wY/excellencia.png"
+              description: "Focused on MPC stream for engineering entrances.\n\nKey Achievements:\n• Specialized in Mathematics, Physics, Chemistry\n• JEE Main and Advanced preparation\n• Advanced problem-solving skills\n• Strong analytical thinking development\n\nSecured admission to VIT Chennai through entrance examination.",
+              techStack: "Advanced Mathematics, Physics, Chemistry, JEE Preparation",
+              imageUrl: "https://i.postimg.cc/p5P7W0wY/excellencia.png",
+              category: "Higher Secondary Education"
             },
             {
               title: "VIT Chennai",
               subtitle: "Vellore Institute of Technology, Chennai",
               period: "Sep. 2022 - June 2027",
-              description: "Relevant coursework: DS, ML, OS, CN, SE, Cloud, DBMS, DevOps.",
-              imageUrl: "https://i.postimg.cc/ZqzGHWpb/vitlogo.jpg"
+              description: "Bachelor of Technology in Computer Science Engineering.\n\nRelevant Coursework:\n• Data Structures and Algorithms\n• Machine Learning and AI\n• Operating Systems\n• Computer Networks\n• Software Engineering\n• Cloud Computing\n• Database Management Systems\n• DevOps and Deployment\n\nCurrently maintaining strong academic performance with hands-on project experience.",
+              techStack: "DSA, ML, OS, CN, SE, Cloud Computing, DBMS, DevOps",
+              imageUrl: "https://i.postimg.cc/ZqzGHWpb/vitlogo.jpg",
+              category: "Bachelor's Degree",
+              link: "https://chennai.vit.ac.in/"
             }
           ]
         }
@@ -389,15 +396,19 @@ const Dashboard = () => {
                   
                   {/* Action Buttons */}
                   <div className="flex gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => window.open(selectedProject.link, '_blank')}
-                      className="px-6 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
-                    >
-                      <ExternalLink size={18} />
-                      View
-                    </motion.button>
+                    {selectedProject.link && (
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => window.open(selectedProject.link, '_blank')}
+                        className="px-6 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
+                      >
+                        <ExternalLink size={18} />
+                        {selectedProject.category?.includes('Education') ? 'Visit Website' : 
+                         selectedProject.category?.includes('Research') ? 'View Details' : 
+                         selectedProject.category?.includes('Web Development') ? 'View Live' : 'View'}
+                      </motion.button>
+                    )}
                     {selectedProject.github && (
                       <motion.button
                         whileHover={{ scale: 1.05 }}
@@ -418,13 +429,18 @@ const Dashboard = () => {
                 {/* Featured Badge */}
                 <div className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium mb-6">
                   <span className="w-2 h-2 bg-white rounded-full"></span>
-                  #1 in Projects Today
+                  {selectedProject.category?.includes('Education') ? 'Education Background' :
+                   selectedProject.category?.includes('Research') ? 'Research Experience' :
+                   selectedProject.category?.includes('Web Development') ? 'Featured Project' : '#1 in Projects Today'}
                 </div>
 
-                {/* Project Description */}
+                {/* Content Description */}
                 <div className="grid md:grid-cols-3 gap-8">
                   <div className="md:col-span-2">
-                    <h3 className="text-xl font-semibold text-white mb-4">Project Overview</h3>
+                    <h3 className="text-xl font-semibold text-white mb-4">
+                      {selectedProject.category?.includes('Education') ? 'Education Details' :
+                       selectedProject.category?.includes('Research') ? 'Experience Overview' : 'Project Overview'}
+                    </h3>
                     <p className="text-gray-300 leading-relaxed whitespace-pre-line">
                       {selectedProject.description}
                     </p>
@@ -437,23 +453,26 @@ const Dashboard = () => {
                   </div>
                   
                   <div>
-                    {/* Tech Stack */}
-                    <div className="mb-6">
-                      <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-                        <Code size={18} className="text-red-400" />
-                        Tech Stack:
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedProject.techStack.split(', ').map((tech, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-red-600/20 text-red-400 rounded-full text-sm"
-                          >
-                            {tech}
-                          </span>
-                        ))}
+                    {/* Tech Stack / Skills */}
+                    {selectedProject.techStack && (
+                      <div className="mb-6">
+                        <h4 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                          <Code size={18} className="text-red-400" />
+                          {selectedProject.category?.includes('Education') ? 'Subjects/Skills:' :
+                           selectedProject.category?.includes('Research') ? 'Technologies:' : 'Tech Stack:'}
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedProject.techStack.split(', ').map((tech, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-red-600/20 text-red-400 rounded-full text-sm"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Area */}
                     <div>
