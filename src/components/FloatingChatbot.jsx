@@ -11,9 +11,27 @@ const FloatingChatbot = () => {
   const [userLanguage, setUserLanguage] = useState('english'); // english or telugu
   const [hasGreeted, setHasGreeted] = useState(false);
   const [currentApiKeyIndex, setCurrentApiKeyIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1024,
+    height: typeof window !== 'undefined' ? window.innerHeight : 768
+  });
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Handle window resize for drag constraints
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Multiple API keys for fallback
   const apiKeys = [
@@ -283,17 +301,28 @@ const FloatingChatbot = () => {
       <AnimatePresence>
         {!isOpen && (
           <motion.div
-            initial={{ scale: 0, rotate: -180 }}
+            drag
+            dragMomentum={false}
+            dragElastic={0.1}
+            dragConstraints={{
+              top: 0,
+              left: 0,
+              right: windowSize.width - 80,
+              bottom: windowSize.height - 80,
+            }}
+            initial={{ scale: 0, rotate: -180, x: 0, y: 0 }}
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: 180 }}
             transition={{ type: "spring", stiffness: 200 }}
-            className="fixed bottom-6 right-6 z-50"
+            className="fixed bottom-6 right-6 z-50 cursor-grab active:cursor-grabbing"
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => setIsDragging(false)}
           >
             <motion.button
-              onClick={() => setIsOpen(true)}
+              onClick={() => !isDragging && setIsOpen(true)}
               className="relative w-16 h-16 rounded-full overflow-hidden border-4 border-[#e50914] shadow-2xl hover:shadow-red-500/50 transition-all duration-300"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: isDragging ? 1 : 1.1 }}
+              whileTap={{ scale: isDragging ? 1 : 0.9 }}
               style={{
                 background: 'linear-gradient(135deg, #e50914 0%, #ff6b9d 100%)',
                 boxShadow: '0 0 30px rgba(229, 9, 20, 0.4)'
@@ -330,7 +359,16 @@ const FloatingChatbot = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 100, scale: 0.8 }}
+            drag
+            dragMomentum={false}
+            dragElastic={0.1}
+            dragConstraints={{
+              top: 0,
+              left: 0,
+              right: windowSize.width - 320,
+              bottom: windowSize.height - (isMinimized ? 80 : 500),
+            }}
+            initial={{ opacity: 0, y: 100, scale: 0.8, x: 0 }}
             animate={{ 
               opacity: 1, 
               y: 0, 
@@ -343,9 +381,11 @@ const FloatingChatbot = () => {
             style={{
               boxShadow: '0 0 50px rgba(229, 9, 20, 0.3)'
             }}
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => setIsDragging(false)}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-800/50 bg-gradient-to-r from-[#e50914] to-[#ff6b9d]">
+            {/* Header - Draggable Area */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-800/50 bg-gradient-to-r from-[#e50914] to-[#ff6b9d] cursor-grab active:cursor-grabbing">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white">
                   <img 
@@ -361,9 +401,17 @@ const FloatingChatbot = () => {
                     S
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-white font-bold text-sm">Sreevallabh</h3>
-                  <p className="text-white/80 text-xs">Online • Usually replies instantly</p>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-white font-bold text-sm">Sreevallabh</h3>
+                    <div className="flex gap-1 opacity-50">
+                      <div className="w-1 h-1 bg-white rounded-full"></div>
+                      <div className="w-1 h-1 bg-white rounded-full"></div>
+                      <div className="w-1 h-1 bg-white rounded-full"></div>
+                      <div className="w-1 h-1 bg-white rounded-full"></div>
+                    </div>
+                  </div>
+                  <p className="text-white/80 text-xs">Online • Usually replies instantly • Drag to move</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -385,7 +433,11 @@ const FloatingChatbot = () => {
             {/* Messages */}
             {!isMinimized && (
               <>
-                <div className="h-80 overflow-y-auto p-4 space-y-4 bg-black/50">
+                <div 
+                  className="h-80 overflow-y-auto p-4 space-y-4 bg-black/50 cursor-default"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                >
                   {messages.map((message, index) => (
                     <motion.div
                       key={index}
@@ -426,7 +478,11 @@ const FloatingChatbot = () => {
                 </div>
 
                 {/* Input */}
-                <div className="p-4 border-t border-gray-800/50 bg-black/50">
+                <div 
+                  className="p-4 border-t border-gray-800/50 bg-black/50 cursor-default"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                >
                   <div className="flex items-center gap-2">
                     <input
                       ref={inputRef}
