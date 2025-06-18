@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Minimize2, Maximize2 } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const FloatingChatbot = () => {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -16,6 +18,34 @@ const FloatingChatbot = () => {
     width: typeof window !== 'undefined' ? window.innerWidth : 1024,
     height: typeof window !== 'undefined' ? window.innerHeight : 768
   });
+
+  // Check if we're on client page (where cart button exists)
+  const isClientPage = location.pathname.includes('/browse/client');
+  
+  // Responsive positioning based on screen size and page
+  const getResponsivePosition = () => {
+    const isMobile = windowSize.width < 768;
+    const isTablet = windowSize.width >= 768 && windowSize.width < 1024;
+    
+    if (isMobile) {
+      // On mobile, position differently based on page
+      return isClientPage 
+        ? { bottom: '6rem', right: '1rem' } // Higher up to avoid cart button
+        : { bottom: '1.5rem', right: '1rem' };
+    } else if (isTablet) {
+      // On tablet, adjust horizontal positioning for client page
+      return isClientPage 
+        ? { bottom: '1.5rem', right: '5.5rem' } // Left of cart button
+        : { bottom: '1.5rem', right: '1.5rem' };
+    } else {
+      // Desktop - client page positions to left of cart
+      return isClientPage 
+        ? { bottom: '1.5rem', right: '5.5rem' } // Left of cart button
+        : { bottom: '1.5rem', right: '1.5rem' };
+    }
+  };
+
+  const responsivePosition = getResponsivePosition();
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -314,7 +344,11 @@ const FloatingChatbot = () => {
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: 180 }}
             transition={{ type: "spring", stiffness: 200 }}
-            className="fixed bottom-6 right-6 z-50 cursor-grab active:cursor-grabbing"
+            className="fixed z-50 cursor-grab active:cursor-grabbing"
+            style={{
+              bottom: responsivePosition.bottom,
+              right: responsivePosition.right
+            }}
             onDragStart={() => setIsDragging(true)}
             onDragEnd={() => setIsDragging(false)}
           >
