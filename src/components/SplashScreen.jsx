@@ -1,7 +1,7 @@
-
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import introSoundPath from '@/assets/nouveau-jingle-netflix.mp3'; // Renamed import for clarity
+import sreevallabhLogo from '@/assets/sreevallabhkakarala.png';
 
 const SplashScreen = ({ onAudioEnd }) => {
   const audioContextRef = useRef(null);
@@ -131,12 +131,12 @@ const SplashScreen = ({ onAudioEnd }) => {
         initial={{ scale: 1.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 3, ease: "easeOut" }}
-        className="netflix-logo w-[80vw] text-center"
+        className="netflix-logo w-full flex flex-col items-center justify-center"
       >
         <img
-          src="https://storage.googleapis.com/hostinger-horizons-assets-prod/5c57ed43-384d-4353-9118-29cad8a3dc9c/d075d826c58328f5561b91f4e67e2276.png"
-          alt="Sreevallabh Kakarala Logo" 
-          className="mx-auto w-full"
+          src={sreevallabhLogo}
+          alt="Sreevallabh Kakarala Logo"
+          className="mx-auto max-w-[90vw] md:max-w-[700px] mt-8"
         />
       </motion.div>
     </motion.div>

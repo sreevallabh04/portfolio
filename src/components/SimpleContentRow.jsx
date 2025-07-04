@@ -105,7 +105,7 @@ const SimpleContentRow = ({ title, items, isSkills, onProjectClick }) => {
                           ease: [0.32, 0.72, 0, 1]
                         }
                       }}
-                      className="relative w-[300px] h-[169px] rounded-md overflow-hidden cursor-pointer flex-shrink-0"
+                      className="relative w-[90vw] max-w-xs sm:w-[300px] h-[48vw] max-h-[180px] sm:h-[169px] rounded-md overflow-hidden cursor-pointer flex-shrink-0"
                     >
                       {/* Background Image/Logo */}
                       <motion.div
@@ -172,7 +172,7 @@ const SimpleContentRow = ({ title, items, isSkills, onProjectClick }) => {
                     ease: [0.32, 0.72, 0, 1]
                   }
                 }}
-                className="relative w-[300px] h-[169px] rounded-md overflow-hidden cursor-pointer flex-shrink-0"
+                className="relative w-[90vw] max-w-xs sm:w-[300px] h-[48vw] max-h-[180px] sm:h-[169px] rounded-md overflow-hidden cursor-pointer flex-shrink-0"
               >
                 {/* Background Image */}
                 <motion.img

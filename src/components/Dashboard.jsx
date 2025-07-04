@@ -378,7 +378,7 @@ const Dashboard = () => {
                 <img
                   src={selectedProject.imageUrl}
                   alt={selectedProject.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain max-h-[40vh] sm:max-h-[60vh]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/60 to-transparent" />
                 

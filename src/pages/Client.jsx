@@ -130,11 +130,11 @@ const OrderForm = ({ cart, total, onClose, onSubmit }) => {
   const hasAI = cart.some(item => item.label === 'AI Agents');
 
   return (
-    <div className="fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-2 md:p-4 overflow-y-auto">
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="bg-zinc-900 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-zinc-700"
+        className="bg-zinc-900 rounded-xl w-full max-w-full md:max-w-2xl max-h-[95vh] overflow-y-auto border border-zinc-700"
       >
         <div className="p-6 border-b border-zinc-700 flex items-center justify-between sticky top-0 bg-zinc-900">
           <h2 className="text-2xl font-bold text-white">Order Details</h2>
@@ -435,7 +435,7 @@ const Client = () => {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-black to-red-900 py-16 px-4">
+      <div className="bg-gradient-to-r from-black to-red-900 py-12 md:py-16 px-2 md:px-4">
         <div className="max-w-6xl mx-auto text-center">
           <BlurText
             text="Your Digital Vision, My Expertise"
@@ -443,9 +443,9 @@ const Client = () => {
             animateBy="words"
             direction="top"
             onAnimationComplete={() => console.log('Animation completed!')}
-            className="text-4xl md:text-6xl font-bold text-white mb-6"
+            className="text-2xl md:text-4xl lg:text-6xl font-bold text-white mb-4 md:mb-6"
           />
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-base md:text-xl text-gray-300 max-w-3xl mx-auto">
             Professional web development, mobile apps, ML models, and AI agents. Choose your service and let's build something amazing.
           </p>
         </div>
@@ -454,12 +454,12 @@ const Client = () => {
       {/* Tabs */}
       <div className="bg-zinc-900 border-b border-zinc-800">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-2 p-4">
+          <div className="flex flex-wrap md:flex-nowrap justify-center gap-2 p-2 md:p-4 overflow-x-auto scrollbar-hide">
             {Object.entries(services).map(([key, service]) => (
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
-                className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                className={`px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-all duration-200 whitespace-nowrap ${
                   activeTab === key
                     ? 'bg-red-600 text-white'
                     : 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
@@ -473,33 +473,33 @@ const Client = () => {
       </div>
 
       {/* Services Content */}
-      <div className="max-w-6xl mx-auto py-12 px-4">
+      <div className="max-w-6xl mx-auto py-8 md:py-12 px-2 md:px-4 min-h-[60vh]">
         <motion.div
           key={activeTab}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <h2 className="text-3xl font-bold text-center mb-8 text-red-500">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8 text-red-500">
             {services[activeTab].title}
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {services[activeTab].items.map((item, index) => (
               <motion.div
                 key={item.name}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.4 }}
-                className="bg-zinc-900 rounded-xl p-6 border border-zinc-800 hover:border-red-600 transition-all duration-300"
+                className="bg-zinc-900 rounded-xl p-4 md:p-6 border border-zinc-800 hover:border-red-600 transition-all duration-300"
               >
-                <h3 className="text-xl font-bold text-white mb-3">{item.name}</h3>
-                <p className="text-gray-400 mb-4">{item.description}</p>
+                <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">{item.name}</h3>
+                <p className="text-gray-400 mb-3 md:mb-4">{item.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-red-500">₹{item.price}</span>
+                  <span className="text-xl md:text-2xl font-bold text-red-500">₹{item.price}</span>
                   <button
                     onClick={() => addToCart(item)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-200"
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 md:px-4 py-2 rounded-lg font-semibold transition-colors duration-200"
                   >
                     Add to Cart
                   </button>
@@ -516,7 +516,8 @@ const Client = () => {
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
-          className="fixed top-0 right-0 h-full w-80 bg-zinc-950 border-l border-zinc-800 z-50 p-6 flex flex-col"
+          className="fixed top-0 right-0 h-full w-full max-w-xs md:max-w-md md:w-80 bg-zinc-950 border-l border-zinc-800 z-50 p-4 md:p-6 flex flex-col"
+          style={{ maxWidth: '100vw' }}
         >
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold">Your Cart</h3>
@@ -582,7 +583,7 @@ const Client = () => {
       {cart.length > 0 && (
         <button
           onClick={() => setShowCart(true)}
-          className="fixed bottom-6 right-6 bg-red-600 hover:bg-red-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg z-40 transition-all duration-200"
+          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 bg-red-600 hover:bg-red-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg z-40 transition-all duration-200"
         >
           🛒
           <span className="absolute -top-2 -right-2 bg-white text-red-600 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">
@@ -592,21 +593,21 @@ const Client = () => {
       )}
 
       {/* Footer */}
-      <footer className="bg-zinc-950 border-t border-zinc-800 py-8">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="text-center md:text-left mb-4 md:mb-0">
-              <h3 className="text-xl font-bold text-red-500 mb-2">Sreevallabh Kakarala</h3>
-              <p className="text-gray-400">Professional Digital Services</p>
+      <footer className="bg-zinc-950 border-t border-zinc-800 py-6 md:py-8">
+        <div className="max-w-6xl mx-auto px-2 md:px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+            <div className="text-center md:text-left mb-2 md:mb-0">
+              <h3 className="text-lg md:text-xl font-bold text-red-500 mb-1 md:mb-2">Sreevallabh Kakarala</h3>
+              <p className="text-gray-400 text-sm md:text-base">Professional Digital Services</p>
             </div>
-            <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4">
               <Link
                 to="/terms"
                 className="text-gray-400 hover:text-white transition-colors duration-200 underline"
               >
                 Terms & Conditions
               </Link>
-              <p className="text-gray-500 text-sm">© 2024 All rights reserved</p>
+              <p className="text-gray-500 text-xs md:text-sm">© 2024 All rights reserved</p>
             </div>
           </div>
         </div>

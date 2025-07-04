@@ -85,6 +85,32 @@ function AppContent() {
   const [showSplash, setShowSplash] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const audioContextResumed = useRef(false);
+  const location = useLocation();
+
+  // Helper: get profile from URL
+  const getProfileFromPath = () => {
+    const match = location.pathname.match(/^\/browse\/(\w+)/);
+    return match ? match[1] : null;
+  };
+
+  // On mount: restore profile from URL or localStorage
+  useEffect(() => {
+    const urlProfile = getProfileFromPath();
+    const storedProfile = localStorage.getItem('selectedProfile');
+    if (urlProfile) {
+      setSelectedProfile(urlProfile);
+      localStorage.setItem('selectedProfile', urlProfile);
+    } else if (storedProfile) {
+      setSelectedProfile(storedProfile);
+    }
+  }, [location.pathname]);
+
+  // Save selectedProfile to localStorage when it changes
+  useEffect(() => {
+    if (selectedProfile) {
+      localStorage.setItem('selectedProfile', selectedProfile);
+    }
+  }, [selectedProfile]);
 
   // Function to handle the initial "Enter" click
   const handleEnter = async () => {
