@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
+import StellarSystemSimulation from './StellarSystemSimulation';
 
 
 // --- ASCII Art & Easter Eggs ---
@@ -119,6 +120,11 @@ const MatrixRain = () => {
   }, []);
 
   return <div ref={containerRef} className="absolute top-0 left-0 w-full h-full z-0" />;
+};
+
+// --- Solar System Simulation Integration ---
+const SolarSystemSimulation = () => {
+  return <StellarSystemSimulation />;
 };
 
 // --- Futuristic Hero Section ---
@@ -896,6 +902,94 @@ Contact: srivallabhkakarala@gmail.com or visit streamvallabh.life`;
               )}
             </AnimatePresence>
             <NetflixCards title="Now Streaming: Skills" items={skills} />
+            
+            {/* Netflix-Style Solar System Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-10"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-3xl font-bold text-red-500 netflix-font">Solar System Explorer</h2>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-400">Interactive 3D Experience</span>
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                </div>
+              </div>
+              
+              <div className="relative bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
+                {/* Netflix-style header */}
+                <div className="bg-gradient-to-r from-red-600 to-red-800 px-6 py-3 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="text-white font-semibold ml-3">Solar System v2.0</span>
+                  </div>
+                  <div className="flex items-center space-x-4 text-white text-sm">
+                    <span className="flex items-center">
+                      <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                      LIVE
+                    </span>
+                    <span>FPS: <span className="text-green-400">60</span></span>
+                  </div>
+                </div>
+                
+                {/* Solar System Container */}
+                <div className="relative">
+                  <SolarSystemSimulation />
+                  
+                  {/* Netflix-style overlay controls */}
+                  <div className="absolute top-4 right-4 flex space-x-2">
+                    <button className="bg-black/60 hover:bg-black/80 text-white p-2 rounded-lg transition-all duration-200 border border-gray-600">
+                      <span className="text-xs">🎮</span>
+                    </button>
+                    <button className="bg-black/60 hover:bg-black/80 text-white p-2 rounded-lg transition-all duration-200 border border-gray-600">
+                      <span className="text-xs">⚙️</span>
+                    </button>
+                    <button className="bg-black/60 hover:bg-black/80 text-white p-2 rounded-lg transition-all duration-200 border border-gray-600">
+                      <span className="text-xs">📊</span>
+                    </button>
+                  </div>
+                  
+                  {/* Info panel */}
+                  <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 border border-gray-700 max-w-xs">
+                    <h3 className="text-white font-semibold mb-2">Controls</h3>
+                    <div className="text-gray-300 text-sm space-y-1">
+                      <div>🖱️ Drag to rotate view</div>
+                      <div>🔍 Scroll to zoom</div>
+                      <div>👆 Touch to navigate</div>
+                      <div>🌍 Real-time orbits</div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Netflix-style footer */}
+                <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-3 border-t border-gray-700">
+                  <div className="flex items-center justify-between text-sm text-gray-400">
+                    <div className="flex items-center space-x-4">
+                      <span>Planets: <span className="text-green-400">8</span></span>
+                      <span>Asteroids: <span className="text-yellow-400">2000+</span></span>
+                      <span>Stars: <span className="text-blue-400">5000+</span></span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-green-400">●</span>
+                      <span>Real-time simulation</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Netflix-style description */}
+              <div className="mt-4 text-center">
+                <p className="text-gray-400 text-sm max-w-2xl mx-auto">
+                  Experience our solar system like never before! Navigate through space, explore planets, 
+                  and witness the beauty of orbital mechanics in this interactive 3D simulation. 
+                  Perfect for space enthusiasts and Netflix binge-watchers alike! 🚀
+                </p>
+              </div>
+            </motion.div>
+            
             <Footer />
           </>
         )}

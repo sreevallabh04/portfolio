@@ -180,6 +180,13 @@
   }
 }
 
+/* Netflix-style Typography */
+.netflix-font {
+  font-family: 'Bebas Neue', 'Arial Black', sans-serif;
+  letter-spacing: 0.05em;
+  font-weight: 900;
+}
+
 /* Loading States */
 .loading-skeleton {
   @apply animate-pulse bg-gray-800 rounded;

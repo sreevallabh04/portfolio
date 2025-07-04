@@ -1,9 +1,10 @@
-// Please work... importing Three.js like a pro!
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-// Main class for the whole solar system. If this breaks, it's all my fault :)
 class StellarSystemSimulation {
-    constructor() {
+    constructor(container) {
+        this.container = container;
+        
         // Scene, camera, renderer... the holy trinity of 3D!
         this.scene = null;
         this.camera = null;
@@ -168,52 +169,14 @@ class StellarSystemSimulation {
         this.init(); // Fingers crossed!
     }
     
-    async init() {
-        await this.showLoadingScreen(); // Loading... please wait (or go make coffee)
+    init() {
         this.setupScene();
         this.createSolarSystem();
         this.setupEventListeners();
-        this.createPlanetControls();
-        this.hideLoadingScreen();
         this.animate(); // And we're off!
     }
     
-    async showLoadingScreen() {
-        // Dramatic loading sequence
-        const loadingProgress = document.getElementById('loadingProgress');
-        const loadingText = document.querySelector('.loading-text');
-        
-        const steps = [
-            'Initializing Three.js engine... (please work)',
-            'Creating celestial bodies... (no pressure)',
-            'Calculating orbital mechanics... (math magic)',
-            'Setting up lighting system... (let there be light!)',
-            'Generating star field... (wish upon one)',
-            'Creating asteroid belts... (space pebbles)',
-            'Finalizing solar system... (almost there!)'
-        ];
-        
-        for (let i = 0; i < steps.length; i++) {
-            loadingText.textContent = steps[i];
-            loadingProgress.style.width = `${((i + 1) / steps.length) * 100}%`;
-            await new Promise(resolve => setTimeout(resolve, 300)); // Just enough time to panic
-        }
-    }
-    
-    hideLoadingScreen() {
-        const loadingScreen = document.getElementById('loadingScreen');
-        const appContainer = document.getElementById('appContainer');
-        
-        setTimeout(() => {
-            loadingScreen.classList.add('hidden');
-            appContainer.classList.add('loaded');
-        }, 500);
-    }
-    
     setupScene() {
-        const canvas = document.getElementById('solarSystemCanvas');
-        const container = canvas.parentElement;
-        
         // Scene setup
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x000011);
@@ -221,7 +184,7 @@ class StellarSystemSimulation {
         // Camera setup with better positioning
         this.camera = new THREE.PerspectiveCamera(
             60,
-            container.clientWidth / container.clientHeight,
+            this.container.clientWidth / this.container.clientHeight,
             0.1,
             2000
         );
@@ -230,17 +193,19 @@ class StellarSystemSimulation {
         
         // Renderer setup with enhanced quality
         this.renderer = new THREE.WebGLRenderer({
-            canvas: canvas,
             antialias: true,
             alpha: true,
             powerPreference: "high-performance"
         });
-        this.renderer.setSize(container.clientWidth, container.clientHeight);
+        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1.2;
+        
+        // Add renderer to container
+        this.container.appendChild(this.renderer.domElement);
         
         // Handle resize
         this.handleResize();
@@ -255,7 +220,6 @@ class StellarSystemSimulation {
         this.createKuiperBelt();
         this.createSolarWind();
         this.setupLighting();
-        this.updateStats();
     }
     
     createStars() {
@@ -343,7 +307,7 @@ class StellarSystemSimulation {
     
     createSun() {
         // Sun geometry with higher detail
-        const sunGeometry = new THREE.SphereGeometry(8, 64, 64); // Increased from 5
+        const sunGeometry = new THREE.SphereGeometry(8, 64, 64);
         
         // Enhanced sun material with shader
         const sunMaterial = new THREE.ShaderMaterial({
@@ -382,7 +346,7 @@ class StellarSystemSimulation {
         this.scene.add(this.sun);
         
         // Sun glow effect
-        const glowGeometry = new THREE.SphereGeometry(12, 32, 32); // Increased from 7
+        const glowGeometry = new THREE.SphereGeometry(12, 32, 32);
         const glowMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 time: { value: 0 }
@@ -411,7 +375,7 @@ class StellarSystemSimulation {
         this.scene.add(sunGlow);
         
         // Corona effect
-        const coronaGeometry = new THREE.SphereGeometry(16, 32, 32); // Increased from 10
+        const coronaGeometry = new THREE.SphereGeometry(16, 32, 32);
         const coronaMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 time: { value: 0 }
@@ -732,97 +696,8 @@ class StellarSystemSimulation {
         this.scene.add(directionalLight);
     }
     
-    createPlanetControls() {
-        const controlsContainer = document.getElementById('planetControls');
-        
-        this.planetData.forEach((data, index) => {
-            const controlDiv = document.createElement('div');
-            controlDiv.className = 'planet-control';
-            
-            controlDiv.innerHTML = `
-                <h4>
-                    <span class="planet-color" style="background-color: #${data.color.toString(16).padStart(6, '0')}"></span>
-                    ${data.name}
-                </h4>
-                <div class="speed-control">
-                    <label>Orbital Speed:</label>
-                    <div class="slider-container">
-                        <input type="range" id="speed-${index}" min="0" max="5" step="0.1" value="1" class="speed-slider">
-                    </div>
-                    <div class="speed-display">
-                        <span id="speed-value-${index}">1.0x</span>
-                    </div>
-                </div>
-            `;
-            
-            controlsContainer.appendChild(controlDiv);
-            
-            // Add event listener for speed control
-            const speedSlider = document.getElementById(`speed-${index}`);
-            const speedValue = document.getElementById(`speed-value-${index}`);
-            
-            speedSlider.addEventListener('input', (e) => {
-                const speed = parseFloat(e.target.value);
-                this.planets[index].userData.individualSpeed = speed;
-                speedValue.textContent = `${speed.toFixed(1)}x`;
-            });
-        });
-    }
-    
     setupEventListeners() {
-        const canvas = document.getElementById('solarSystemCanvas');
-        
-        // System controls
-        document.getElementById('pauseBtn').addEventListener('click', () => {
-            this.toggleAnimation();
-        });
-        
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            this.resetSystem();
-        });
-        
-        document.getElementById('themeBtn').addEventListener('click', () => {
-            this.toggleTheme();
-        });
-        
-        document.getElementById('fullscreenBtn').addEventListener('click', () => {
-            this.toggleFullscreen();
-        });
-        
-        // Global speed control
-        const globalSpeedSlider = document.getElementById('globalSpeed');
-        const globalSpeedValue = document.getElementById('globalSpeedValue');
-        const speedIndicator = document.getElementById('speedIndicator');
-        
-        globalSpeedSlider.addEventListener('input', (e) => {
-            this.globalSpeed = parseFloat(e.target.value);
-            globalSpeedValue.textContent = `${this.globalSpeed.toFixed(1)}x`;
-            speedIndicator.textContent = `${this.globalSpeed.toFixed(1)}x`;
-        });
-        
-        // Camera presets
-        document.querySelectorAll('.preset-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.setCameraPreset(e.target.closest('.preset-btn').dataset.preset);
-            });
-        });
-        
-        // Visual options
-        document.getElementById('showOrbits').addEventListener('change', (e) => {
-            this.toggleOrbits(e.target.checked);
-        });
-        
-        document.getElementById('showLabels').addEventListener('change', (e) => {
-            this.toggleLabels(e.target.checked);
-        });
-        
-        document.getElementById('showStars').addEventListener('change', (e) => {
-            this.toggleStars(e.target.checked);
-        });
-        
-        document.getElementById('showTrails').addEventListener('change', (e) => {
-            this.toggleTrails(e.target.checked);
-        });
+        const canvas = this.renderer.domElement;
         
         // Mouse controls
         canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
@@ -838,45 +713,6 @@ class StellarSystemSimulation {
         
         // Window resize
         window.addEventListener('resize', () => this.handleResize());
-        
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            switch(e.code) {
-                case 'Space':
-                    e.preventDefault();
-                    this.toggleAnimation();
-                    break;
-                case 'KeyR':
-                    this.resetSystem();
-                    break;
-                case 'KeyT':
-                    this.toggleTheme();
-                    break;
-                case 'KeyF':
-                    this.toggleFullscreen();
-                    break;
-                case 'KeyH':
-                    this.toggleShortcutsHelp();
-                    break;
-                case 'Digit1':
-                    this.setCameraPreset('overview');
-                    break;
-                case 'Digit2':
-                    this.setCameraPreset('inner');
-                    break;
-                case 'Digit3':
-                    this.setCameraPreset('outer');
-                    break;
-                case 'Digit4':
-                    this.setCameraPreset('sun');
-                    break;
-            }
-        });
-        
-        // Panel toggle for mobile
-        document.getElementById('panelToggle').addEventListener('click', () => {
-            this.togglePanel();
-        });
     }
     
     onMouseDown(event) {
@@ -887,7 +723,7 @@ class StellarSystemSimulation {
     
     onMouseMove(event) {
         // Update mouse position for raycasting
-        const canvas = document.getElementById('solarSystemCanvas');
+        const canvas = this.renderer.domElement;
         const rect = canvas.getBoundingClientRect();
         this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -904,9 +740,6 @@ class StellarSystemSimulation {
             
             this.cameraControls.mouseX = event.clientX;
             this.cameraControls.mouseY = event.clientY;
-        } else {
-            // Handle planet hover
-            this.handlePlanetHover();
         }
     }
     
@@ -949,187 +782,6 @@ class StellarSystemSimulation {
         this.cameraControls.isMouseDown = false;
     }
     
-    handlePlanetHover() {
-        this.raycaster.setFromCamera(this.mouse, this.camera);
-        const intersects = this.raycaster.intersectObjects(this.planets);
-        
-        if (intersects.length > 0) {
-            const planet = intersects[0].object;
-            if (planet !== this.hoveredPlanet) {
-                this.hoveredPlanet = planet;
-                this.showPlanetTooltip(planet);
-            }
-        } else {
-            if (this.hoveredPlanet) {
-                this.hidePlanetTooltip();
-                this.hoveredPlanet = null;
-            }
-        }
-    }
-    
-    showPlanetTooltip(planet) {
-        const tooltip = document.getElementById('planetTooltip');
-        const nameElement = document.getElementById('tooltipName');
-        const iconElement = document.getElementById('tooltipIcon');
-        const descriptionElement = document.getElementById('tooltipDescription');
-        const distanceElement = document.getElementById('tooltipDistance');
-        const periodElement = document.getElementById('tooltipPeriod');
-        const diameterElement = document.getElementById('tooltipDiameter');
-        
-        const data = planet.userData;
-        
-        nameElement.textContent = data.name;
-        iconElement.style.backgroundColor = `#${data.color.toString(16).padStart(6, '0')}`;
-        descriptionElement.textContent = data.description;
-        distanceElement.textContent = data.realDistance;
-        periodElement.textContent = data.orbitalPeriod;
-        diameterElement.textContent = data.diameter;
-        
-        tooltip.classList.add('visible');
-        
-        // Position tooltip near mouse
-        const canvas = document.getElementById('solarSystemCanvas');
-        const rect = canvas.getBoundingClientRect();
-        const x = (this.mouse.x + 1) * rect.width / 2 + rect.left + 10;
-        const y = (-this.mouse.y + 1) * rect.height / 2 + rect.top - 10;
-        
-        tooltip.style.left = `${Math.min(x, window.innerWidth - tooltip.offsetWidth - 20)}px`;
-        tooltip.style.top = `${Math.max(y, 20)}px`;
-    }
-    
-    hidePlanetTooltip() {
-        const tooltip = document.getElementById('planetTooltip');
-        tooltip.classList.remove('visible');
-    }
-    
-    toggleAnimation() {
-        this.isAnimating = !this.isAnimating;
-        const btn = document.getElementById('pauseBtn');
-        const btnIcon = btn.querySelector('.btn-icon');
-        const btnText = btn.querySelector('.btn-text');
-        const systemStatus = document.getElementById('systemStatus');
-        
-        if (this.isAnimating) {
-            btnIcon.textContent = '⏸️';
-            btnText.textContent = 'Pause';
-            systemStatus.textContent = 'RUNNING';
-            systemStatus.className = 'stat-value status-running';
-        } else {
-            btnIcon.textContent = '▶️';
-            btnText.textContent = 'Resume';
-            systemStatus.textContent = 'PAUSED';
-            systemStatus.className = 'stat-value status-paused';
-        }
-    }
-    
-    resetSystem() {
-        // Reset all planet positions and speeds
-        this.planets.forEach((planet, index) => {
-            planet.userData.angle = Math.random() * Math.PI * 2;
-            planet.userData.individualSpeed = 1.0;
-            
-            // Reset UI controls
-            document.getElementById(`speed-${index}`).value = 1.0;
-            document.getElementById(`speed-value-${index}`).textContent = '1.0x';
-        });
-        
-        // Reset global speed
-        this.globalSpeed = 1.0;
-        document.getElementById('globalSpeed').value = 1.0;
-        document.getElementById('globalSpeedValue').textContent = '1.0x';
-        document.getElementById('speedIndicator').textContent = '1.0x';
-        
-        // Reset simulation time
-        this.simulationTime = 0;
-        
-        // Reset camera
-        this.setCameraPreset('overview');
-    }
-    
-    toggleTheme() {
-        this.isDarkTheme = !this.isDarkTheme;
-        document.body.classList.toggle('dark-theme', this.isDarkTheme);
-        
-        const btn = document.getElementById('themeBtn');
-        const btnIcon = btn.querySelector('.btn-icon');
-        const btnText = btn.querySelector('.btn-text');
-        
-        if (this.isDarkTheme) {
-            btnIcon.textContent = '☀️';
-            btnText.textContent = 'Light Mode';
-            this.scene.background = new THREE.Color(0x000000);
-        } else {
-            btnIcon.textContent = '🌙';
-            btnText.textContent = 'Dark Mode';
-            this.scene.background = new THREE.Color(0x000011);
-        }
-    }
-    
-    toggleFullscreen() {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
-        } else {
-            document.exitFullscreen();
-        }
-    }
-    
-    toggleShortcutsHelp() {
-        const help = document.getElementById('shortcutsHelp');
-        help.classList.toggle('visible');
-    }
-    
-    togglePanel() {
-        const panel = document.getElementById('panelContent');
-        panel.classList.toggle('collapsed');
-    }
-    
-    setCameraPreset(preset) {
-        switch(preset) {
-            case 'overview':
-                this.cameraControls.targetDistance = 150;
-                this.cameraControls.targetRotationX = 0.3;
-                this.cameraControls.targetRotationY = 0;
-                break;
-            case 'inner':
-                this.cameraControls.targetDistance = 80;
-                this.cameraControls.targetRotationX = 0.2;
-                this.cameraControls.targetRotationY = 0;
-                break;
-            case 'outer':
-                this.cameraControls.targetDistance = 250;
-                this.cameraControls.targetRotationX = 0.1;
-                this.cameraControls.targetRotationY = 0;
-                break;
-            case 'sun':
-                this.cameraControls.targetDistance = 50;
-                this.cameraControls.targetRotationX = 0;
-                this.cameraControls.targetRotationY = 0;
-                break;
-        }
-    }
-    
-    toggleOrbits(show) {
-        this.orbitLines.forEach(orbit => {
-            orbit.visible = show;
-        });
-    }
-    
-    toggleLabels(show) {
-        // Labels implementation would go here
-        console.log('Toggle labels:', show);
-    }
-    
-    toggleStars(show) {
-        if (this.stars) {
-            this.stars.visible = show;
-        }
-    }
-    
-    toggleTrails(show) {
-        // Trails implementation would go here
-        console.log('Toggle trails:', show);
-    }
-    
     updateCameraPosition() {
         // Smooth camera movement
         this.cameraControls.currentRotationX += (this.cameraControls.targetRotationX - this.cameraControls.currentRotationX) * 0.05;
@@ -1167,10 +819,6 @@ class StellarSystemSimulation {
         
         const deltaTime = this.clock.getDelta();
         this.simulationTime += deltaTime * this.globalSpeed;
-        
-        // Update simulation time display
-        const days = Math.floor(this.simulationTime * 10); // Accelerated time
-        document.getElementById('simulationTime').textContent = `${days} days`;
         
         this.planets.forEach(planet => {
             const data = planet.userData;
@@ -1228,30 +876,10 @@ class StellarSystemSimulation {
         }
     }
     
-    updateStats() {
-        // Update FPS
-        this.frameCount++;
-        const currentTime = performance.now();
-        
-        if (currentTime - this.lastTime >= 1000) {
-            this.fps = Math.round((this.frameCount * 1000) / (currentTime - this.lastTime));
-            document.getElementById('fpsDisplay').textContent = this.fps;
-            
-            this.frameCount = 0;
-            this.lastTime = currentTime;
-        }
-        
-        // Update object count
-        document.getElementById('objectCount').textContent = this.scene.children.length;
-    }
-    
     handleResize() {
-        const canvas = document.getElementById('solarSystemCanvas');
-        const container = canvas.parentElement;
-        
-        this.camera.aspect = container.clientWidth / container.clientHeight;
+        this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(container.clientWidth, container.clientHeight);
+        this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
     }
     
     animate() {
@@ -1259,7 +887,6 @@ class StellarSystemSimulation {
         
         this.updateCameraPosition();
         this.updatePlanets();
-        this.updateStats();
         
         this.renderer.render(this.scene, this.camera);
     }
@@ -1282,26 +909,48 @@ class StellarSystemSimulation {
                 }
             }
         });
+        
+        // Remove event listeners
+        const canvas = this.renderer.domElement;
+        canvas.removeEventListener('mousedown', this.onMouseDown);
+        canvas.removeEventListener('mousemove', this.onMouseMove);
+        canvas.removeEventListener('mouseup', this.onMouseUp);
+        canvas.removeEventListener('wheel', this.onWheel);
+        canvas.removeEventListener('mouseleave', this.onMouseUp);
+        canvas.removeEventListener('touchstart', this.onTouchStart);
+        canvas.removeEventListener('touchmove', this.onTouchMove);
+        canvas.removeEventListener('touchend', this.onTouchEnd);
+        window.removeEventListener('resize', this.handleResize);
     }
 }
 
-// Initialize the application
-document.addEventListener('DOMContentLoaded', () => {
-    const stellarSystem = new StellarSystemSimulation();
-    
-    // Handle page unload
-    window.addEventListener('beforeunload', () => {
-        stellarSystem.destroy();
-    });
-    
-    // Add keyboard shortcuts info to console
-    console.log('🌌 STELLAR SYSTEM - Keyboard Shortcuts:');
-    console.log('Space: Pause/Resume animation');
-    console.log('R: Reset system');
-    console.log('T: Toggle theme');
-    console.log('F: Toggle fullscreen');
-    console.log('H: Show/hide help');
-    console.log('1-4: Camera presets');
-    console.log('Mouse: Drag to rotate, scroll to zoom');
-    console.log('Touch: Drag to navigate on mobile');
-});
+const StellarSystemSimulationComponent = () => {
+    const containerRef = useRef(null);
+    const simulationRef = useRef(null);
+
+    useEffect(() => {
+        if (containerRef.current) {
+            simulationRef.current = new StellarSystemSimulation(containerRef.current);
+        }
+        
+        return () => {
+            if (simulationRef.current) {
+                simulationRef.current.destroy();
+            }
+        };
+    }, []);
+
+    return (
+        <div 
+            ref={containerRef} 
+            style={{ 
+                width: '100%', 
+                height: '600px',
+                borderRadius: '0',
+                overflow: 'hidden'
+            }} 
+        />
+    );
+};
+
+export default StellarSystemSimulationComponent; 
