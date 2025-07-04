@@ -489,6 +489,7 @@ const DeveloperPage = () => {
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [cursorTrail, setCursorTrail] = useState([]);
+  const trailCounterRef = useRef(0);
   const [colorScheme, setColorScheme] = useState({
     primary: '#22c55e',
     secondary: '#3b82f6',
@@ -512,7 +513,8 @@ const DeveloperPage = () => {
     const handleMouseMove = (e) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
       setCursorTrail(prev => {
-        const newTrail = [...prev, { x: e.clientX, y: e.clientY, id: Date.now() }];
+        trailCounterRef.current++;
+        const newTrail = [...prev, { x: e.clientX, y: e.clientY, id: `${Date.now()}-${trailCounterRef.current}` }];
         return newTrail.slice(-20); // Keep last 20 positions
       });
     };
