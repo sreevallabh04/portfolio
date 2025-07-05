@@ -8,29 +8,29 @@ const services = {
   'web-dev': {
     title: 'Web Development',
     items: [
-      { name: 'Portfolio Website', price: 499, description: 'Showcase your work in style' },
-      { name: 'Business Website', price: 999, description: 'Professional business presence' },
-      { name: 'Project Website', price: 799, description: 'Custom project showcase' },
+      { name: 'Portfolio Website', description: 'Showcase your work in style' },
+      { name: 'Business Website', description: 'Professional business presence' },
+      { name: 'Project Website', description: 'Custom project showcase' },
     ]
   },
   'app-dev': {
     title: 'App Development',
     items: [
-      { name: 'Portfolio App', price: 998, description: 'Mobile portfolio app' },
-      { name: 'Business App', price: 1998, description: 'Enterprise mobile solution' },
-      { name: 'Project App', price: 1598, description: 'Custom mobile app' },
+      { name: 'Portfolio App', description: 'Mobile portfolio app' },
+      { name: 'Business App', description: 'Enterprise mobile solution' },
+      { name: 'Project App', description: 'Custom mobile app' },
     ]
   },
   'ml': {
     title: 'Machine Learning',
     items: [
-      { name: 'Custom ML Model', price: 2000, description: 'AI-powered machine learning solutions' },
+      { name: 'Custom ML Model', description: 'AI-powered machine learning solutions' },
     ]
   },
   'ai-agents': {
     title: 'AI Agents',
     items: [
-      { name: 'AI Agent', price: 5000, description: 'Intelligent automation agents' },
+      { name: 'AI Agent', description: 'Intelligent automation agents' },
     ]
   }
 };
@@ -71,9 +71,8 @@ const OrderForm = ({ cart, total, onClose, onSubmit }) => {
     });
 
     // Add cart details
-    formDataToSend.append('services', cart.map(item => `${item.name} - ₹${item.price}`).join(', '));
-    formDataToSend.append('totalAmount', `₹${total}`);
-    formDataToSend.append('orderDate', new Date().toLocaleDateString());
+    formDataToSend.append('services', cart.map(item => item.name).join(', '));
+    formDataToSend.append('requestDate', new Date().toLocaleDateString());
 
     try {
       const response = await fetch('https://formspree.io/f/mldnlodb', {
@@ -106,9 +105,9 @@ const OrderForm = ({ cart, total, onClose, onSubmit }) => {
           className="bg-zinc-900 rounded-xl max-w-md w-full p-8 text-center border border-zinc-700"
         >
           <div className="text-green-500 text-6xl mb-4">✓</div>
-          <h2 className="text-2xl font-bold text-white mb-4">Order Submitted!</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Quote Request Submitted!</h2>
           <p className="text-gray-300 mb-6">
-            Thank you for your order! I'll review your requirements and get back to you within 24 hours with a detailed proposal and timeline.
+            Thank you for your quote request! I'll review your requirements and get back to you within 24 hours with a detailed proposal and pricing.
           </p>
           <p className="text-sm text-gray-400 mb-6">
             You'll receive a confirmation email shortly at {formData.email}
@@ -495,13 +494,12 @@ const Client = () => {
               >
                 <h3 className="text-lg md:text-xl font-bold text-white mb-2 md:mb-3">{item.name}</h3>
                 <p className="text-gray-400 mb-3 md:mb-4">{item.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xl md:text-2xl font-bold text-red-500">₹{item.price}</span>
+                <div className="flex items-center justify-center">
                   <button
                     onClick={() => addToCart(item)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 md:px-4 py-2 rounded-lg font-semibold transition-colors duration-200"
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-semibold transition-colors duration-200 w-full"
                   >
-                    Add to Cart
+                    Get Quote
                   </button>
                 </div>
               </motion.div>
@@ -538,7 +536,7 @@ const Client = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold text-white">{item.name}</h4>
-                      <p className="text-gray-400 text-sm">₹{item.price}</p>
+                      <p className="text-gray-400 text-sm">Quote requested</p>
                     </div>
                     <button
                       onClick={() => removeFromCart(item.id)}
@@ -554,15 +552,14 @@ const Client = () => {
           
           {cart.length > 0 && (
             <div className="border-t border-zinc-800 pt-4">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-lg font-bold">Total:</span>
-                <span className="text-xl font-bold text-red-500">₹{total}</span>
+              <div className="flex items-center justify-center mb-4">
+                <span className="text-lg font-bold text-white">Ready to get quotes!</span>
               </div>
               <button
                 onClick={() => setShowOrderForm(true)}
                 className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-bold transition-colors duration-200"
               >
-                Proceed to Order
+                Request Quotes
               </button>
             </div>
           )}
