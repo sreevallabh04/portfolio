@@ -35,7 +35,7 @@ const services = {
   }
 };
 
-const OrderForm = ({ cart, total, onClose, onSubmit }) => {
+const OrderForm = ({ cart, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -44,7 +44,7 @@ const OrderForm = ({ cart, total, onClose, onSubmit }) => {
     projectTitle: '',
     projectDescription: '',
     timeline: '',
-    budget: total,
+    budget: '',
     additionalRequirements: '',
     preferredContact: 'email'
   });
@@ -136,7 +136,7 @@ const OrderForm = ({ cart, total, onClose, onSubmit }) => {
         className="bg-zinc-900 rounded-xl w-full max-w-full md:max-w-2xl max-h-[95vh] overflow-y-auto border border-zinc-700"
       >
         <div className="p-6 border-b border-zinc-700 flex items-center justify-between sticky top-0 bg-zinc-900">
-          <h2 className="text-2xl font-bold text-white">Order Details</h2>
+          <h2 className="text-2xl font-bold text-white">Quote Request Details</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white text-3xl font-bold"
@@ -371,20 +371,16 @@ const OrderForm = ({ cart, total, onClose, onSubmit }) => {
             </div>
           </div>
 
-          {/* Order Summary */}
+          {/* Services Summary */}
           <div className="border-t border-zinc-700 pt-6">
-            <h3 className="text-lg font-bold text-white mb-4">Order Summary</h3>
+            <h3 className="text-lg font-bold text-white mb-4">Services Requested</h3>
             <div className="bg-zinc-800 rounded-lg p-4 mb-4">
               {cart.map((item, index) => (
                 <div key={index} className="flex justify-between items-center py-2">
                   <span className="text-white">{item.name}</span>
-                  <span className="text-red-500 font-bold">₹{item.price}</span>
+                  <span className="text-green-500 font-bold">Quote Requested</span>
                 </div>
               ))}
-              <div className="border-t border-zinc-700 mt-4 pt-4 flex justify-between items-center">
-                <span className="text-lg font-bold text-white">Total:</span>
-                <span className="text-xl font-bold text-red-500">₹{total}</span>
-              </div>
             </div>
           </div>
 
@@ -394,7 +390,7 @@ const OrderForm = ({ cart, total, onClose, onSubmit }) => {
             disabled={isSubmitting}
             className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white py-4 rounded-lg font-bold text-lg transition-colors duration-200"
           >
-            {isSubmitting ? 'Submitting Order...' : 'Submit Order & Get Quote'}
+            {isSubmitting ? 'Submitting Request...' : 'Submit Quote Request'}
           </button>
 
           <p className="text-sm text-gray-400 text-center">
@@ -429,7 +425,7 @@ const Client = () => {
     setShowCart(false);
   };
 
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  // Removed total calculation since we no longer display prices
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -570,7 +566,6 @@ const Client = () => {
       {showOrderForm && (
         <OrderForm
           cart={cart}
-          total={total}
           onClose={() => setShowOrderForm(false)}
           onSubmit={handleOrderSubmit}
         />
