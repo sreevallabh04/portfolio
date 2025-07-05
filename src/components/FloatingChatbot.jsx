@@ -366,11 +366,6 @@ Respond in a fun but professional way. Be encouraging about their projects or qu
               
               {/* Pulsing ring */}
               <div className="absolute inset-0 rounded-full border-2 border-white animate-ping opacity-75"></div>
-              
-              {/* Chat icon overlay */}
-              <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                <MessageCircle className="w-3 h-3 text-white" />
-              </div>
             </motion.button>
           </motion.div>
         )}
