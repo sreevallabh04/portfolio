@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
 import ProfileSelection from '@/components/ProfileSelection';
@@ -86,6 +86,7 @@ function AppContent() {
   const [selectedProfile, setSelectedProfile] = useState(null);
   const audioContextResumed = useRef(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Helper: get profile from URL
   const getProfileFromPath = () => {
@@ -135,6 +136,12 @@ function AppContent() {
     setShowSplash(false);
   };
 
+  // Function to handle profile selection
+  const handleProfileSelect = (profileId) => {
+    setSelectedProfile(profileId);
+    navigate(`/browse/${profileId}`);
+  };
+
   if (!hasEntered) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'black' }}>
@@ -156,7 +163,7 @@ function AppContent() {
             <Route
               path="/"
               element={
-                <ProfileSelection onProfileSelect={setSelectedProfile} />
+                <ProfileSelection onProfileSelect={handleProfileSelect} />
               }
             />
             <Route

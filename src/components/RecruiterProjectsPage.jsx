@@ -68,6 +68,15 @@ const projects = [
     imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
     link: "https://onlypalms.streamlit.app/",
     category: "AI/ML"
+  },
+  {
+    title: "GitAlong",
+    period: "2024",
+    description: `GitAlong is a Flutter application that connects developers with open source projects through a Tinder-like interface. Find projects that match your skills, interests, and availability.\n\n🚀 Features:\n✅ Email, Google, GitHub OAuth\n✅ Profile setup with avatar upload\n✅ GitHub-style UI\n✅ AI-powered swiping & matching\n✅ Real-time messaging\n✅ Maintainer dashboard\n\n🚀 Production-Ready Features:\n✅ Authentication System - Firebase Authentication fully configured and production-ready\n✅ Google Sign-In - Complete integration with proper error handling\n✅ Apple Sign-In - Available on iOS/macOS platforms\n✅ Email/Password - Traditional authentication with validation\n✅ Comprehensive Logging - Production-grade logging system\n✅ Error Handling - Robust error management and user feedback\n\n🔧 Technical Architecture:\n- State Management - Flutter Riverpod with proper provider architecture\n- Local Storage - Hive for efficient local data management\n- Responsive Design - Flutter ScreenUtil for multi-device support\n- Modern UI - Glassmorphism effects and smooth animations\n- Error Recovery - Graceful error handling with user-friendly messaging`,
+    techStack: "Flutter, Riverpod, Hooks, GoRouter, Firebase Auth, Firestore, Storage, GitHub OAuth, FastAPI, ML",
+    imageUrl: "/GitAlong.jpg",
+    github: "https://github.com/sreevallabh04/GitAlong",
+    category: "Mobile Apps"
   }
 ];
 
