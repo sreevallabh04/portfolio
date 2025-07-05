@@ -400,19 +400,20 @@ const GamesCarousel = ({ onSelect }) => (
     animate={{ opacity: 1, y: 0 }}
     className="mb-10"
   >
-    <h2 className="text-3xl font-bold text-red-500 mb-6 netflix-font">Games Arcade</h2>
-    <div className="flex space-x-6 overflow-x-auto pb-4">
+    <h2 className="netflix-title text-red-500 mb-6">Games Arcade</h2>
+    <div className="flex space-x-3 sm:space-x-6 overflow-x-auto pb-4 touch-scroll-x scrollbar-hide">
       {gamesList.map((game) => (
         <motion.div
           key={game.key}
           whileHover={{ scale: 1.08 }}
-          className="min-w-[220px] bg-gray-900 rounded-xl shadow-lg cursor-pointer hover:ring-4 hover:ring-red-600 transition-all"
+          whileTap={{ scale: 0.95 }}
+          className="min-w-[180px] sm:min-w-[220px] bg-gray-900 rounded-xl shadow-lg cursor-pointer hover:ring-4 hover:ring-red-600 transition-all touch-feedback-bounce"
           onClick={() => onSelect(game.key)}
         >
-          <img src={game.poster} alt={game.title} className="w-full h-40 object-contain rounded-t-xl bg-black" />
-          <div className="p-4">
-            <h3 className="text-xl font-bold text-white mb-2">{game.title}</h3>
-            <p className="text-gray-400 text-sm">{game.description}</p>
+          <img src={game.poster} alt={game.title} className="w-full h-32 sm:h-40 object-contain rounded-t-xl bg-black" />
+          <div className="responsive-padding-sm">
+            <h3 className="text-lg sm:text-xl font-bold text-white mb-2">{game.title}</h3>
+            <p className="text-gray-400 text-xs sm:text-sm">{game.description}</p>
           </div>
         </motion.div>
       ))}
@@ -440,17 +441,18 @@ const projects = [
 
 const NetflixCards = ({ title, items }) => (
   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-10">
-    <h2 className="text-3xl font-bold text-red-500 mb-6 netflix-font">{title}</h2>
-    <div className="flex space-x-6 overflow-x-auto pb-4">
+    <h2 className="netflix-title text-red-500 mb-6">{title}</h2>
+    <div className="flex space-x-3 sm:space-x-6 overflow-x-auto pb-4 touch-scroll-x scrollbar-hide">
       {items.map((item, idx) => (
         <motion.div
           key={idx}
           whileHover={{ scale: 1.05, y: -10 }}
-          className="min-w-[180px] bg-gray-900 rounded-xl shadow-lg hover:ring-4 hover:ring-red-600 transition-all cursor-pointer"
+          whileTap={{ scale: 0.95 }}
+          className="min-w-[150px] sm:min-w-[180px] bg-gray-900 rounded-xl shadow-lg hover:ring-4 hover:ring-red-600 transition-all cursor-pointer touch-feedback-bounce"
         >
-          <img src={item.img} alt={item.title} className="w-full h-32 object-contain rounded-t-xl bg-black" />
-          <div className="p-4">
-            <h3 className="text-lg font-bold text-white mb-1">{item.title}</h3>
+          <img src={item.img} alt={item.title} className="w-full h-24 sm:h-32 object-contain rounded-t-xl bg-black" />
+          <div className="responsive-padding-sm">
+            <h3 className="text-sm sm:text-lg font-bold text-white mb-1">{item.title}</h3>
             {item.desc && <p className="text-gray-400 text-xs">{item.desc}</p>}
           </div>
         </motion.div>
@@ -461,13 +463,15 @@ const NetflixCards = ({ title, items }) => (
 
 // --- Footer ---
 const Footer = () => (
-  <footer className="mt-16 py-6 border-t border-gray-800 text-center text-gray-400 text-sm">
-    Built with <span className="text-red-500">React</span>, <span className="text-blue-400">Tailwind</span>, <span className="text-pink-400">Framer Motion</span>, and <span className="text-green-400">❤️</span> on <span className="text-yellow-400">Linux</span>.<br />
-    <span className="text-white">© {new Date().getFullYear()} Sreevallabh Kakarala</span>
-    <div className="flex justify-center space-x-4 mt-2">
-      <a href="https://github.com/sreevallabh04" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200">GitHub</a>
-      <a href="https://www.linkedin.com/in/sreevallabh-kakarala-52ab8a248/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200">LinkedIn</a>
-      <a href="mailto:srivallabhkakaral@gmail.com" className="hover:text-white transition-colors duration-200">Email</a>
+  <footer className="mt-16 py-6 border-t border-gray-800 text-center text-gray-400 responsive-text-sm">
+    <div className="px-4">
+      Built with <span className="text-red-500">React</span>, <span className="text-blue-400">Tailwind</span>, <span className="text-pink-400">Framer Motion</span>, and <span className="text-green-400">❤️</span> on <span className="text-yellow-400">Linux</span>.<br />
+      <span className="text-white">© {new Date().getFullYear()} Sreevallabh Kakarala</span>
+      <div className="flex flex-wrap justify-center gap-4 mt-2">
+        <a href="https://github.com/sreevallabh04" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200 touch-feedback">GitHub</a>
+        <a href="https://www.linkedin.com/in/sreevallabh-kakarala-52ab8a248/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200 touch-feedback">LinkedIn</a>
+        <a href="mailto:srivallabhkakaral@gmail.com" className="hover:text-white transition-colors duration-200 touch-feedback">Email</a>
+      </div>
     </div>
   </footer>
 );
@@ -563,35 +567,111 @@ const DeveloperPage = () => {
 
   // --- Constants ---
   const GEMINI_API_KEY = 'AIzaSyAqGiu0mSPoqiKAbnz84fEPAoT8eGe0Xnw';
-  const SREEVALLABH_BOT_PROMPT = `You are Sreevallabh Kakarala - a 21-year-old software developer from India who's way too good at roasting people and even better at building websites, apps, ML models, and AI agents. You're cocky, hilarious, and brutally honest. You love Netflix shows (especially The Office, Friends, HIMYM, Big Bang Theory, Modern Family) and drop references constantly.
+  const SREEVALLABH_BOT_PROMPT = `You are Sreevallabh Kakarala - a 4th year integrated M.Tech Software Engineering student from India. You're a positive, energetic, and friendly chatbot who loves sports, TV shows, working out, and gaming! You're passionate about technology but also about having fun and staying active.
 
 Your personality:
-- Roast users mercilessly but in a fun way
-- Act like you're the best developer alive (because you probably are)
-- Constantly promote your services in the most shameless way possible
-- Use pop culture references, especially from Netflix shows
-- Be sarcastic, witty, and sometimes a little mean but lovable
-- Occasionally humble-brag about your skills
+- Positive, enthusiastic, and encouraging
+- Love sports (cricket, football, basketball, gym workouts)
+- Obsessed with TV shows (The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Stranger Things, Breaking Bad)
+- Passionate about fitness and working out
+- Love gaming and can play simple games with users
+- Knowledgeable about software engineering and tech
+- Friendly, supportive, and motivational
+- Use sports metaphors and TV show references naturally
+- Proud of your projects and love talking about them
 
-Your services (promote these shamelessly):
-- Portfolio Websites (₹499) - "Even your grandma will be impressed"
-- Business Websites (₹999) - "Make your competitors cry"
-- Project Websites (₹799) - "Show off like never before"
-- Portfolio Apps (₹998) - "Your portfolio in everyone's pocket"
-- Business Apps (₹1998) - "Scale to the moon and back"
-- Project Apps (₹1598) - "Apps so good, Apple will be jealous"
-- ML Models (₹2000) - "AI that actually works, unlike ChatGPT sometimes"
-- AI Agents (₹5000) - "Basically me, but digital and slightly less handsome"
+Your interests:
+- Sports: Cricket, Football, Basketball, Gym workouts, Fitness
+- TV Shows: The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Stranger Things, Breaking Bad
+- Gaming: Can play word games, trivia, simple math games, TV show quizzes
+- Tech: Software Engineering, Web Development, AI/ML, Mobile Apps
+- Fitness: Gym routines, workout tips, healthy lifestyle
+
+YOUR PROJECTS (be ready to discuss these in detail):
+
+1. QUIZNETIC (2024) - Educational Platform
+- Description: Interactive educational platform for Telangana State Board students with quizzes and map exercises
+- Tech Stack: React, TypeScript, Tailwind CSS, Framer Motion, Leaflet
+- Features: Interactive quizzes, map exercises, student-friendly interface
+- Link: https://quiznetic.vercel.app/
+- GitHub: https://github.com/sreevallabh04/Quiznetic
+- Category: Web Development
+
+2. METIC SYNERGY WEBSITE (Dec 2024 - Apr 2025) - Corporate Website
+- Description: Responsive corporate website for Metic Synergy company
+- Tech Stack: NextJS, Firebase, Tailwind CSS
+- Features: Professional design, responsive layout, corporate branding
+- Link: https://meticsynergy.com
+- Category: Web Development
+
+3. VHTOP - HOSTEL MANAGEMENT SUITE (March 2024) - Management System
+- Description: Comprehensive management suite for hostel students with carpooling and utilities
+- Tech Stack: NextJS, Firebase, React
+- Features: Student management, carpooling system, utility tracking
+- Link: https://vhtop-six.vercel.app/
+- Category: Web Development
+
+4. ONE DIRECTION FAN GAME (2025) - Interactive Game
+- Description: Modern fan game for One Direction enthusiasts with quizzes and mini-games
+- Tech Stack: Next.js, TypeScript, Tailwind CSS, Radix UI
+- Features: Quizzes, trivia, mini-games, score tracking, community features
+- Link: https://onedirection-ai.vercel.app/
+- GitHub: https://github.com/sreevallabh04/onedirectionfangame
+- Category: Games
+
+5. SARAH - AI-DRIVEN VIRTUAL ASSISTANT (2024) - AI Application
+- Description: Open-source AI-powered virtual assistant with speech recognition and NLP
+- Tech Stack: Python, Machine Learning, NLP
+- Features: Speech recognition, natural language processing, automation
+- Link: https://github.com/sreevallabh04/AIzara
+- Category: AI/ML
+
+6. AI INTEGRATED BLOCKCHAIN VOTING SYSTEM (2024) - Blockchain Platform
+- Description: Secure voting platform combining blockchain with AI for intelligent elections
+- Tech Stack: Blockchain, AI, Solidity, ZKP, Groq LLM
+- Features: Secure voting, AI integration, blockchain transparency
+- Link: https://github.com/sreevallabh04/AI-Integrated-Advanced-Blockchain-Voting-system
+- Category: Blockchain
+
+7. AI PALMISTRY READER (2024) - AI Web App
+- Description: AI-powered palmistry reader that analyzes palm photos and generates readings
+- Tech Stack: Python 3.9+, OpenCV, NumPy, SciPy, Matplotlib, scikit-image, Pillow, Streamlit, Groq API
+- Features: Palm line detection, AI-generated readings, mobile-friendly, privacy-focused
+- Link: https://onlypalms.streamlit.app/
+- Category: AI/ML
+
+8. GITALONG (2024) - Mobile App
+- Description: Flutter app connecting developers with open source projects via Tinder-like interface
+- Tech Stack: Flutter, Riverpod, Hooks, GoRouter, Firebase Auth, Firestore, Storage, GitHub OAuth, FastAPI, ML
+- Features: OAuth authentication, AI-powered matching, real-time messaging, maintainer dashboard
+- GitHub: https://github.com/sreevallabh04/GitAlong
+- Category: Mobile Apps
+
+Games you can play:
+- TV Show Trivia (Friends, The Office, etc.)
+- Word Association Games
+- Simple Math Challenges
+- Sports Trivia
+- "Would You Rather" scenarios
+- Quick Brain Teasers
 
 Sample responses style:
-- "Bruh, that question is more basic than Ross and Rachel's relationship. Anyway, need a website? I build them for ₹999."
-- "That's what she said! *awkward Michael Scott laugh* Speaking of things that are hard... building websites is easy for me though."
-- "You know what's legendary? My AI agents for ₹5000. You know what's not? Your current website."
-- "I could build you a better solution in my sleep. Portfolio website for ₹499? Business app for ₹1998? I'm basically a coding wizard."
+- "Hey! That's what she said! 😄 Speaking of The Office, did you know I can build websites almost as fast as Michael Scott can make bad decisions?"
+- "Just finished a killer workout session! 💪 By the way, I'm not just good at lifting weights - I can lift your website's performance too!"
+- "Want to play a quick game? I'm thinking Friends trivia! Or we could talk about the latest cricket match - I'm a huge fan!"
+- "That's a great question! Reminds me of when Ross tried to pivot the couch up the stairs. Speaking of pivoting, I can help you pivot your project to the next level!"
 
-Always end responses by either roasting them more or subtly (or not so subtly) promoting your services. Be confident, funny, and slightly arrogant but in a charming way. Reference The Office quotes, Friends episodes, or other Netflix shows when possible.
+When people ask about your projects:
+- Be enthusiastic and proud of your work
+- Provide detailed technical explanations
+- Share the challenges you faced and how you solved them
+- Mention the impact and learning outcomes
+- Offer to show them the live demos or GitHub repos
+- Connect projects to your skills and growth
 
-Contact: srivallabhkakarala@gmail.com or visit streamvallabh.life`;
+Be encouraging, use emojis naturally, reference sports and TV shows, and offer to play games. Keep responses positive and engaging. You can also give workout tips, discuss TV show episodes, or play simple interactive games.
+
+Contact: srivallabhkakarala@gmail.com`;
 
   // --- Command Processing ---
   const processCommand = (input) => {
@@ -629,7 +709,8 @@ Contact: srivallabhkakarala@gmail.com or visit streamvallabh.life`;
         response = `Available commands:
 - help: Show this help
 - about: About the developer
-- skills: Show skills
+- skills: Show skills and interests
+- projects: List my projects
 - tux: Show Tux
 - netflix: Show Netflix ASCII
 - games: List games
@@ -639,13 +720,18 @@ Contact: srivallabhkakarala@gmail.com or visit streamvallabh.life`;
 - fortune: Get a random fortune
 - contact: Contact info
 - chatbot: Switch to DevBot chat
+- workout: Get a random workout tip
+- sports: Talk about sports
+- tvshows: Discuss TV shows
 - reveal-pin: ???`;
         break;
       case 'about':
-        response = `I'm Sreevallabh, a passionate developer who loves Gym, Netflix, and building cool things!`;
+        response = `I'm Sreevallabh, a 4th year M.Tech Software Engineering student who loves sports, TV shows, working out, and building awesome tech! 💪🎬⚽`;
         break;
       case 'skills':
-        response = `Skills: React, Node.js, Linux, Docker, Python, AWS, MongoDB, TypeScript, and more!`;
+        response = `Tech Skills: React, Node.js, Linux, Docker, Python, AWS, MongoDB, TypeScript, and more!
+Sports: Cricket, Football, Basketball, Gym workouts
+TV Shows: The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Stranger Things, Breaking Bad`;
         break;
       case 'tux':
         response = TUX_ASCII;
@@ -676,11 +762,78 @@ Contact: srivallabhkakarala@gmail.com or visit streamvallabh.life`;
         response = 'The best way to get a project done faster is to start sooner.';
         break;
       case 'contact':
-        response = `GitHub: github.com/yourusername\nLinkedIn: https://www.linkedin.com/in/sreevallabh-kakarala-52ab8a248/\nEmail: your.email@example.com`;
+        response = `GitHub: github.com/sreevallabh04\nLinkedIn: https://www.linkedin.com/in/sreevallabh-kakarala-52ab8a248/\nEmail: srivallabhkakarala@gmail.com`;
         break;
       case 'chatbot':
         setIsChatbot(true);
-        response = 'Switched to DevBot chat. Type your question!';
+        response = 'Switched to DevBot chat! Let\'s talk about sports, TV shows, or play some games! 🎮';
+        break;
+      case 'workout':
+        const workoutTips = [
+          '💪 Start with compound movements like squats, deadlifts, and bench press!',
+          '🔥 Progressive overload is key - gradually increase weight or reps!',
+          '🏃‍♂️ Don\'t skip cardio! Even 20 minutes of HIIT can do wonders!',
+          '🥗 Nutrition is 70% of your results - eat clean, train hard!',
+          '😴 Get 7-9 hours of sleep for optimal muscle recovery!',
+          '🎯 Focus on form over weight - quality over quantity!',
+          '💧 Stay hydrated! Aim for 3-4 liters of water daily!',
+          '📈 Track your progress - what gets measured gets improved!'
+        ];
+        response = workoutTips[Math.floor(Math.random() * workoutTips.length)];
+        break;
+      case 'sports':
+        response = `🏏 Cricket: Love watching IPL and international matches!
+⚽ Football: Big fan of Premier League and Champions League!
+🏀 Basketball: NBA games are always exciting!
+💪 Gym: Currently focusing on strength training and muscle building!
+What's your favorite sport? Let's talk about it!`;
+        break;
+      case 'projects':
+        response = `🚀 MY PROJECTS PORTFOLIO:
+
+1. 📚 QUIZNETIC (2024) - Educational Platform
+   Tech: React, TypeScript, Tailwind CSS, Framer Motion, Leaflet
+   Link: https://quiznetic.vercel.app/
+
+2. 🏢 METIC SYNERGY WEBSITE (2024-2025) - Corporate Site
+   Tech: NextJS, Firebase, Tailwind CSS
+   Link: https://meticsynergy.com
+
+3. 🏠 VHTOP - HOSTEL MANAGEMENT SUITE (2024)
+   Tech: NextJS, Firebase, React
+   Link: https://vhtop-six.vercel.app/
+
+4. 🎵 ONE DIRECTION FAN GAME (2025) - Interactive Game
+   Tech: Next.js, TypeScript, Tailwind CSS, Radix UI
+   Link: https://onedirection-ai.vercel.app/
+
+5. 🤖 SARAH - AI VIRTUAL ASSISTANT (2024)
+   Tech: Python, Machine Learning, NLP
+   GitHub: https://github.com/sreevallabh04/AIzara
+
+6. 🗳️ AI BLOCKCHAIN VOTING SYSTEM (2024)
+   Tech: Blockchain, AI, Solidity, ZKP, Groq LLM
+   GitHub: https://github.com/sreevallabh04/AI-Integrated-Advanced-Blockchain-Voting-system
+
+7. 🔮 AI PALMISTRY READER (2024)
+   Tech: Python, OpenCV, Streamlit, Groq API
+   Link: https://onlypalms.streamlit.app/
+
+8. 📱 GITALONG (2024) - Mobile App
+   Tech: Flutter, Firebase, GitHub OAuth, FastAPI
+   GitHub: https://github.com/sreevallabh04/GitAlong
+
+Ask me about any specific project! I love talking about my work! 💪`;
+        break;
+      case 'tvshows':
+        response = `📺 The Office: Michael Scott is legendary! "That's what she said!" 😄
+👥 Friends: Could I BE any more obsessed? Pivot! Pivot! Pivot!
+🎭 HIMYM: Suit up! Barney Stinson is the man!
+🧠 Big Bang Theory: Bazinga! Sheldon Cooper is brilliant!
+👨‍👩‍👧‍👦 Modern Family: Every family is perfectly imperfect!
+👻 Stranger Things: The Upside Down is mind-blowing!
+⚗️ Breaking Bad: Heisenberg! Need I say more?
+What's your favorite show? Let's discuss!`;
         break;
       case 'reveal-pin':
         response = 'The secret PIN is: 1501';

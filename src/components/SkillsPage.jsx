@@ -127,7 +127,7 @@ const SkillsPage = () => {
                     key={index}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="netflix-card bg-zinc-900/80 backdrop-blur-sm rounded-lg shadow-lg flex flex-col items-center justify-center p-3 sm:p-4 cursor-pointer transition-all duration-300 border border-gray-800 hover:border-red-500/50"
+                    className="netflix-card bg-zinc-900/80 backdrop-blur-sm rounded-lg shadow-lg flex flex-col items-center justify-center p-3 sm:p-4 cursor-pointer transition-all duration-300 border border-gray-800 hover:border-red-500/50 touch-feedback-bounce"
                     onHoverStart={() => setHoveredIndex(`${category}-${index}`)}
                     onHoverEnd={() => setHoveredIndex(null)}
                   >
@@ -161,7 +161,8 @@ const SkillsPage = () => {
                     <motion.div
                       key={index}
                       whileHover={{ scale: 1.12, zIndex: 10 }}
-                      className="netflix-card w-40 md:w-48 lg:w-52 h-40 md:h-48 lg:h-52 bg-zinc-900/90 backdrop-blur-sm rounded-lg shadow-xl flex flex-col items-center justify-center mx-2 cursor-pointer transition-all duration-300 border border-gray-800 hover:border-red-500/50"
+                      whileTap={{ scale: 0.98 }}
+                      className="netflix-card w-40 md:w-48 lg:w-52 h-40 md:h-48 lg:h-52 bg-zinc-900/90 backdrop-blur-sm rounded-lg shadow-xl flex flex-col items-center justify-center mx-2 cursor-pointer transition-all duration-300 border border-gray-800 hover:border-red-500/50 touch-feedback-bounce"
                       onHoverStart={() => setHoveredIndex(`${category}-${index}`)}
                       onHoverEnd={() => setHoveredIndex(null)}
                     >

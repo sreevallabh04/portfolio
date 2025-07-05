@@ -70,8 +70,9 @@ const Navbar = () => {
             <div className="md:hidden">
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="text-white hover:text-red-600 transition-colors duration-200 focus:outline-none"
+                className="touch-target text-white hover:text-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 rounded-lg"
                 aria-label="Toggle menu"
+                aria-expanded={isOpen}
               >
                 <svg
                   className="h-6 w-6"
@@ -102,14 +103,14 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed top-16 left-0 right-0 bg-black/95 backdrop-blur-lg z-40 md:hidden px-2"
+            className="fixed top-16 left-0 right-0 bg-black/95 backdrop-blur-lg z-40 md:hidden safe-area-top"
           >
-            <div className="px-4 py-2 space-y-1">
+            <div className="responsive-padding-sm space-y-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className="block px-3 py-2 text-white hover:text-red-600 transition-colors duration-200 text-base font-medium"
+                  className="block touch-target px-4 py-3 text-white hover:text-red-600 hover:bg-red-600/10 transition-all duration-200 text-base font-medium rounded-lg"
                 >
                   {link.label}
                 </Link>

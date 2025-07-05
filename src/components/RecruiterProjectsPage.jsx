@@ -157,12 +157,12 @@ const RecruiterProjectsPage = () => {
 
       {/* Categories */}
       <div className="px-2 sm:px-4 md:px-8 py-4 sm:py-6">
-        <div className="flex gap-2 sm:gap-4 overflow-x-auto pb-2 sm:pb-4 scrollbar-hide">
+        <div className="flex gap-2 sm:gap-4 overflow-x-auto pb-2 sm:pb-4 touch-scroll-x scrollbar-hide">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-3 py-1 sm:px-4 sm:py-2 rounded-full whitespace-nowrap transition-colors text-sm sm:text-base ${
+              className={`px-3 py-1 sm:px-4 sm:py-2 rounded-full whitespace-nowrap transition-colors text-sm sm:text-base touch-feedback ${
                 selectedCategory === category
                   ? 'bg-red-600 text-white'
                   : 'bg-white/10 text-gray-300 hover:bg-white/20'
@@ -181,7 +181,8 @@ const RecruiterProjectsPage = () => {
             <motion.div
               key={idx}
               whileHover={{ scale: 1.03, zIndex: 30 }}
-              className="relative bg-zinc-900 rounded-md overflow-hidden shadow-2xl cursor-pointer group"
+              whileTap={{ scale: 0.98 }}
+              className="relative bg-zinc-900 rounded-md overflow-hidden shadow-2xl cursor-pointer group touch-feedback-bounce"
               onClick={() => openProjectModal(project)}
             >
               {/* Project Image */}
@@ -206,7 +207,7 @@ const RecruiterProjectsPage = () => {
                       href={project.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                      className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors touch-feedback"
                       onClick={e => e.stopPropagation()}
                     >
                       <Github size={16} className="text-white" />
@@ -217,7 +218,7 @@ const RecruiterProjectsPage = () => {
                       href={project.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                      className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors touch-feedback"
                       onClick={e => e.stopPropagation()}
                     >
                       <ExternalLink size={16} className="text-white" />
@@ -260,7 +261,7 @@ const RecruiterProjectsPage = () => {
               {/* Close Button */}
               <button
                 onClick={closeProjectModal}
-                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors touch-feedback"
               >
                 <X size={20} className="text-white" />
               </button>
@@ -292,7 +293,7 @@ const RecruiterProjectsPage = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => window.open(selectedProject.link, '_blank')}
-                      className="px-6 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
+                      className="mobile-button px-6 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 touch-feedback"
                     >
                       <ExternalLink size={18} />
                       View
@@ -302,7 +303,7 @@ const RecruiterProjectsPage = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => window.open(selectedProject.github, '_blank')}
-                        className="px-6 py-2.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+                        className="mobile-button px-6 py-2.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2 touch-feedback"
                       >
                         <Github size={18} />
                         GitHub

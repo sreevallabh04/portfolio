@@ -354,7 +354,7 @@ const Dashboard = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 safe-area-top safe-area-bottom"
             onClick={closeProjectModal}
           >
             <motion.div
@@ -362,19 +362,19 @@ const Dashboard = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-zinc-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden relative"
+              className="bg-zinc-900 rounded-xl sm:rounded-2xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden relative touch-scroll-y"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
               <button
                 onClick={closeProjectModal}
-                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10 touch-target rounded-full bg-black/50 hover:bg-black/70 transition-colors touch-feedback"
               >
-                <X size={20} className="text-white" />
+                <X size={18} className="text-white sm:w-5 sm:h-5" />
               </button>
 
               {/* Project Image Header */}
-              <div className="relative h-64 md:h-80 overflow-hidden">
+              <div className="relative h-48 sm:h-64 md:h-80 overflow-hidden">
                 <img
                   src={selectedProject.imageUrl}
                   alt={selectedProject.title}
@@ -383,25 +383,25 @@ const Dashboard = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/60 to-transparent" />
                 
                 {/* Project Header Info */}
-                <div className="absolute bottom-6 left-6 right-6">
+                <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6">
                   <div className="flex items-center gap-2 text-sm text-gray-300 mb-2">
                     <Calendar size={16} />
                     <span>{selectedProject.period}</span>
                     <span className="mx-2">•</span>
                     <span>3 Months</span>
                   </div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4">
                     {selectedProject.title}
                   </h2>
                   
                   {/* Action Buttons */}
-                  <div className="flex gap-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
                     {selectedProject.link && (
-                      <motion.button
+                                              <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => window.open(selectedProject.link, '_blank')}
-                        className="px-6 py-2.5 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
+                        className="mobile-button bg-white text-black hover:bg-gray-200 flex items-center justify-center gap-2 touch-feedback"
                       >
                         <ExternalLink size={18} />
                         {selectedProject.category?.includes('Education') ? 'Visit Website' : 
@@ -410,11 +410,11 @@ const Dashboard = () => {
                       </motion.button>
                     )}
                     {selectedProject.github && (
-                      <motion.button
+                                              <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => window.open(selectedProject.github, '_blank')}
-                        className="px-6 py-2.5 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+                        className="mobile-button bg-black text-white hover:bg-gray-800 flex items-center justify-center gap-2 touch-feedback"
                       >
                         <Github size={18} />
                         GitHub
@@ -425,7 +425,7 @@ const Dashboard = () => {
               </div>
 
               {/* Project Content */}
-              <div className="p-6 md:p-8">
+              <div className="p-4 sm:p-6 md:p-8">
                 {/* Featured Badge */}
                 <div className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium mb-6">
                   <span className="w-2 h-2 bg-white rounded-full"></span>

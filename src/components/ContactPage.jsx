@@ -50,43 +50,43 @@ const ContactPage = () => {
             <div className="space-y-4">
               <a
                 href={`mailto:${contactInfo.email}`}
-                className="flex items-center space-x-4 p-4 bg-[#181818] rounded-lg hover:bg-[#252525] transition-colors duration-200"
+                className="flex items-center space-x-4 responsive-padding-sm bg-[#181818] rounded-lg hover:bg-[#252525] transition-colors duration-200 touch-feedback hover-lift"
               >
-                <Mail className="w-6 h-6 text-red-600" />
-                <span>{contactInfo.email}</span>
+                <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 flex-shrink-0" />
+                <span className="text-sm sm:text-base break-all">{contactInfo.email}</span>
               </a>
 
               <a
                 href={`https://${contactInfo.linkedin}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-4 p-4 bg-[#181818] rounded-lg hover:bg-[#252525] transition-colors duration-200"
+                className="flex items-center space-x-4 responsive-padding-sm bg-[#181818] rounded-lg hover:bg-[#252525] transition-colors duration-200 touch-feedback hover-lift"
               >
-                <Linkedin className="w-6 h-6 text-red-600" />
-                <span>LinkedIn Profile</span>
+                <Linkedin className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 flex-shrink-0" />
+                <span className="text-sm sm:text-base">LinkedIn Profile</span>
               </a>
 
               <a
                 href={`https://${contactInfo.github}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-4 p-4 bg-[#181818] rounded-lg hover:bg-[#252525] transition-colors duration-200"
+                className="flex items-center space-x-4 responsive-padding-sm bg-[#181818] rounded-lg hover:bg-[#252525] transition-colors duration-200 touch-feedback hover-lift"
               >
-                <Github className="w-6 h-6 text-red-600" />
-                <span>GitHub Profile</span>
+                <Github className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 flex-shrink-0" />
+                <span className="text-sm sm:text-base">GitHub Profile</span>
               </a>
 
-              <div className="flex items-center space-x-4 p-4 bg-[#181818] rounded-lg">
-                <MapPin className="w-6 h-6 text-red-600" />
-                <span>{contactInfo.location}</span>
+              <div className="flex items-center space-x-4 responsive-padding-sm bg-[#181818] rounded-lg">
+                <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 flex-shrink-0" />
+                <span className="text-sm sm:text-base">{contactInfo.location}</span>
               </div>
 
               <a
                 href={`tel:${contactInfo.phone}`}
-                className="flex items-center space-x-4 p-4 bg-[#181818] rounded-lg hover:bg-[#252525] transition-colors duration-200"
+                className="flex items-center space-x-4 responsive-padding-sm bg-[#181818] rounded-lg hover:bg-[#252525] transition-colors duration-200 touch-feedback hover-lift"
               >
-                <Phone className="w-6 h-6 text-red-600" />
-                <span>{contactInfo.phone}</span>
+                <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 flex-shrink-0" />
+                <span className="text-sm sm:text-base">{contactInfo.phone}</span>
               </a>
             </div>
           </motion.div>
@@ -117,7 +117,7 @@ const ContactPage = () => {
                     placeholder="Your anonymous message..."
                     rows="6"
                     required
-                    className="w-full p-4 bg-[#181818] rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 resize-none text-white placeholder-gray-400"
+                    className="w-full responsive-padding-sm bg-[#181818] rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600 resize-none text-white placeholder-gray-400 mobile-input"
                   />
                   <ValidationError 
                     prefix="Message" 
@@ -130,7 +130,7 @@ const ContactPage = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full py-4 bg-red-600 text-white font-semibold rounded-lg transition-all duration-200 ${
+                  className={`mobile-button w-full bg-red-600 text-white font-semibold rounded-lg transition-all duration-200 touch-feedback ${
                     isSubmitting 
                       ? 'opacity-50 cursor-not-allowed' 
                       : 'hover:bg-red-700 hover:scale-[1.02]'

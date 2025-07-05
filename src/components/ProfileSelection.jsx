@@ -84,10 +84,10 @@ const ProfileSelection = ({ onProfileSelect }) => {
             key={profile.id}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="flex flex-col items-center"
+            className="flex flex-col items-center touch-feedback-bounce"
             onClick={() => onProfileSelect(profile.id)}
           >
-            <div className={`w-28 h-28 sm:w-[120px] sm:h-[120px] md:w-[160px] md:h-[160px] cursor-pointer rounded-lg shadow-lg shadow-black/50 hover:shadow-xl hover:shadow-black/60 transition-all duration-300 overflow-hidden ${!imagesLoaded[profile.id] ? profile.color : ''}`}>
+            <div className={`w-28 h-28 sm:w-[120px] sm:h-[120px] md:w-[160px] md:h-[160px] cursor-pointer rounded-lg shadow-lg shadow-black/50 hover-glow transition-all duration-300 overflow-hidden touch-target ${!imagesLoaded[profile.id] ? profile.color : ''}`}>
               {/* Display image if loaded, otherwise show colored background */}
               {imagesLoaded[profile.id] !== false && (
                 <img 

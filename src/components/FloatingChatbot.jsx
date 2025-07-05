@@ -13,6 +13,7 @@ const FloatingChatbot = () => {
   const [hasGreeted, setHasGreeted] = useState(false);
   const [currentApiKeyIndex, setCurrentApiKeyIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 1024,
     height: typeof window !== 'undefined' ? window.innerHeight : 768
@@ -46,14 +47,14 @@ const FloatingChatbot = () => {
 
    const responsivePosition = getResponsivePosition();
    
-   // Adjust drag constraints based on responsive positioning
+   // Adjust drag constraints to allow free movement across entire screen
    const getDragConstraints = (isButton = false) => {
      const elementWidth = isButton ? 80 : (windowSize.width < 480 ? 288 : 320); // w-72 = 288px, w-80 = 320px
      const elementHeight = isButton ? 80 : (isMinimized ? 80 : 500);
      
      return {
-       top: 0,
-       left: 0,
+       top: -windowSize.height + elementHeight,
+       left: -windowSize.width + elementWidth,
        right: windowSize.width - elementWidth,
        bottom: windowSize.height - elementHeight,
      };
@@ -328,7 +329,7 @@ Respond in a fun but professional way. Be encouraging about their projects or qu
             dragElastic={0.1}
             dragConstraints={getDragConstraints(true)}
             initial={{ scale: 0, rotate: -180, x: 0, y: 0 }}
-            animate={{ scale: 1, rotate: 0 }}
+            animate={{ scale: 1, rotate: 0, x: position.x, y: position.y }}
             exit={{ scale: 0, rotate: 180 }}
             transition={{ type: "spring", stiffness: 200 }}
             className="fixed z-50 cursor-grab active:cursor-grabbing"
@@ -338,6 +339,9 @@ Respond in a fun but professional way. Be encouraging about their projects or qu
             }}
             onDragStart={() => setIsDragging(true)}
             onDragEnd={() => setIsDragging(false)}
+            onDrag={(event, info) => {
+              setPosition({ x: info.point.x, y: info.point.y });
+            }}
           >
             <motion.button
               onClick={() => !isDragging && setIsOpen(true)}
@@ -384,7 +388,9 @@ Respond in a fun but professional way. Be encouraging about their projects or qu
               opacity: 1, 
               y: 0, 
               scale: isMinimized ? 0.8 : 1,
-              height: isMinimized ? 80 : 500
+              height: isMinimized ? 80 : 500,
+              x: position.x, 
+              y: position.y
             }}
             exit={{ opacity: 0, y: 100, scale: 0.8 }}
             transition={{ type: "spring", stiffness: 200 }}
@@ -398,6 +404,9 @@ Respond in a fun but professional way. Be encouraging about their projects or qu
             }}
             onDragStart={() => setIsDragging(true)}
             onDragEnd={() => setIsDragging(false)}
+            onDrag={(event, info) => {
+              setPosition({ x: info.point.x, y: info.point.y });
+            }}
           >
             {/* Header - Draggable Area */}
             <div className="flex items-center justify-between p-4 border-b border-gray-800/50 bg-gradient-to-r from-[#e50914] to-[#ff6b9d] cursor-grab active:cursor-grabbing">
