@@ -1,0 +1,92 @@
+# Portfolio Website - LLM Scraping Guide
+
+## Site Overview
+This is a personal portfolio website for a software developer/engineer showcasing their skills, projects, and experience. The site features a Netflix-inspired design with interactive elements and multiple profile views.
+
+## Site Structure
+
+### Main Pages
+- **Home/Developer Page** (`/` or `/developer`): Main portfolio page with interactive solar system simulation
+- **Client Page** (`/client`): Alternative view for potential clients
+- **Recruiter Page** (`/recruiter`): Specialized view for recruiters and hiring managers
+- **Skills Page** (`/skills`): Comprehensive skills showcase
+- **Contact Page** (`/contact`): Contact information and form
+- **Terms Page** (`/terms`): Terms of service
+
+### Key Components
+- **Navbar**: Netflix-style navigation with profile switching
+- **ProfileSelection**: Allows switching between Developer, Client, and Recruiter views
+- **Dashboard**: Project showcase with modal displays
+- **SkillsPage**: Interactive skills grid with categories
+- **ContactPage**: Contact form and information
+- **DeveloperPage**: Main portfolio with Three.js solar system simulation
+
+## Content Overview
+
+### Developer Information
+- **Name**: Sarah (based on file references)
+- **Role**: Software Developer/Engineer
+- **Location**: Telangana, India (based on image references)
+- **Education**: VIT (Vellore Institute of Technology), DPS
+- **Experience**: Full-stack development, AI/ML, blockchain
+
+### Skills Categories
+- **Programming Languages**: Python, Java, JavaScript, C++, PHP, HTML, CSS
+- **Frameworks & Libraries**: React.js, Next.js, Flask, NumPy, Pandas, Scikit-learn
+- **Cloud & DevOps**: AWS, GCP, Docker, Firebase, Firestore
+- **Databases**: MySQL, SQLite, DynamoDB
+- **Design & Tools**: Figma, Adobe XD, Notion, Git, Linux, Bash
+- **AI/ML**: Machine Learning, Data Science, AI in Blockchain
+
+### Projects Showcased
+- **AI in Blockchain**: Blockchain and AI integration project
+- **Netflix Hacker**: Cybersecurity/gaming project
+- **Code Breaker**: Programming game
+- **Terminal Racer**: Terminal-based racing game
+- **Snake Game**: Classic snake game implementation
+- **HopeCore**: Core project (video and image assets present)
+
+### Interactive Features
+- **Three.js Solar System**: Interactive 3D solar system simulation on developer page
+- **Profile Switching**: Dynamic content based on viewer type (Developer/Client/Recruiter)
+- **Responsive Design**: Mobile-first approach with Netflix-inspired UI
+- **Floating Chatbot**: AI-powered chat interface
+- **Web Swing Game**: Interactive web-based game
+
+## Technical Stack
+- **Frontend**: React.js with Vite
+- **Styling**: Tailwind CSS
+- **3D Graphics**: Three.js
+- **Deployment**: Vercel
+- **Assets**: Local images, videos, and audio files
+
+## Design Theme
+- **Netflix-inspired**: Dark theme with red accents
+- **Modern UI**: Clean, professional design
+- **Interactive Elements**: Hover effects, animations, and transitions
+- **Responsive**: Mobile-first design approach
+
+## Key Files for Understanding
+- `src/App.jsx`: Main application routing and structure
+- `src/components/DeveloperPage.jsx`: Main portfolio page
+- `src/components/SkillsPage.jsx`: Skills showcase
+- `src/components/Navbar.jsx`: Navigation component
+- `src/main.jsx`: Three.js solar system simulation
+- `src/components/Dashboard.jsx`: Project showcase
+
+## Content Categories
+1. **Personal Information**: Education, location, background
+2. **Technical Skills**: Programming languages, frameworks, tools
+3. **Projects**: Portfolio of work with descriptions and media
+4. **Interactive Elements**: Games, simulations, chatbots
+5. **Contact Information**: Professional contact details
+
+## Scraping Notes
+- Site uses client-side routing with React Router
+- Content is dynamically rendered based on selected profile
+- Interactive elements may require JavaScript execution
+- Media assets are stored in `/public/` directory
+- Responsive design adapts content for different screen sizes
+
+## Important Context
+This is a personal portfolio website showcasing technical skills, projects, and professional experience. The site emphasizes interactive elements, modern web technologies, and a Netflix-inspired design aesthetic. Content is tailored for different audiences (developers, clients, recruiters) through profile switching functionality. 

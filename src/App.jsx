@@ -100,9 +100,8 @@ function AppContent() {
     if (urlProfile) {
       setSelectedProfile(urlProfile);
       localStorage.setItem('selectedProfile', urlProfile);
-    } else if (storedProfile) {
-      setSelectedProfile(storedProfile);
     }
+    // Don't auto-restore stored profile - let user choose on root path
   }, [location.pathname]);
 
   // Save selectedProfile to localStorage when it changes
@@ -157,11 +156,7 @@ function AppContent() {
             <Route
               path="/"
               element={
-                !selectedProfile ? (
-                  <ProfileSelection onProfileSelect={setSelectedProfile} />
-                ) : (
-                  <Navigate to={`/browse/${selectedProfile}`} replace />
-                )
+                <ProfileSelection onProfileSelect={setSelectedProfile} />
               }
             />
             <Route
