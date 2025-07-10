@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, FreeMode } from 'swiper/modules';
+import SEO from '@/components/SEO';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -60,8 +61,25 @@ const skillsData = {
 const SkillsPage = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
+  // Prepare structured data for skills
+  const skillsList = Object.entries(skillsData).flatMap(([category, skills]) =>
+    skills.map(skill => skill.name)
+  );
+
+  const seoConfig = {
+    title: "Technical Skills & Expertise",
+    description: "Comprehensive overview of my technical skills including programming languages, frameworks, cloud technologies, and development tools. Expertise in Web Development, AI/ML, and Cloud Technologies.",
+    type: "profile",
+    keywords: skillsList.join(', '),
+    section: "Skills",
+    isArticle: false,
+    modifiedTime: new Date().toISOString()
+  };
+
   return (
-    <motion.div
+    <>
+      <SEO {...seoConfig} />
+      <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
