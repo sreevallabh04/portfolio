@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import StellarSystemSimulation from './StellarSystemSimulation';
-import SEO from '@/components/SEO';
 
 
 // --- ASCII Art & Easter Eggs ---
@@ -479,16 +478,6 @@ const Footer = () => (
 
 // --- Main Page Component ---
 const DeveloperPage = () => {
-  const seoConfig = {
-    title: "Developer Portfolio & Interactive Experience",
-    description: "Explore my interactive developer portfolio featuring 3D visualizations, live coding terminal, and Netflix-style project showcase. Experience web development, AI/ML, and blockchain projects through an immersive interface.",
-    type: "profile",
-    keywords: "developer portfolio, interactive experience, 3D visualization, web development, AI/ML, blockchain, React, Three.js, Framer Motion",
-    author: "Sreevallabh Kakarala",
-    section: "Developer",
-    isArticle: false,
-    modifiedTime: new Date().toISOString()
-  };
   const [showTerminal, setShowTerminal] = useState(false);
   const [terminalHistory, setTerminalHistory] = useState([
     { type: 'system', content: NETFLIX_ASCII + '\nWelcome to DevTerm v2.0.0' },
@@ -940,9 +929,7 @@ What's your favorite show? Let's discuss!`;
 
   // --- Main Render ---
   return (
-    <>
-      <SEO {...seoConfig} />
-      <div className="min-h-screen bg-black text-white relative overflow-hidden">
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
       {/* Animated Background Gradient */}
       <div 
         className="fixed inset-0 opacity-20"
