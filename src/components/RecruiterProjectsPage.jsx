@@ -385,7 +385,8 @@ const RecruiterProjectsPage = () => {
         )}
       </AnimatePresence>
     </motion.div>
+    </>
   );
 };
 
-export default RecruiterProjectsPage; 
+export default RecruiterProjectsPage;
