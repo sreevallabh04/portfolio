@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, Github, ChevronRight, ChevronLeft, X, Calendar, Code, Folder } from 'lucide-react';
+import SEO from '@/components/SEO';
 
 // Projects data from Dashboard recruiter section
 const projects = [
@@ -90,6 +91,17 @@ const categories = [
 ];
 
 const RecruiterProjectsPage = () => {
+  const seoConfig = {
+    title: "Projects Portfolio",
+    description: "Explore my diverse portfolio of projects in Web Development, AI/ML, Blockchain, and Mobile Apps. View detailed case studies, tech stacks, and live demos.",
+    type: "website",
+    isArticle: true,
+    publishedTime: "2024-01-01",
+    modifiedTime: new Date().toISOString(),
+    section: "Projects",
+    keywords: "web development, AI/ML, blockchain, mobile apps, React, NextJS, Flutter, Python, software projects, portfolio",
+    author: "Sreevallabh Kakarala"
+  };
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedProject, setSelectedProject] = useState(null);
   const featuredProject = projects.find(p => p.title === "Metic Synergy Website");
@@ -107,7 +119,9 @@ const RecruiterProjectsPage = () => {
   };
 
   return (
-    <motion.div
+    <>
+      <SEO {...seoConfig} />
+      <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
