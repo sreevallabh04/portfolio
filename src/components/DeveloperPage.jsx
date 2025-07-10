@@ -929,7 +929,20 @@ What's your favorite show? Let's discuss!`;
 
   // --- Main Render ---
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+    <div 
+      className="min-h-screen bg-black text-white relative overflow-hidden"
+      itemScope
+      itemType="http://schema.org/Person"
+    >
+      <meta itemProp="name" content="Sreevallabh Kakarala" />
+      <meta itemProp="jobTitle" content="Software Engineer" />
+      <meta itemProp="description" content="4th year integrated M.Tech Software Engineering student specializing in Web Development, AI/ML, and Blockchain" />
+      <meta itemProp="alumniOf" content="VIT Chennai" />
+      <meta name="description" content="Interactive developer portfolio showcasing projects in Web Development, AI/ML, Blockchain, and more" />
+      <meta name="keywords" content="software engineer, web development, AI/ML, blockchain, React, NextJS, Python" />
+      <meta property="og:type" content="profile" />
+      <meta property="profile:first_name" content="Sreevallabh" />
+      <meta property="profile:last_name" content="Kakarala" />
       {/* Animated Background Gradient */}
       <div 
         className="fixed inset-0 opacity-20"
