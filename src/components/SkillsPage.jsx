@@ -229,6 +229,7 @@ const SkillsPage = () => {
         </div>
       </motion.div>
     </motion.div>
+    </>
   );
 };
 
