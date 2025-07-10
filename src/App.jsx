@@ -6,6 +6,7 @@ import ProfileSelection from '@/components/ProfileSelection';
 import Navbar from '@/components/Navbar';
 import FloatingChatbot from '@/components/FloatingChatbot';
 import { Toaster } from '@/components/ui/toaster';
+import SEO from '@/components/SEO';
 
 // Lazy load components for better performance
 const Dashboard = lazy(() => import('@/components/Dashboard'));
@@ -80,8 +81,60 @@ const ConditionalChatbot = () => {
   return <FloatingChatbot />;
 };
 
+// SEO configurations for different routes
+const getSEOConfig = (pathname, profile) => {
+  const baseConfig = {
+    title: "Sreevallabh Kakarala",
+    description: "Software Engineering student specializing in full-stack development and AI/ML solutions. Explore my portfolio, projects, and professional experience.",
+    type: "website",
+    image: "/HopeCore.png",
+    url: `https://streamvallabh.life${pathname}`
+  };
+
+  switch (true) {
+    case pathname === '/':
+      return {
+        ...baseConfig,
+        title: "Choose Your Experience",
+        description: "Select your profile to explore Sreevallabh Kakarala's portfolio in different ways - Developer, Recruiter, or Client perspective."
+      };
+    case pathname.includes('/browse/recruiter'):
+      return {
+        ...baseConfig,
+        title: "Professional Portfolio",
+        description: "Explore my professional experience, projects, and technical skills. View my work in web development, AI/ML, and software engineering.",
+        type: "profile"
+      };
+    case pathname.includes('/browse/developer'):
+      return {
+        ...baseConfig,
+        title: "Developer Portfolio",
+        description: "Technical deep-dive into my development projects, coding skills, and software engineering expertise.",
+        type: "profile"
+      };
+    case pathname.includes('/skills'):
+      return {
+        ...baseConfig,
+        title: "Technical Skills",
+        description: "Comprehensive overview of my technical skills including programming languages, frameworks, and tools.",
+        type: "profile"
+      };
+    case pathname.includes('/contact'):
+      return {
+        ...baseConfig,
+        title: "Contact",
+        description: "Get in touch with Sreevallabh Kakarala for professional opportunities, collaborations, or inquiries.",
+        type: "profile"
+      };
+    default:
+      return baseConfig;
+  }
+};
+
 function AppContent() {
+  const location = useLocation();
   const [hasEntered, setHasEntered] = useState(false);
+  const seoConfig = getSEOConfig(location.pathname, selectedProfile);
   const [showSplash, setShowSplash] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const audioContextResumed = useRef(false);
@@ -156,6 +209,7 @@ function AppContent() {
 
   return (
     <>
+      <SEO {...seoConfig} />
       <Navbar />
       <AnimatePresence mode="wait">
         <Suspense fallback={<LoadingSpinner />}>
