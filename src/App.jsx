@@ -133,13 +133,12 @@ const getSEOConfig = (pathname, profile) => {
 
 function AppContent() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [hasEntered, setHasEntered] = useState(false);
-  const seoConfig = getSEOConfig(location.pathname, selectedProfile);
   const [showSplash, setShowSplash] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const audioContextResumed = useRef(false);
-  const location = useLocation();
-  const navigate = useNavigate();
+  const seoConfig = getSEOConfig(location.pathname, selectedProfile);
 
   // Helper: get profile from URL
   const getProfileFromPath = () => {
