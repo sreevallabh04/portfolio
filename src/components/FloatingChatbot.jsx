@@ -386,7 +386,6 @@ Respond in a fun but professional way. Be encouraging about their projects or qu
             initial={{ opacity: 0, y: 100, scale: 0.8, x: 0 }}
             animate={{ 
               opacity: 1, 
-              y: 0, 
               scale: isMinimized ? 0.8 : 1,
               height: isMinimized ? 80 : 500,
               x: position.x, 
