@@ -11,7 +11,6 @@ const FloatingChatbot = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [hasGreeted, setHasGreeted] = useState(false);
-  const [currentApiKeyIndex, setCurrentApiKeyIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [windowSize, setWindowSize] = useState({
@@ -76,23 +75,9 @@ const FloatingChatbot = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Multiple API keys for fallback
+  // API key
   const apiKeys = [
-    'AIzaSyBY3JRDz66RYCkRVPO0sil_akc-wGLxKGk',
-    'AIzaSyAB113h5ALxnUiZRv6xcE_58AqObSyrJA4',
-    'AIzaSyAx7bE9-iugvw08adrZwqGRODmDS4ZM8Dw',
-    'AIzaSyB_xPYF3IAO9j6m3GARZjyMQE3Glz7l2s0',
-    'AIzaSyCHRW_m-Z9j1jUdrnsTvoA7-ungz0_dNcE',
-    'AIzaSyAPaDfht1yfbsfVLxqla4JA3kJe5RWI0X0',
-    'AIzaSyBxuNzyDQNqKCPSHZznWbMaXohz9-rpJXjg',
-    'AIzaSyD0wwDlGT69c2SeOf_ett7Y-ogWtqOb9T4',
-    'AIzaSyCPK-TcfnqXIZXoInz8nKkUei7hVYvBKR0',
-    'AIzaSyBWkP_pRVMLtgKRpdlxwozSCQeBMbU8LXU',
-    'AIzaSyA_EnnsrErziVFHHrSmSzA4cpfMWnnTzPs',
-    'AIzaSyDle9KLhixAi5Q9vkS4p0R8s-jLC75RXEI',
-    'AIzaSyAqGiu0mSPoqiKAbnz84fEPAoT8eGe0Xnw',
-    'AIzaSyA34Ypb8SbTmAUIVkONb-9nSt1tY0AjkF8',
-    'AIzaSyDI-VDDHxX04JX_K_JlVWZyJqFF-j3hx0A'
+    'AIzaSyCQZQQCr0Jh07Sh6wl07e7EK-FKcwYkIJI'
   ];
 
   // Interactive greeting messages
@@ -165,10 +150,10 @@ const FloatingChatbot = () => {
     }
   }, [isOpen, isMinimized, hasGreeted]);
 
-  // Function to try API call with automatic key rotation
-  const tryApiCall = async (prompt, keyIndex = currentApiKeyIndex) => {
+  // Function to try API call
+  const tryApiCall = async (prompt) => {
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKeys[keyIndex]}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKeys[0]}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -199,22 +184,11 @@ const FloatingChatbot = () => {
         throw new Error('No response from API');
       }
 
-      console.log(`✅ API Key ${keyIndex + 1} successful`);
+      console.log(`✅ API call successful`);
       return aiResponse;
     } catch (error) {
-      console.error(`❌ API Key ${keyIndex + 1} failed:`, error.message);
-      
-      // Try next API key if available
-      const nextKeyIndex = (keyIndex + 1) % apiKeys.length;
-      if (nextKeyIndex !== currentApiKeyIndex) {
-        console.log(`🔄 Switching to API Key ${nextKeyIndex + 1}`);
-        setCurrentApiKeyIndex(nextKeyIndex);
-        return await tryApiCall(prompt, nextKeyIndex);
-      }
-      
-      // All keys failed
-      console.error('💀 All API keys exhausted');
-      throw new Error('All API keys exhausted');
+      console.error(`❌ API call failed:`, error.message);
+      throw error;
     }
   };
 
@@ -364,7 +338,7 @@ Respond in a fun but professional way. Be encouraging about their projects or qu
                 }}
               />
               {/* Fallback avatar */}
-              <div className="absolute inset-0 flex items-center justify-center text-white text-2xl font-bold bg-[#e50914] hidden">
+              <div className="absolute inset-0 flex items-center justify-center text-white text-2xl font-bold bg-[#e50914]">
                 S
               </div>
               
@@ -420,7 +394,7 @@ Respond in a fun but professional way. Be encouraging about their projects or qu
                       e.target.nextSibling.style.display = 'flex';
                     }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center text-white font-bold bg-[#e50914] hidden">
+                  <div className="absolute inset-0 flex items-center justify-center text-white font-bold bg-[#e50914]">
                     S
                   </div>
                 </div>
