@@ -128,6 +128,13 @@ const getSEOConfig = (pathname, profile) => {
         description: "Stories and learnings from building products, exploring AI, and shipping experiences.",
         type: "article"
       };
+    case pathname.includes('/browse/blog/'):
+      return {
+        ...baseConfig,
+        title: "Blog Post",
+        description: "Read the latest article from Sreevallabh.",
+        type: "article"
+      };
     case pathname.includes('/contact'):
       return {
         ...baseConfig,

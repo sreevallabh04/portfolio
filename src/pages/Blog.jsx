@@ -1,39 +1,15 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, Calendar, Tag, BookOpen, ImageOff } from 'lucide-react';
+import { ExternalLink, Calendar, Tag, BookOpen } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
-import { fetchBlogPosts } from '@/lib/contentfulClient';
+import { getAllBlogPosts, getAllTags } from '@/lib/blogLoader';
 
 const Blog = () => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [selectedTag, setSelectedTag] = useState('All');
 
-  useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchBlogPosts();
-        setPosts(data);
-      } catch (err) {
-        console.error(err);
-        setError('Unable to load blog posts right now.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadPosts();
-  }, []);
-
-  const tags = useMemo(() => {
-    const uniqueTags = new Set();
-    posts.forEach((post) => {
-      post.tags.forEach((tag) => uniqueTags.add(tag));
-    });
-    return ['All', ...Array.from(uniqueTags)];
-  }, [posts]);
+  const posts = useMemo(() => getAllBlogPosts(), []);
+  const tags = useMemo(() => ['All', ...getAllTags()], []);
 
   const filteredPosts = useMemo(() => {
     if (selectedTag === 'All') {
@@ -88,30 +64,13 @@ const Blog = () => {
             </div>
           </section>
 
-          {loading && (
-            <div className="flex flex-col items-center justify-center gap-4 py-24 text-white/70">
-              <motion.div
-                className="h-16 w-16 rounded-full border-4 border-red-500 border-t-transparent"
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-              />
-              <p>Loading latest posts…</p>
-            </div>
-          )}
-
-          {!loading && error && (
-            <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-8 text-center text-red-200">
-              <p>{error}</p>
-              <p className="mt-2 text-sm text-red-300">
-                Make sure your Contentful credentials are set and you have published entries.
-              </p>
-            </div>
-          )}
-
-          {!loading && !error && filteredPosts.length === 0 && (
+          {filteredPosts.length === 0 && (
             <div className="rounded-xl border border-white/10 bg-white/5 p-12 text-center text-white/60">
-              <ImageOff className="mx-auto mb-4 h-10 w-10" />
+              <BookOpen className="mx-auto mb-4 h-10 w-10" />
               <p>No posts found for this filter yet.</p>
+              <p className="mt-2 text-sm text-white/40">
+                Create a new markdown file in <code className="px-2 py-1 bg-white/10 rounded">content/blog/</code> to get started!
+              </p>
             </div>
           )}
 
@@ -119,7 +78,7 @@ const Blog = () => {
             <div className="grid gap-6 md:grid-cols-2">
               {filteredPosts.map((post, idx) => (
                 <motion.article
-                  key={post.id}
+                  key={post.slug}
                   layout
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -130,8 +89,8 @@ const Blog = () => {
                   {post.heroImage ? (
                     <div className="relative h-56 overflow-hidden">
                       <img
-                        src={post.heroImage.url}
-                        alt={post.heroImage.description}
+                        src={post.heroImage}
+                        alt={post.title}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         loading="lazy"
                       />
@@ -161,13 +120,13 @@ const Blog = () => {
                       ))}
                     </div>
 
-                    <a
-                      href={`/browse/blog/${post.slug}`}
+                    <Link
+                      to={`/browse/blog/${post.slug}`}
                       className="group inline-flex items-center gap-2 text-sm font-semibold text-red-400 transition-colors hover:text-red-300"
                     >
                       Continue reading
                       <ExternalLink size={16} className="transition-transform group-hover:translate-x-1" />
-                    </a>
+                    </Link>
                   </div>
                 </motion.article>
               ))}
