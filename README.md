@@ -20,14 +20,14 @@ StreamVallabh is a creative Netflix-inspired portfolio website that offers a uni
   <img src="public/avatars/avatar1.jpeg" alt="Recruiter Profile" width="100px" style="border-radius: 10px; margin: 0 10px"/>
   <img src="public/avatars/avatar2.jpeg" alt="Developer Profile" width="100px" style="border-radius: 10px; margin: 0 10px"/>
   <img src="public/avatars/avatar3.jpeg" alt="Stalker Profile" width="100px" style="border-radius: 10px; margin: 0 10px"/>
-  <img src="public/avatars/avatar4.jpeg" alt="Client Profile" width="100px" style="border-radius: 10px; margin: 0 10px"/>
+  <img src="public/avatars/avatar4.jpeg" alt="Blog Profile" width="100px" style="border-radius: 10px; margin: 0 10px"/>
 </div>
 
 ## ✨ Features
 
 ### 🎬 Netflix-Inspired Experience
 - **Iconic Splash Screen**: Complete with the signature Netflix sound
-- **Profile Selection**: Choose your viewing experience (Recruiter, Developer, Stalker, or Client)
+- **Profile Selection**: Choose your viewing experience (Recruiter, Developer, Stalker, or Blog)
 - **Responsive Layout**: Works on devices of all sizes
 
 ### 👔 For Recruiters
@@ -53,15 +53,17 @@ StreamVallabh is a creative Netflix-inspired portfolio website that offers a uni
   <img src="public/games/snake.jpeg" alt="Snake Game" width="150px" style="border-radius: 10px; margin: 5px"/>
 </div>
 
-### 💼 For Clients
-- Service-oriented view with pricing and project examples
-- Client-focused information
+### 📝 For Readers
+- Curated blog index with tag filters
+- Long-form articles rendered from Contentful rich text
+- Responsive layouts with hero imagery
 
 ### 🔍 Additional Features
 - Interactive AI chatbot for questions
 - Animated UI elements with Framer Motion
 - Responsive design for all device sizes
 - SEO optimization
+- Headless CMS-powered blog with Contentful
 
 ## 🚀 Technologies
 
@@ -102,6 +104,36 @@ StreamVallabh is a creative Netflix-inspired portfolio website that offers a uni
    ```bash
    npm run build
    ```
+
+### Environment Variables
+
+Create a `.env` file (or configure your hosting environment) with the following values:
+
+```bash
+VITE_CONTENTFUL_SPACE_ID=xxxxxxxxxxxxxxxx
+VITE_CONTENTFUL_DELIVERY_TOKEN=yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+```
+
+These credentials come from **Contentful** → **Settings** → **API keys**. Grant "Content Delivery" access for the blog content model.
+
+If the variables are missing, the blog gracefully shows an empty state and logs a warning in the console.
+
+## ✍️ Blogging with Contentful
+
+1. **Create a Space** in [Contentful](https://www.contentful.com/).
+2. **Add a content model** named `blogPost` with the following fields:
+   - `title` (Short text)
+   - `slug` (Short text, unique)
+   - `excerpt` (Long text)
+   - `publishDate` (Date & time)
+   - `tags` (Short text, list)
+   - `heroImage` (Asset, optional)
+   - `content` (Rich text)
+3. **Publish entries** to make them visible via the Content Delivery API.
+4. Set the environment variables mentioned above, then run `npm run dev` to preview the blog at `/browse/blog`.
+5. For each published post, a detail page is available at `/browse/blog/{slug}` with rich text, images, and links rendered automatically.
+
+Publishing is as simple as writing a new entry in Contentful and hitting **Publish**—your site will pull the latest content on refresh or deploy.
 
 ## 🧩 Project Structure
 

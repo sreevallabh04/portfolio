@@ -18,28 +18,28 @@ const FloatingChatbot = () => {
     height: typeof window !== 'undefined' ? window.innerHeight : 768
   });
 
-  // Check if we're on client page (where cart button exists)
-  const isClientPage = location.pathname.includes('/browse/client');
+  // Check if we're on blog page (where we may need extra spacing)
+  const isBlogPage = location.pathname.includes('/browse/blog');
   
      // Responsive positioning based on screen size and page
    const getResponsivePosition = () => {
      const isMobile = windowSize.width < 768;
      const isTablet = windowSize.width >= 768 && windowSize.width < 1024;
      
-     if (isMobile) {
-       // On mobile, position differently based on page
-       return isClientPage 
-         ? { bottom: '6rem', right: '1rem' } // Higher up to avoid cart button
-         : { bottom: '1.5rem', right: '1rem' };
+    if (isMobile) {
+      // On mobile, position differently based on page
+      return isBlogPage 
+        ? { bottom: '6rem', right: '1rem' }
+        : { bottom: '1.5rem', right: '1rem' };
      } else if (isTablet) {
-       // On tablet, adjust horizontal positioning for client page
-       return isClientPage 
-         ? { bottom: '1.5rem', right: '5.5rem' } // Left of cart button
+      // On tablet, adjust horizontal positioning for blog page
+      return isBlogPage 
+        ? { bottom: '1.5rem', right: '5.5rem' }
          : { bottom: '1.5rem', right: '1.5rem' };
      } else {
-       // Desktop - client page positions to left of cart
-       return isClientPage 
-         ? { bottom: '1.5rem', right: '5.5rem' } // Left of cart button
+      // Desktop positioning
+      return isBlogPage 
+        ? { bottom: '1.5rem', right: '5.5rem' }
          : { bottom: '1.5rem', right: '1.5rem' };
      }
    };
@@ -198,7 +198,7 @@ const FloatingChatbot = () => {
     if (userMessage.toLowerCase().includes('buy') || userMessage.toLowerCase().includes('hire') || 
         userMessage.toLowerCase().includes('service') || userMessage.toLowerCase().includes('website') ||
         userMessage.toLowerCase().includes('price') || userMessage.toLowerCase().includes('cost')) {
-      return "Oho! You've got budget? Excellent! 💸 Check out the Client page for my packages. Fair warning: I charge more than a Starbucks coffee but deliver more value than a self-help book! 😂";
+      return "Oho! You've got budget? Let's chat about building something great! 💸 Check out my packages on the contact page or drop me a message here.";
     }
 
     // Playful responses for common questions

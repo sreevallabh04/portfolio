@@ -16,7 +16,8 @@ const ContactPage = lazy(() => import('@/components/ContactPage'));
 const StalkerPage = lazy(() => import('@/components/StalkerPage'));
 const RecruiterProjectsPage = lazy(() => import('@/components/RecruiterProjectsPage'));
 const DeveloperPage = lazy(() => import('@/components/DeveloperPage'));
-const Client = lazy(() => import('@/pages/Client'));
+const Blog = lazy(() => import('@/pages/Blog'));
+const BlogPost = lazy(() => import('@/pages/BlogPost'));
 const Terms = lazy(() => import('@/pages/Terms'));
 
 // Loading component for route transitions
@@ -97,7 +98,7 @@ const getSEOConfig = (pathname, profile) => {
       return {
         ...baseConfig,
         title: "Choose Your Experience",
-        description: "Select your profile to explore Sreevallabh Kakarala's portfolio in different ways - Developer, Recruiter, or Client perspective."
+        description: "Select your profile to explore Sreevallabh Kakarala's portfolio in different ways - Developer, Recruiter, or Blog perspective."
       };
     case pathname.includes('/browse/recruiter'):
       return {
@@ -119,6 +120,13 @@ const getSEOConfig = (pathname, profile) => {
         title: "Technical Skills",
         description: "Comprehensive overview of my technical skills including programming languages, frameworks, and tools.",
         type: "profile"
+      };
+    case pathname.includes('/browse/blog'):
+      return {
+        ...baseConfig,
+        title: "Blog",
+        description: "Stories and learnings from building products, exploring AI, and shipping experiences.",
+        type: "article"
       };
     case pathname.includes('/contact'):
       return {
@@ -269,10 +277,18 @@ function AppContent() {
               }
             />
             <Route
-              path="/browse/client"
+              path="/browse/blog"
               element={
                 <ProtectedRoute profile={selectedProfile}>
-                  <Client />
+                  <Blog />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/browse/blog/:slug"
+              element={
+                <ProtectedRoute profile={selectedProfile}>
+                  <BlogPost />
                 </ProtectedRoute>
               }
             />

@@ -22,8 +22,8 @@ const profiles = [
     avatar: '/avatars/avatar3.jpeg'
   },
   { 
-    id: 'client', 
-    name: 'Client',
+    id: 'blog', 
+    name: 'Blog',
     color: 'bg-blue-600',
     avatar: '/avatars/avatar4.jpeg'
   }

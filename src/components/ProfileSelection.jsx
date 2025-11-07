@@ -28,12 +28,12 @@ const profiles = [
     avatar: '/avatars/avatar3.jpeg'
   },
   { 
-    id: 'client', 
-    name: 'Client',
+    id: 'blog', 
+    name: 'Blog',
     color: 'bg-blue-600',  // Fallback color
     avatar: '/avatars/avatar4.jpeg',
     content: {
-      description: 'Explore our services and pricing for web development, mobile apps, ML models, and AI agents'
+      description: 'Read behind-the-scenes notes on experiments, products, and lessons learned.'
     }
   }
 ];
