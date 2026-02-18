@@ -19,6 +19,7 @@ const DeveloperPage = lazy(() => import('@/components/DeveloperPage'));
 const Blog = lazy(() => import('@/pages/Blog'));
 const BlogPost = lazy(() => import('@/pages/BlogPost'));
 const Terms = lazy(() => import('@/pages/Terms'));
+const Admin = lazy(() => import('@/pages/Admin'));
 
 // Loading component for route transitions
 const LoadingSpinner = () => (
@@ -72,11 +73,12 @@ const EnterButton = ({ onClick }) => (
 const ConditionalChatbot = () => {
   const location = useLocation();
   
-  // Don't show chatbot on recruiter pages OR profile selection page
   const isRecruiterPage = location.pathname.includes('/browse/recruiter');
   const isProfileSelectionPage = location.pathname === '/';
+  const isDeveloperPage = location.pathname.includes('/browse/developer');
+  const isAdminPage = location.pathname === '/admin';
   
-  if (isRecruiterPage || isProfileSelectionPage) {
+  if (isRecruiterPage || isProfileSelectionPage || isDeveloperPage || isAdminPage) {
     return null;
   }
   
@@ -300,6 +302,7 @@ function AppContent() {
               }
             />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

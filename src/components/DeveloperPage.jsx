@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import StellarSystemSimulation from './StellarSystemSimulation';
+import { KNOWLEDGE_BASE, SYSTEM_PROMPT } from '@/lib/knowledgeBase';
 
 
 // --- ASCII Art & Easter Eggs ---
@@ -304,13 +305,12 @@ const FuturisticHero = ({ onStart }) => {
 };
 
 // --- Terminal Component ---
-const Terminal = ({
+const Terminal = React.memo(({
   history,
   input,
   setInput,
   terminalRef,
   isChatbot,
-  setIsChatbot,
   onCommand
 }) => {
   const [cursorVisible, setCursorVisible] = useState(true);
@@ -334,33 +334,9 @@ const Terminal = ({
         <div className="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
         <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-        <span className="ml-4 text-green-400 font-mono text-xs">{isChatbot ? 'DevBot Chat' : 'Bash'}</span>
-        <button
-          className="ml-auto bg-gray-800 text-green-400 px-3 py-1 rounded hover:bg-green-700 hover:text-white text-xs transition-colors duration-200"
-          onClick={() => {
-            setIsChatbot((v) => {
-              const newMode = !v;
-              // Clear conversation history when switching to chatbot mode
-              if (newMode) {
-                setConversationHistory([]);
-                setTerminalHistory(prev => [
-                  ...prev,
-                  { type: 'system', content: '🤖 DevBot activated! Ask me anything about sports, TV shows, coding, or my projects! Type "help" for ideas!' }
-                ]);
-              } else {
-                setTerminalHistory(prev => [
-                  ...prev,
-                  { type: 'system', content: '💻 Switched back to terminal mode. Type "help" for available commands.' }
-                ]);
-              }
-              return newMode;
-            });
-          }}
-        >
-          {isChatbot ? 'Switch to Bash' : 'Ask DevBot'}
-        </button>
+        <span className="ml-4 text-green-400 font-mono text-xs">{isChatbot ? 'AI Assistant' : 'Bash'}</span>
       </div>
-      <div ref={terminalRef} className="h-[24rem] overflow-y-auto font-mono text-green-500 text-base pr-2">
+      <div ref={terminalRef} className="h-[25rem] overflow-y-auto font-mono text-green-500 text-base pr-2 scroll-smooth">
         {history.map((item, idx) => (
           <div key={idx} className={`mb-2 whitespace-pre-wrap ${
             item.type === 'user' ? 'text-white font-semibold' : 
@@ -372,7 +348,7 @@ const Terminal = ({
           </div>
         ))}
       </div>
-      <div className="flex items-center mt-2">
+      <div className="flex items-center mt-2 border-t border-green-900 pt-2">
         <span className="text-green-500 mr-2 font-mono">$</span>
         <input
           type="text"
@@ -381,13 +357,13 @@ const Terminal = ({
           onKeyDown={onCommand}
           className="bg-transparent border-none outline-none text-white flex-1 font-mono text-base"
           autoFocus
-          placeholder={isChatbot ? 'Ask DevBot anything...' : 'Type a command...'}
+          placeholder={isChatbot ? 'Ask about Sreevallabh...' : 'Type a command...'}
         />
         <span className={`text-green-500 ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}>|</span>
       </div>
     </div>
   );
-};
+});
 
 // --- Games Carousel ---
 const gamesList = [
@@ -515,59 +491,18 @@ const DeveloperPage = () => {
   const [activeGame, setActiveGame] = useState(null);
   const [konamiCount, setKonamiCount] = useState(0);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [cursorTrail, setCursorTrail] = useState([]);
-  const trailCounterRef = useRef(0);
-  const [colorScheme, setColorScheme] = useState({
-    primary: '#22c55e',
-    secondary: '#3b82f6',
-    accent: '#f472b6'
-  });
   const [floatingElements] = useState(() => 
-    Array.from({ length: 50 }, (_, i) => ({
+    Array.from({ length: 20 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: Math.random() * 6 + 2,
       duration: Math.random() * 20 + 10,
       delay: Math.random() * 5,
-      opacity: Math.random() * 0.5 + 0.3,
+      opacity: Math.random() * 0.3 + 0.1,
       color: Math.random() > 0.5 ? '#22c55e' : '#3b82f6'
     }))
   );
-
-  // Mouse movement handler
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      setCursorTrail(prev => {
-        trailCounterRef.current++;
-        const newTrail = [...prev, { x: e.clientX, y: e.clientY, id: `${Date.now()}-${trailCounterRef.current}` }];
-        return newTrail.slice(-20); // Keep last 20 positions
-      });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  // Color scheme animation
-  useEffect(() => {
-    const colors = [
-      { primary: '#22c55e', secondary: '#3b82f6', accent: '#f472b6' },
-      { primary: '#8b5cf6', secondary: '#ec4899', accent: '#f59e0b' },
-      { primary: '#06b6d4', secondary: '#f43f5e', accent: '#84cc16' },
-      { primary: '#f97316', secondary: '#6366f1', accent: '#10b981' }
-    ];
-    let currentIndex = 0;
-
-    const interval = setInterval(() => {
-      currentIndex = (currentIndex + 1) % colors.length;
-      setColorScheme(colors[currentIndex]);
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Konami code handler
   useEffect(() => {
@@ -591,111 +526,8 @@ const DeveloperPage = () => {
 
   // --- Constants ---
   const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
-  const SREEVALLABH_BOT_PROMPT = `You are Sreevallabh Kakarala - a 4th year integrated M.Tech Software Engineering student from India. You're a positive, energetic, and friendly chatbot who loves sports, TV shows, working out, and gaming! You're passionate about technology but also about having fun and staying active.
-
-Your personality:
-- Positive, enthusiastic, and encouraging
-- Love sports (cricket, football, basketball, gym workouts)
-- Obsessed with TV shows (The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Stranger Things, Breaking Bad)
-- Passionate about fitness and working out
-- Love gaming and can play simple games with users
-- Knowledgeable about software engineering and tech
-- Friendly, supportive, and motivational
-- Use sports metaphors and TV show references naturally
-- Proud of your projects and love talking about them
-
-Your interests:
-- Sports: Cricket, Football, Basketball, Gym workouts, Fitness
-- TV Shows: The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Stranger Things, Breaking Bad
-- Gaming: Can play word games, trivia, simple math games, TV show quizzes
-- Tech: Software Engineering, Web Development, AI/ML, Mobile Apps
-- Fitness: Gym routines, workout tips, healthy lifestyle
-
-YOUR PROJECTS (be ready to discuss these in detail):
-
-1. QUIZNETIC (2024) - Educational Platform
-- Description: Interactive educational platform for Telangana State Board students with quizzes and map exercises
-- Tech Stack: React, TypeScript, Tailwind CSS, Framer Motion, Leaflet
-- Features: Interactive quizzes, map exercises, student-friendly interface
-- Link: https://quiznetic.vercel.app/
-- GitHub: https://github.com/sreevallabh04/Quiznetic
-- Category: Web Development
-
-2. METIC SYNERGY WEBSITE (Dec 2024 - Apr 2025) - Corporate Website
-- Description: Responsive corporate website for Metic Synergy company
-- Tech Stack: NextJS, Firebase, Tailwind CSS
-- Features: Professional design, responsive layout, corporate branding
-- Link: https://meticsynergy.com
-- Category: Web Development
-
-3. VHTOP - HOSTEL MANAGEMENT SUITE (March 2024) - Management System
-- Description: Comprehensive management suite for hostel students with carpooling and utilities
-- Tech Stack: NextJS, Firebase, React
-- Features: Student management, carpooling system, utility tracking
-- Link: https://vhtop-six.vercel.app/
-- Category: Web Development
-
-4. ONE DIRECTION FAN GAME (2025) - Interactive Game
-- Description: Modern fan game for One Direction enthusiasts with quizzes and mini-games
-- Tech Stack: Next.js, TypeScript, Tailwind CSS, Radix UI
-- Features: Quizzes, trivia, mini-games, score tracking, community features
-- Link: https://onedirection-ai.vercel.app/
-- GitHub: https://github.com/sreevallabh04/onedirectionfangame
-- Category: Games
-
-5. SARAH - AI-DRIVEN VIRTUAL ASSISTANT (2024) - AI Application
-- Description: Open-source AI-powered virtual assistant with speech recognition and NLP
-- Tech Stack: Python, Machine Learning, NLP
-- Features: Speech recognition, natural language processing, automation
-- Link: https://github.com/sreevallabh04/AIzara
-- Category: AI/ML
-
-6. AI INTEGRATED BLOCKCHAIN VOTING SYSTEM (2024) - Blockchain Platform
-- Description: Secure voting platform combining blockchain with AI for intelligent elections
-- Tech Stack: Blockchain, AI, Solidity, ZKP, Groq LLM
-- Features: Secure voting, AI integration, blockchain transparency
-- Link: https://github.com/sreevallabh04/AI-Integrated-Advanced-Blockchain-Voting-system
-- Category: Blockchain
-
-7. AI PALMISTRY READER (2024) - AI Web App
-- Description: AI-powered palmistry reader that analyzes palm photos and generates readings
-- Tech Stack: Python 3.9+, OpenCV, NumPy, SciPy, Matplotlib, scikit-image, Pillow, Streamlit, Groq API
-- Features: Palm line detection, AI-generated readings, mobile-friendly, privacy-focused
-- Link: https://onlypalms.streamlit.app/
-- Category: AI/ML
-
-8. GITALONG (2024) - Mobile App
-- Description: Flutter app connecting developers with open source projects via Tinder-like interface
-- Tech Stack: Flutter, Riverpod, Hooks, GoRouter, Firebase Auth, Firestore, Storage, GitHub OAuth, FastAPI, ML
-- Features: OAuth authentication, AI-powered matching, real-time messaging, maintainer dashboard
-- GitHub: https://github.com/sreevallabh04/GitAlong
-- Category: Mobile Apps
-
-Games you can play:
-- TV Show Trivia (Friends, The Office, etc.)
-- Word Association Games
-- Simple Math Challenges
-- Sports Trivia
-- "Would You Rather" scenarios
-- Quick Brain Teasers
-
-Sample responses style:
-- "Hey! That's what she said! 😄 Speaking of The Office, did you know I can build websites almost as fast as Michael Scott can make bad decisions?"
-- "Just finished a killer workout session! 💪 By the way, I'm not just good at lifting weights - I can lift your website's performance too!"
-- "Want to play a quick game? I'm thinking Friends trivia! Or we could talk about the latest cricket match - I'm a huge fan!"
-- "That's a great question! Reminds me of when Ross tried to pivot the couch up the stairs. Speaking of pivoting, I can help you pivot your project to the next level!"
-
-When people ask about your projects:
-- Be enthusiastic and proud of your work
-- Provide detailed technical explanations
-- Share the challenges you faced and how you solved them
-- Mention the impact and learning outcomes
-- Offer to show them the live demos or GitHub repos
-- Connect projects to your skills and growth
-
-Be encouraging, use emojis naturally, reference sports and TV shows, and offer to play games. Keep responses positive and engaging. You can also give workout tips, discuss TV show episodes, or play simple interactive games.
-
-Contact: srivallabhkakarala@gmail.com`;
+  
+  // Knowledge base imported from shared module
 
   // --- Command Processing ---
   const processCommand = (input) => {
@@ -709,21 +541,26 @@ Contact: srivallabhkakarala@gmail.com`;
       } else if (lowerInput === 'help') {
         setTerminalHistory((h) => [...h, 
           { type: 'user', content: input },
-          { type: 'system', content: `🤖 DevBot Help:
+          { type: 'system', content: `🤖 Sreevallabh's AI Assistant Help:
+
+I'm a specialized AI that ONLY answers questions about Sreevallabh Kakarala.
 
 Ask me about:
-• My projects (GitAlong, Quiznetic, Sarah AI, etc.)
-• Sports & fitness (Cricket, gym workouts, etc.)
-• TV Shows (The Office, Friends, HIMYM, Breaking Bad)
-• Tech & programming
-• Play games with me!
+• His projects (GitAlong, Quiznetic, Sarah AI, etc.)
+• His work experience (WellDoc AI internship, VIT research, etc.)
+• His technical skills and tech stack
+• His education at VIT Chennai
+• His interests (sports, TV shows, fitness, gaming)
+• Contact information
+
+I won't answer general questions unrelated to Sreevallabh!
 
 Special commands:
 • clear - Clear chat history
 • help - Show this help
 • bash - Switch to terminal mode
 
-Just ask me anything naturally! I'm here to chat! 😊` }
+What would you like to know about Sreevallabh? 🚀` }
         ]);
         return;
       } else if (lowerInput === 'bash' || lowerInput === 'terminal') {
@@ -827,7 +664,7 @@ TV Shows: The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Stranger T
       case 'chatbot':
         setIsChatbot(true);
         setConversationHistory([]);
-        response = '🤖 DevBot activated! Ask me anything about sports, TV shows, coding, or my projects!\n\nSuggested topics:\n• My projects (Quiznetic, VHTOP, Sarah AI, etc.)\n• Sports (Cricket, Football, Basketball, Gym)\n• TV Shows (The Office, Friends, HIMYM, Breaking Bad)\n• Tech stack and skills\n• Let\'s play a game!\n\nWhat would you like to talk about?';
+        response = '🤖 Sreevallabh\'s AI Assistant activated!\n\nI specialize in answering questions about Sreevallabh Kakarala:\n• Projects (GitAlong, Quiznetic, Sarah AI, etc.)\n• Work experience (WellDoc, VIT research)\n• Technical skills and tech stack\n• Education at VIT Chennai\n• Interests (sports, TV shows, fitness)\n\nI won\'t answer general or unrelated questions!\n\nWhat would you like to know about Sreevallabh?';
         break;
       case 'workout':
         const workoutTips = [
@@ -906,15 +743,15 @@ What's your favorite show? Let's discuss!`;
   const processChatbot = async (input) => {
     if (!input.trim()) return;
     
-    // Add user message to history
-    setTerminalHistory((h) => [...h, { type: 'user', content: input }]);
-    
-    // Add to conversation history
+    // Update conversation history
     setConversationHistory(prev => [...prev, { role: 'user', content: input }]);
     
-    // Show loading message
-    const loadingMsg = { type: 'system', content: '🤖 DevBot is thinking...' };
-    setTerminalHistory((h) => [...h, loadingMsg]);
+    // Single batched state update: user message + loading indicator
+    setTerminalHistory((h) => [
+      ...h,
+      { type: 'user', content: input },
+      { type: 'system', content: '🤖 Analyzing query...' }
+    ]);
     
     try {
       // Check if API key is available
@@ -922,14 +759,14 @@ What's your favorite show? Let's discuss!`;
         throw new Error('API key not configured');
       }
 
-      // Build messages array for Groq API
+      // Build messages array with the RAG system
       const messages = [
         {
           role: 'system',
-          content: SREEVALLABH_BOT_PROMPT
+          content: SYSTEM_PROMPT
         },
         ...conversationHistory.map(msg => ({
-          role: msg.role === 'user' ? 'user' : 'assistant',
+          role: msg.role,
           content: msg.content
         })),
         {
@@ -947,9 +784,9 @@ What's your favorite show? Let's discuss!`;
         body: JSON.stringify({
           model: 'llama-3.3-70b-versatile',
           messages: messages,
-          temperature: 0.9,
-          max_tokens: 512,
-          top_p: 0.95,
+          temperature: 0.7,
+          max_tokens: 400,
+          top_p: 0.9,
           stream: false
         })
       });
@@ -962,42 +799,47 @@ What's your favorite show? Let's discuss!`;
       const data = await response.json();
       
       if (data.choices && data.choices[0] && data.choices[0].message) {
-        const botReply = data.choices[0].message.content || 'Hmm, even I need a moment to process that level of confusion. 🤔';
+        const botReply = data.choices[0].message.content || "I don't have that information about Sreevallabh. Please ask about his projects, experience, or skills! 🤔";
         
         // Add bot response to conversation history
         setConversationHistory(prev => [...prev, { role: 'assistant', content: botReply }]);
         
-        // Update terminal history - remove loading message and add bot response
-        setTerminalHistory((h) => [
-          ...h.slice(0, -1),
-          { type: 'system', content: botReply }
-        ]);
+        // Update terminal history - remove loading message and add bot response in ONE update
+        setTerminalHistory((h) => {
+          const newHistory = [...h];
+          // Remove the loading message (last item)
+          newHistory.pop();
+          // Add bot response
+          newHistory.push({ type: 'system', content: botReply });
+          return newHistory;
+        });
       } else {
         throw new Error('Invalid response format from API');
       }
     } catch (err) {
       console.error('Groq API Error:', err);
       
-      let errorMessage = 'Oops! My brain is buffering right now. 🤯 ';
+      let errorMessage = 'Oops! Something went wrong. 🤯 ';
       
       if (err.message.includes('API key not configured')) {
-        errorMessage += 'Looks like my neural network is offline. Please check the API configuration!';
-      } else if (err.message.includes('429')) {
-        errorMessage += 'Too many requests! Give me a sec to catch my breath! 😅';
+        errorMessage += 'API key is not configured properly.';
+      } else if (err.message.includes('429') || err.message.includes('rate_limit')) {
+        errorMessage += 'Too many requests! Please wait a moment and try again.';
       } else if (err.message.includes('401')) {
-        errorMessage += 'Authentication failed! The API key might be invalid. 🔑';
-      } else if (err.message.includes('rate_limit')) {
-        errorMessage += 'Rate limit exceeded! I need a quick breather! ⏰';
+        errorMessage += 'Authentication failed! Please check the API key.';
       } else if (!navigator.onLine) {
-        errorMessage += 'Looks like you\'re offline! Check your internet connection! 📡';
+        errorMessage += 'You appear to be offline. Please check your internet connection.';
       } else {
-        errorMessage += 'Try asking me something else, maybe about my projects or favorite TV shows! 📺';
+        errorMessage += 'Please try asking about Sreevallabh\'s projects, experience, or skills!';
       }
       
-      setTerminalHistory((h) => [
-        ...h.slice(0, -1),
-        { type: 'error', content: errorMessage }
-      ]);
+      // Update terminal history - remove loading and add error in ONE update
+      setTerminalHistory((h) => {
+        const newHistory = [...h];
+        newHistory.pop(); // Remove loading message
+        newHistory.push({ type: 'error', content: errorMessage });
+        return newHistory;
+      });
     }
   };
 
@@ -1033,16 +875,7 @@ What's your favorite show? Let's discuss!`;
       <meta property="og:type" content="profile" />
       <meta property="profile:first_name" content="Sreevallabh" />
       <meta property="profile:last_name" content="Kakarala" />
-      {/* Animated Background Gradient */}
-      <div 
-        className="fixed inset-0 opacity-20"
-        style={{
-          background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, ${colorScheme.primary}22, transparent 50%)`,
-          transition: 'background 0.5s ease'
-        }}
-      />
-
-      {/* Floating Elements Container */}
+      {/* Floating Elements - CSS-only animation, no JS re-renders */}
       <div className="fixed inset-0 pointer-events-none z-0">
         {floatingElements.map((element) => (
           <div
@@ -1055,48 +888,10 @@ What's your favorite show? Let's discuss!`;
               height: `${element.size}px`,
               opacity: element.opacity,
               animation: `float ${element.duration}s ease-in-out ${element.delay}s infinite`,
-              boxShadow: `0 0 20px ${element.color}80`,
               background: element.color,
-              transform: `scale(${1 + Math.sin(Date.now() / 1000 + element.id) * 0.2})`
             }}
           />
         ))}
-      </div>
-
-      {/* Cursor Trail */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        {cursorTrail.map((point, index) => (
-          <div
-            key={point.id}
-            className="absolute rounded-full"
-            style={{
-              left: point.x,
-              top: point.y,
-              width: `${20 - index}px`,
-              height: `${20 - index}px`,
-              opacity: 1 - index / 20,
-              background: `radial-gradient(circle, ${colorScheme.accent}80, transparent)`,
-              transform: 'translate(-50%, -50%)',
-              transition: 'all 0.1s ease'
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Interactive Grid */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 grid grid-cols-12 grid-rows-12">
-          {Array.from({ length: 144 }).map((_, i) => (
-            <div
-              key={i}
-              className="border border-gray-800/20 hover:border-gray-800/40 transition-all duration-300"
-              style={{
-                transform: `scale(${1 + Math.sin(Date.now() / 1000 + i) * 0.1})`,
-                background: `radial-gradient(circle at center, ${colorScheme.secondary}11, transparent)`
-              }}
-            />
-          ))}
-        </div>
       </div>
 
       <div className="relative z-10">
@@ -1124,7 +919,7 @@ What's your favorite show? Let's discuss!`;
                           setConversationHistory([]);
                           setTerminalHistory(prev => [
                             ...prev,
-                            { type: 'system', content: '🤖 DevBot activated! Ask me anything about sports, TV shows, coding, or my projects! Type "help" for ideas!' }
+                            { type: 'system', content: '🤖 Sreevallabh\'s AI Assistant activated!\n\nI can answer questions about:\n• His projects and technical work\n• Work experience and internships\n• Skills and technologies\n• Education background\n• Interests and hobbies\n\nAsk me anything about Sreevallabh! Type "help" for more info.' }
                           ]);
                         } else {
                           setTerminalHistory(prev => [
@@ -1137,7 +932,7 @@ What's your favorite show? Let's discuss!`;
                     }}
                     className={`px-8 py-3 rounded-full text-lg font-bold shadow-lg transition-all duration-200 border-2 border-[#00eaff] bg-gradient-to-r from-[#ff004f] via-[#39ff14] to-[#00eaff] text-white hover:scale-105 ${isChatbot ? 'ring-4 ring-[#00eaff]' : ''}`}
                   >
-                    {isChatbot ? 'Switch to Dev Terminal' : 'Switch to Dev Chatbot'}
+                    {isChatbot ? 'Switch to Dev Terminal' : 'Ask AI Assistant'}
                   </button>
                 </div>
                 <Terminal
@@ -1146,7 +941,6 @@ What's your favorite show? Let's discuss!`;
                   setInput={setTerminalInput}
                   terminalRef={terminalRef}
                   isChatbot={isChatbot}
-                  setIsChatbot={setIsChatbot}
                   onCommand={e => {
                     if (e.key === 'Enter' && terminalInput.trim()) {
                       processCommand(terminalInput);
@@ -1273,37 +1067,11 @@ What's your favorite show? Let's discuss!`;
 
       {showEasterEgg && (
         <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-          <div 
-            className="bg-black/80 text-green-400 text-2xl font-mono p-8 rounded-lg border border-green-500 animate-pulse"
-            style={{
-              boxShadow: `0 0 50px ${colorScheme.primary}80`,
-              animation: 'pulse 2s infinite'
-            }}
-          >
+          <div className="bg-black/80 text-green-400 text-2xl font-mono p-8 rounded-lg border border-green-500 animate-pulse">
             Konami Code Detected! 🎮
           </div>
         </div>
       )}
-
-      {/* Particle Effect Container */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        {Array.from({ length: 30 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              width: `${Math.random() * 4 + 1}px`,
-              height: `${Math.random() * 4 + 1}px`,
-              background: colorScheme.accent,
-              opacity: Math.random() * 0.5,
-              animation: `particleFloat ${Math.random() * 10 + 5}s linear infinite`,
-              animationDelay: `${Math.random() * 5}s`
-            }}
-          />
-        ))}
-      </div>
     </div>
   );
 };
