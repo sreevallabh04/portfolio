@@ -81,8 +81,13 @@ const SimpleContentRow = ({ title, items, isSkills, onProjectClick }) => {
 
       {/* Scrollable Content */}
       <div 
-        className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide" 
+        className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide touch-scroll-x scroll-smooth" 
         ref={scrollRef}
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch'
+        }}
       >
         {isSkills ? (
           // Render skills
@@ -105,7 +110,7 @@ const SimpleContentRow = ({ title, items, isSkills, onProjectClick }) => {
                           ease: [0.32, 0.72, 0, 1]
                         }
                       }}
-                      className="relative w-[90vw] max-w-xs sm:w-[300px] h-[48vw] max-h-[180px] sm:h-[169px] rounded-md overflow-hidden cursor-pointer flex-shrink-0"
+                      className="relative w-[90vw] max-w-xs sm:w-[300px] h-[48vw] max-h-[180px] sm:h-[169px] rounded-md overflow-hidden cursor-pointer flex-shrink-0 bg-zinc-900"
                     >
                       {/* Background Image/Logo */}
                       <motion.div
@@ -119,6 +124,7 @@ const SimpleContentRow = ({ title, items, isSkills, onProjectClick }) => {
                           src={skill.logo}
                           alt={`${skill.name} Logo`}
                           className="w-24 h-24 object-contain"
+                          loading="lazy"
                         />
                       </motion.div>
 
@@ -172,13 +178,18 @@ const SimpleContentRow = ({ title, items, isSkills, onProjectClick }) => {
                     ease: [0.32, 0.72, 0, 1]
                   }
                 }}
-                className="relative w-[90vw] max-w-xs sm:w-[300px] h-[48vw] max-h-[180px] sm:h-[169px] rounded-md overflow-hidden cursor-pointer flex-shrink-0"
+                className="relative w-[90vw] max-w-xs sm:w-[300px] h-[48vw] max-h-[180px] sm:h-[169px] rounded-md overflow-hidden cursor-pointer flex-shrink-0 bg-zinc-900"
               >
                 {/* Background Image */}
                 <motion.img
                   src={item.imageUrl}
                   alt={item.title}
                   className="w-full h-full object-cover"
+                  style={{
+                    objectFit: 'cover',
+                    objectPosition: 'center'
+                  }}
+                  loading="lazy"
                   animate={{
                     scale: isHovered ? 1.1 : 1,
                     transition: { duration: 0.3 }
@@ -205,20 +216,20 @@ const SimpleContentRow = ({ title, items, isSkills, onProjectClick }) => {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 flex flex-col justify-end"
+                      className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/40 p-3 flex flex-col justify-end"
                     >
-                      <div>
+                      <div className="overflow-y-auto max-h-full pr-1 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
                         <h3 className="text-base font-semibold text-white mb-1">{item.title}</h3>
                         {(item.subtitle || item.period) && (
-                          <div className="flex items-center text-xs text-white/90 mb-1">
-                            {item.subtitle && <span>{item.subtitle}</span>}
+                          <div className="flex items-center text-xs text-white/90 mb-1 flex-wrap">
+                            {item.subtitle && <span className="mr-1">{item.subtitle}</span>}
                             {item.subtitle && item.period && <span className="mx-1">•</span>}
                             {item.period && <span>{item.period}</span>}
                           </div>
                         )}
                         {item.description && (
-                          <p className="text-xs text-white/90 mb-2 max-h-[70px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-transparent pr-1">
-                            {item.description}
+                          <p className="text-xs text-white/80 mb-2 line-clamp-3">
+                            {item.description.split('\n')[0]}
                           </p>
                         )}
                         {item.techStack && (

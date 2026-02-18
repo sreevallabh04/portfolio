@@ -376,6 +376,50 @@
   overscroll-behavior-x: auto;
 }
 
+/* Smooth scroll utility */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Netflix card improvements */
+.netflix-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.netflix-card-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  background-color: #18181b;
+}
+
+/* Better scrollbar styling for Netflix rows */
+.netflix-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.netflix-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+
+.netflix-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.netflix-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.netflix-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
 /* Safe Area Insets */
 .safe-area-top {
   padding-top: env(safe-area-inset-top);

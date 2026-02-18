@@ -54,6 +54,24 @@ const Dashboard = () => {
           title: "Projects",
           items: [
             {
+              title: "GitAlong",
+              period: "Currently in Progress",
+              description: "A collaborative platform for developers to connect, code together, and build amazing projects.\n\nKey Features:\n• Real-time collaboration tools\n• Project management and version control integration\n• Developer networking and matchmaking\n• Code sharing and review capabilities\n\nCurrently under active development with exciting features being added regularly.",
+              techStack: "React, Node.js, WebSockets, Firebase, Git",
+              imageUrl: "/GitAlong.jpg",
+              link: "https://gitalong.app",
+              category: "Web Development"
+            },
+            {
+              title: "Sarah - AI-Driven Virtual Assistant",
+              period: "2024",
+              description: "Open-source, AI-powered virtual assistant with speech recognition, NLP, and automation.",
+              techStack: "Python, Machine Learning, NLP",
+              imageUrl: "https://i.postimg.cc/yNhwb7yF/Sarah-AI-agent.jpg",
+              link: "https://github.com/sreevallabh04/AIzara",
+              category: "AI/ML"
+            },
+            {
               title: "Quiznetic",
               period: "2024",
               description: "Educational platform for Telangana State Board students with interactive quizzes and map exercises.",
@@ -80,15 +98,6 @@ const Dashboard = () => {
               imageUrl: "https://i.postimg.cc/ZqzGHWpb/vitlogo.jpg",
               link: "https://vhtop-six.vercel.app/",
               category: "Web Development"
-            },
-            {
-              title: "Sarah - AI-Driven Virtual Assistant",
-              period: "2024",
-              description: "Open-source, AI-powered virtual assistant with speech recognition, NLP, and automation.",
-              techStack: "Python, Machine Learning, NLP",
-              imageUrl: "https://i.postimg.cc/yNhwb7yF/Sarah-AI-agent.jpg",
-              link: "https://github.com/sreevallabh04/AIzara",
-              category: "AI/ML"
             },
             {
               title: "AI integrated Blockchain voting system",

@@ -336,15 +336,38 @@ const Terminal = ({
         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
         <span className="ml-4 text-green-400 font-mono text-xs">{isChatbot ? 'DevBot Chat' : 'Bash'}</span>
         <button
-          className="ml-auto bg-gray-800 text-green-400 px-3 py-1 rounded hover:bg-green-700 hover:text-white text-xs"
-          onClick={() => setIsChatbot((v) => !v)}
+          className="ml-auto bg-gray-800 text-green-400 px-3 py-1 rounded hover:bg-green-700 hover:text-white text-xs transition-colors duration-200"
+          onClick={() => {
+            setIsChatbot((v) => {
+              const newMode = !v;
+              // Clear conversation history when switching to chatbot mode
+              if (newMode) {
+                setConversationHistory([]);
+                setTerminalHistory(prev => [
+                  ...prev,
+                  { type: 'system', content: '🤖 DevBot activated! Ask me anything about sports, TV shows, coding, or my projects! Type "help" for ideas!' }
+                ]);
+              } else {
+                setTerminalHistory(prev => [
+                  ...prev,
+                  { type: 'system', content: '💻 Switched back to terminal mode. Type "help" for available commands.' }
+                ]);
+              }
+              return newMode;
+            });
+          }}
         >
           {isChatbot ? 'Switch to Bash' : 'Ask DevBot'}
         </button>
       </div>
       <div ref={terminalRef} className="h-[24rem] overflow-y-auto font-mono text-green-500 text-base pr-2">
         {history.map((item, idx) => (
-          <div key={idx} className={`mb-2 whitespace-pre-wrap ${item.type === 'user' ? 'text-white' : ''}`}>
+          <div key={idx} className={`mb-2 whitespace-pre-wrap ${
+            item.type === 'user' ? 'text-white font-semibold' : 
+            item.type === 'error' ? 'text-red-400' : 
+            item.type === 'success' ? 'text-green-400' : 
+            'text-green-500'
+          }`}>
             {item.type === 'user' ? `$ ${item.content}` : item.content}
           </div>
         ))}
@@ -485,6 +508,7 @@ const DeveloperPage = () => {
   ]);
   const [terminalInput, setTerminalInput] = useState('');
   const [isChatbot, setIsChatbot] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState([]);
   const [hasSudoAccess, setHasSudoAccess] = useState(false);
   const [sudoEffect, setSudoEffect] = useState(false);
   const terminalRef = useRef(null);
@@ -566,7 +590,7 @@ const DeveloperPage = () => {
   }, []);
 
   // --- Constants ---
-  const GEMINI_API_KEY = 'AIzaSyAqGiu0mSPoqiKAbnz84fEPAoT8eGe0Xnw';
+  const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
   const SREEVALLABH_BOT_PROMPT = `You are Sreevallabh Kakarala - a 4th year integrated M.Tech Software Engineering student from India. You're a positive, energetic, and friendly chatbot who loves sports, TV shows, working out, and gaming! You're passionate about technology but also about having fun and staying active.
 
 Your personality:
@@ -676,6 +700,42 @@ Contact: srivallabhkakarala@gmail.com`;
   // --- Command Processing ---
   const processCommand = (input) => {
     if (isChatbot) {
+      // Handle special chatbot commands
+      const lowerInput = input.toLowerCase().trim();
+      if (lowerInput === 'clear') {
+        setTerminalHistory([{ type: 'system', content: '🤖 Chat cleared! Starting fresh conversation...' }]);
+        setConversationHistory([]);
+        return;
+      } else if (lowerInput === 'help') {
+        setTerminalHistory((h) => [...h, 
+          { type: 'user', content: input },
+          { type: 'system', content: `🤖 DevBot Help:
+
+Ask me about:
+• My projects (GitAlong, Quiznetic, Sarah AI, etc.)
+• Sports & fitness (Cricket, gym workouts, etc.)
+• TV Shows (The Office, Friends, HIMYM, Breaking Bad)
+• Tech & programming
+• Play games with me!
+
+Special commands:
+• clear - Clear chat history
+• help - Show this help
+• bash - Switch to terminal mode
+
+Just ask me anything naturally! I'm here to chat! 😊` }
+        ]);
+        return;
+      } else if (lowerInput === 'bash' || lowerInput === 'terminal') {
+        setIsChatbot(false);
+        setTerminalHistory((h) => [...h, 
+          { type: 'user', content: input },
+          { type: 'system', content: '💻 Switched back to terminal mode. Type "help" for available commands.' }
+        ]);
+        return;
+      }
+      
+      // Otherwise process as chatbot message
       processChatbot(input);
       return;
     }
@@ -766,7 +826,8 @@ TV Shows: The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Stranger T
         break;
       case 'chatbot':
         setIsChatbot(true);
-        response = 'Switched to DevBot chat! Let\'s talk about sports, TV shows, or play some games! 🎮';
+        setConversationHistory([]);
+        response = '🤖 DevBot activated! Ask me anything about sports, TV shows, coding, or my projects!\n\nSuggested topics:\n• My projects (Quiznetic, VHTOP, Sarah AI, etc.)\n• Sports (Cricket, Football, Basketball, Gym)\n• TV Shows (The Office, Friends, HIMYM, Breaking Bad)\n• Tech stack and skills\n• Let\'s play a game!\n\nWhat would you like to talk about?';
         break;
       case 'workout':
         const workoutTips = [
@@ -791,21 +852,22 @@ What's your favorite sport? Let's talk about it!`;
       case 'projects':
         response = `🚀 MY PROJECTS PORTFOLIO:
 
-1. 📚 QUIZNETIC (2024) - Educational Platform
+1. 🤝 GITALONG (Currently in Progress) - Developer Collaboration Platform
+   Tech: React, Node.js, WebSockets, Firebase, Git
+   Link: https://gitalong.app
+   Status: Active Development
+
+2. 📚 QUIZNETIC (2024) - Educational Platform
    Tech: React, TypeScript, Tailwind CSS, Framer Motion, Leaflet
    Link: https://quiznetic.vercel.app/
 
-2. 🏢 METIC SYNERGY WEBSITE (2024-2025) - Corporate Site
+3. 🏢 METIC SYNERGY WEBSITE (2024-2025) - Corporate Site
    Tech: NextJS, Firebase, Tailwind CSS
    Link: https://meticsynergy.com
 
-3. 🏠 VHTOP - HOSTEL MANAGEMENT SUITE (2024)
+4. 🏠 VHTOP - HOSTEL MANAGEMENT SUITE (2024)
    Tech: NextJS, Firebase, React
    Link: https://vhtop-six.vercel.app/
-
-4. 🎵 ONE DIRECTION FAN GAME (2025) - Interactive Game
-   Tech: Next.js, TypeScript, Tailwind CSS, Radix UI
-   Link: https://onedirection-ai.vercel.app/
 
 5. 🤖 SARAH - AI VIRTUAL ASSISTANT (2024)
    Tech: Python, Machine Learning, NLP
@@ -818,10 +880,6 @@ What's your favorite sport? Let's talk about it!`;
 7. 🔮 AI PALMISTRY READER (2024)
    Tech: Python, OpenCV, Streamlit, Groq API
    Link: https://onlypalms.streamlit.app/
-
-8. 📱 GITALONG (2024) - Mobile App
-   Tech: Flutter, Firebase, GitHub OAuth, FastAPI
-   GitHub: https://github.com/sreevallabh04/GitAlong
 
 Ask me about any specific project! I love talking about my work! 💪`;
         break;
@@ -846,67 +904,99 @@ What's your favorite show? Let's discuss!`;
   };
 
   const processChatbot = async (input) => {
-    setTerminalHistory((h) => [...h, { type: 'user', content: input }, { type: 'system', content: 'DevBot is thinking...' }]);
+    if (!input.trim()) return;
+    
+    // Add user message to history
+    setTerminalHistory((h) => [...h, { type: 'user', content: input }]);
+    
+    // Add to conversation history
+    setConversationHistory(prev => [...prev, { role: 'user', content: input }]);
+    
+    // Show loading message
+    const loadingMsg = { type: 'system', content: '🤖 DevBot is thinking...' };
+    setTerminalHistory((h) => [...h, loadingMsg]);
     
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`, {
+      // Check if API key is available
+      if (!GROQ_API_KEY) {
+        throw new Error('API key not configured');
+      }
+
+      // Build messages array for Groq API
+      const messages = [
+        {
+          role: 'system',
+          content: SREEVALLABH_BOT_PROMPT
+        },
+        ...conversationHistory.map(msg => ({
+          role: msg.role === 'user' ? 'user' : 'assistant',
+          content: msg.content
+        })),
+        {
+          role: 'user',
+          content: input
+        }
+      ];
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${GROQ_API_KEY}`
         },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `${SREEVALLABH_BOT_PROMPT}\n\nUser: ${input}`
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.8,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 256,
-          },
-          safetySettings: [
-            {
-              category: "HARM_CATEGORY_HARASSMENT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_HATE_SPEECH",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            },
-            {
-              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-              threshold: "BLOCK_MEDIUM_AND_ABOVE"
-            }
-          ]
+          model: 'llama-3.3-70b-versatile',
+          messages: messages,
+          temperature: 0.9,
+          max_tokens: 512,
+          top_p: 0.95,
+          stream: false
         })
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`API request failed with status ${response.status}: ${errorData.error?.message || 'Unknown error'}`);
+      }
+
       const data = await response.json();
       
-      if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-        const botReply = data.candidates[0].content.parts[0].text || 'Hmm, even I need a moment to process that level of confusion.';
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        const botReply = data.choices[0].message.content || 'Hmm, even I need a moment to process that level of confusion. 🤔';
+        
+        // Add bot response to conversation history
+        setConversationHistory(prev => [...prev, { role: 'assistant', content: botReply }]);
+        
+        // Update terminal history - remove loading message and add bot response
         setTerminalHistory((h) => [
           ...h.slice(0, -1),
           { type: 'system', content: botReply }
         ]);
       } else {
-        throw new Error('Invalid response format');
+        throw new Error('Invalid response format from API');
       }
     } catch (err) {
-      console.error('Gemini API Error:', err);
+      console.error('Groq API Error:', err);
+      
+      let errorMessage = 'Oops! My brain is buffering right now. 🤯 ';
+      
+      if (err.message.includes('API key not configured')) {
+        errorMessage += 'Looks like my neural network is offline. Please check the API configuration!';
+      } else if (err.message.includes('429')) {
+        errorMessage += 'Too many requests! Give me a sec to catch my breath! 😅';
+      } else if (err.message.includes('401')) {
+        errorMessage += 'Authentication failed! The API key might be invalid. 🔑';
+      } else if (err.message.includes('rate_limit')) {
+        errorMessage += 'Rate limit exceeded! I need a quick breather! ⏰';
+      } else if (!navigator.onLine) {
+        errorMessage += 'Looks like you\'re offline! Check your internet connection! 📡';
+      } else {
+        errorMessage += 'Try asking me something else, maybe about my projects or favorite TV shows! 📺';
+      }
+      
       setTerminalHistory((h) => [
         ...h.slice(0, -1),
-        { type: 'system', content: 'Looks like my brain is buffering. Try asking me something else!' }
+        { type: 'error', content: errorMessage }
       ]);
     }
   };
@@ -1026,7 +1116,25 @@ What's your favorite show? Let's discuss!`;
               >
                 <div className="flex justify-center mb-6">
                   <button
-                    onClick={() => setIsChatbot((v) => !v)}
+                    onClick={() => {
+                      setIsChatbot((v) => {
+                        const newMode = !v;
+                        // Clear conversation history when switching to chatbot mode
+                        if (newMode) {
+                          setConversationHistory([]);
+                          setTerminalHistory(prev => [
+                            ...prev,
+                            { type: 'system', content: '🤖 DevBot activated! Ask me anything about sports, TV shows, coding, or my projects! Type "help" for ideas!' }
+                          ]);
+                        } else {
+                          setTerminalHistory(prev => [
+                            ...prev,
+                            { type: 'system', content: '💻 Switched back to terminal mode. Type "help" for available commands.' }
+                          ]);
+                        }
+                        return newMode;
+                      });
+                    }}
                     className={`px-8 py-3 rounded-full text-lg font-bold shadow-lg transition-all duration-200 border-2 border-[#00eaff] bg-gradient-to-r from-[#ff004f] via-[#39ff14] to-[#00eaff] text-white hover:scale-105 ${isChatbot ? 'ring-4 ring-[#00eaff]' : ''}`}
                   >
                     {isChatbot ? 'Switch to Dev Terminal' : 'Switch to Dev Chatbot'}
