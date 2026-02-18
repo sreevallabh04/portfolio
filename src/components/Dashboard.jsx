@@ -105,6 +105,15 @@ const Dashboard = () => {
           title: "Professional Experience",
           items: [
             {
+              title: "AI Intern",
+              subtitle: "WellDoc",
+              period: "Present",
+              description: "Built RAG pipelines using LangChain for domain-specific Q&A: document ingestion, chunking, embedding generation, and retrieval tuning across 500+ internal documents.\n\nKey Achievements:\n• Developed evaluation loops to improve answer grounding and reduce hallucinations by 30%\n• Integrated into an internal assistant workflow, cutting knowledge lookup time by 50%\n• Experimented with prompt engineering, vector databases (FAISS, ChromaDB), and open-source LLMs to optimize retrieval accuracy and latency\n\nTechnologies used: LangChain, FAISS, ChromaDB, Python, RAG, NLP, LLMs",
+              techStack: "LangChain, FAISS, ChromaDB, Python, RAG, NLP, LLMs",
+              imageUrl: "/welldoc.png",
+              category: "AI/ML & NLP"
+            },
+            {
               title: "Research Intern",
               subtitle: "Agriculture Domain Research - VIT Chennai",
               period: "Jan. 2025 - Present",
