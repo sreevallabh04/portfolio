@@ -16,8 +16,7 @@ const ContactPage = lazy(() => import('@/components/ContactPage'));
 const StalkerPage = lazy(() => import('@/components/StalkerPage'));
 const RecruiterProjectsPage = lazy(() => import('@/components/RecruiterProjectsPage'));
 const DeveloperPage = lazy(() => import('@/components/DeveloperPage'));
-const Blog = lazy(() => import('@/pages/Blog'));
-const BlogPost = lazy(() => import('@/pages/BlogPost'));
+const MemoriesPage = lazy(() => import('@/pages/MemoriesPage'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const Admin = lazy(() => import('@/pages/Admin'));
 
@@ -77,8 +76,9 @@ const ConditionalChatbot = () => {
   const isProfileSelectionPage = location.pathname === '/';
   const isDeveloperPage = location.pathname.includes('/browse/developer');
   const isAdminPage = location.pathname === '/admin';
+  const isMemoriesPage = location.pathname.includes('/browse/memories');
   
-  if (isRecruiterPage || isProfileSelectionPage || isDeveloperPage || isAdminPage) {
+  if (isRecruiterPage || isProfileSelectionPage || isDeveloperPage || isAdminPage || isMemoriesPage) {
     return null;
   }
   
@@ -100,7 +100,7 @@ const getSEOConfig = (pathname, profile) => {
       return {
         ...baseConfig,
         title: "Choose Your Experience",
-        description: "Select your profile to explore Sreevallabh Kakarala's portfolio in different ways - Developer, Recruiter, or Blog perspective."
+        description: "Select your profile to explore Sreevallabh Kakarala's portfolio in different ways - Developer, Recruiter, or Memories."
       };
     case pathname.includes('/browse/recruiter'):
       return {
@@ -123,19 +123,12 @@ const getSEOConfig = (pathname, profile) => {
         description: "Comprehensive overview of my technical skills including programming languages, frameworks, and tools.",
         type: "profile"
       };
-    case pathname.includes('/browse/blog'):
+    case pathname.includes('/browse/memories'):
       return {
         ...baseConfig,
-        title: "Blog",
-        description: "Stories and learnings from building products, exploring AI, and shipping experiences.",
-        type: "article"
-      };
-    case pathname.includes('/browse/blog/'):
-      return {
-        ...baseConfig,
-        title: "Blog Post",
-        description: "Read the latest article from Sreevallabh.",
-        type: "article"
+        title: "Memories",
+        description: "A personal photo gallery of moments, friends, family, and adventures from Sreevallabh's life.",
+        type: "website"
       };
     case pathname.includes('/contact'):
       return {
@@ -286,18 +279,10 @@ function AppContent() {
               }
             />
             <Route
-              path="/browse/blog"
+              path="/browse/memories"
               element={
                 <ProtectedRoute profile={selectedProfile}>
-                  <Blog />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/browse/blog/:slug"
-              element={
-                <ProtectedRoute profile={selectedProfile}>
-                  <BlogPost />
+                  <MemoriesPage />
                 </ProtectedRoute>
               }
             />

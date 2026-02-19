@@ -28,13 +28,10 @@ const profiles = [
     avatar: '/avatars/avatar3.jpeg'
   },
   { 
-    id: 'blog', 
-    name: 'Blog',
-    color: 'bg-blue-600',  // Fallback color
-    avatar: '/avatars/avatar4.jpeg',
-    content: {
-      description: 'Read behind-the-scenes notes on experiments, products, and lessons learned.'
-    }
+    id: 'memories', 
+    name: 'Memories',
+    color: 'bg-purple-600',
+    avatar: '/avatars/avatar4.jpeg'
   }
 ];
 

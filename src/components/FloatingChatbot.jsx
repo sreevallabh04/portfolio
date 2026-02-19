@@ -28,18 +28,12 @@ const FloatingChatbot = () => {
   const subscriptionRef = useRef(null);
   const sessionSubscriptionRef = useRef(null);
 
-  const isBlogPage = location.pathname.includes('/browse/blog');
-
   const getResponsivePosition = () => {
     const isMobile = windowSize.width < 768;
     if (isMobile) {
-      return isBlogPage
-        ? { bottom: '6rem', right: '1rem' }
-        : { bottom: '1.5rem', right: '1rem' };
+      return { bottom: '1.5rem', right: '1rem' };
     }
-    return isBlogPage
-      ? { bottom: '1.5rem', right: '5.5rem' }
-      : { bottom: '1.5rem', right: '1.5rem' };
+    return { bottom: '1.5rem', right: '1.5rem' };
   };
 
   const responsivePosition = getResponsivePosition();
