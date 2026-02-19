@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import StellarSystemSimulation from './StellarSystemSimulation';
 import { KNOWLEDGE_BASE, SYSTEM_PROMPT } from '@/lib/knowledgeBase';
+import { supabase } from '@/lib/supabase';
+import emailjs from '@emailjs/browser';
 
 
 // --- ASCII Art & Easter Eggs ---
@@ -342,6 +344,7 @@ const Terminal = React.memo(({
             item.type === 'user' ? 'text-white font-semibold' : 
             item.type === 'error' ? 'text-red-400' : 
             item.type === 'success' ? 'text-green-400' : 
+            item.type === 'admin' ? 'text-blue-400 font-semibold' :
             'text-green-500'
           }`}>
             {item.type === 'user' ? `$ ${item.content}` : item.content}
@@ -504,6 +507,99 @@ const DeveloperPage = () => {
     }))
   );
 
+  // Supabase hybrid chat state
+  const [chatSessionId, setChatSessionId] = useState(null);
+  const [adminActive, setAdminActive] = useState(false);
+  const chatSubscriptionRef = useRef(null);
+  const sessionSubscriptionRef = useRef(null);
+
+  const createChatSession = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('chat_sessions')
+        .insert([{ visitor_name: 'DevChat Visitor', is_active: true, admin_active: false }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      setChatSessionId(data.id);
+
+      // Email notification
+      try {
+        emailjs.send(
+          import.meta.env.VITE_EMAILJS_SERVICE_ID,
+          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+          {
+            to_name: 'Sreevallabh',
+            from_name: 'Portfolio DevChat',
+            message: `New visitor started a DevChat session!\n\nSession ID: ${data.id}\nTime: ${new Date().toLocaleString()}\n\nHead to your admin panel to take over.`,
+          },
+          import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+        );
+      } catch (emailErr) {
+        console.error('EmailJS notification failed:', emailErr);
+      }
+
+      // Subscribe to messages for this session (admin/ai replies)
+      chatSubscriptionRef.current = supabase
+        .channel(`devchat-msgs:${data.id}`)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'messages', filter: `session_id=eq.${data.id}` },
+          (payload) => {
+            const msg = payload.new;
+            if (msg.sender === 'admin' || msg.sender === 'ai') {
+              setTerminalHistory((h) => {
+                const filtered = h.filter(
+                  (item) => item.content !== '🤖 Analyzing query...' && item.content !== '⏳ Waiting for Sreevallabh to reply...'
+                );
+                return [
+                  ...filtered,
+                  {
+                    type: msg.sender === 'admin' ? 'admin' : 'system',
+                    content: msg.sender === 'admin' ? `💬 Sreevallabh: ${msg.content}` : msg.content,
+                  },
+                ];
+              });
+            }
+          }
+        )
+        .subscribe();
+
+      // Subscribe to session updates (admin_active toggle)
+      sessionSubscriptionRef.current = supabase
+        .channel(`devchat-session:${data.id}`)
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'chat_sessions', filter: `id=eq.${data.id}` },
+          (payload) => {
+            const wasActive = adminActive;
+            const nowActive = payload.new.admin_active;
+            setAdminActive(nowActive);
+            if (nowActive && !wasActive) {
+              setTerminalHistory((h) => [...h, { type: 'success', content: '🟢 Sreevallabh just joined the chat!' }]);
+            } else if (!nowActive && wasActive) {
+              setTerminalHistory((h) => [...h, { type: 'system', content: '🤖 Sreevallabh left. AI Assistant is back.' }]);
+            }
+          }
+        )
+        .subscribe();
+
+      return data.id;
+    } catch (err) {
+      console.error('Failed to create chat session:', err);
+      return null;
+    }
+  }, [adminActive]);
+
+  // Cleanup subscriptions on unmount
+  useEffect(() => {
+    return () => {
+      if (chatSubscriptionRef.current) supabase.removeChannel(chatSubscriptionRef.current);
+      if (sessionSubscriptionRef.current) supabase.removeChannel(sessionSubscriptionRef.current);
+    };
+  }, []);
+
   // Konami code handler
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -544,6 +640,9 @@ const DeveloperPage = () => {
           { type: 'system', content: `🤖 Sreevallabh's AI Assistant Help:
 
 I'm a specialized AI that ONLY answers questions about Sreevallabh Kakarala.
+Sreevallabh may also jump in and reply personally at any time!
+
+${adminActive ? '🟢 Sreevallabh is currently in the chat!' : '🤖 AI is currently responding.'}
 
 Ask me about:
 • His projects (GitAlong, Quiznetic, Sarah AI, etc.)
@@ -552,8 +651,6 @@ Ask me about:
 • His education at VIT Chennai
 • His interests (sports, TV shows, fitness, gaming)
 • Contact information
-
-I won't answer general questions unrelated to Sreevallabh!
 
 Special commands:
 • clear - Clear chat history
@@ -664,7 +761,10 @@ TV Shows: The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Stranger T
       case 'chatbot':
         setIsChatbot(true);
         setConversationHistory([]);
-        response = '🤖 Sreevallabh\'s AI Assistant activated!\n\nI specialize in answering questions about Sreevallabh Kakarala:\n• Projects (GitAlong, Quiznetic, Sarah AI, etc.)\n• Work experience (WellDoc, VIT research)\n• Technical skills and tech stack\n• Education at VIT Chennai\n• Interests (sports, TV shows, fitness)\n\nI won\'t answer general or unrelated questions!\n\nWhat would you like to know about Sreevallabh?';
+        if (!chatSessionId) {
+          createChatSession();
+        }
+        response = '🤖 Sreevallabh\'s AI Assistant activated!\n\nI specialize in answering questions about Sreevallabh Kakarala:\n• Projects (GitAlong, Quiznetic, Sarah AI, etc.)\n• Work experience (WellDoc, VIT research)\n• Technical skills and tech stack\n• Education at VIT Chennai\n• Interests (sports, TV shows, fitness)\n\nI won\'t answer general or unrelated questions!\nSreevallabh may jump in and reply personally at any time.\n\nWhat would you like to know about Sreevallabh?';
         break;
       case 'workout':
         const workoutTips = [
@@ -742,53 +842,60 @@ What's your favorite show? Let's discuss!`;
 
   const processChatbot = async (input) => {
     if (!input.trim()) return;
-    
-    // Update conversation history
-    setConversationHistory(prev => [...prev, { role: 'user', content: input }]);
-    
-    // Single batched state update: user message + loading indicator
-    setTerminalHistory((h) => [
-      ...h,
-      { type: 'user', content: input },
-      { type: 'system', content: '🤖 Analyzing query...' }
-    ]);
-    
-    try {
-      // Check if API key is available
-      if (!GROQ_API_KEY) {
-        throw new Error('API key not configured');
-      }
 
-      // Build messages array with the RAG system
-      const messages = [
-        {
-          role: 'system',
-          content: SYSTEM_PROMPT
-        },
-        ...conversationHistory.map(msg => ({
-          role: msg.role,
-          content: msg.content
-        })),
-        {
-          role: 'user',
-          content: input
-        }
+    setConversationHistory(prev => [...prev, { role: 'user', content: input }]);
+    setTerminalHistory((h) => [...h, { type: 'user', content: input }]);
+
+    // Ensure session exists
+    let sid = chatSessionId;
+    if (!sid) {
+      sid = await createChatSession();
+      if (!sid) {
+        setTerminalHistory((h) => [...h, { type: 'error', content: 'Failed to start chat session. Please try again.' }]);
+        return;
+      }
+    }
+
+    // Store visitor message in Supabase
+    try {
+      await supabase.from('messages').insert([{ session_id: sid, content: input, sender: 'visitor' }]);
+      await supabase.from('chat_sessions').update({ last_message_at: new Date().toISOString() }).eq('id', sid);
+    } catch (err) {
+      console.error('Failed to store message:', err);
+    }
+
+    // Check if admin is active
+    try {
+      const { data: sessionData } = await supabase
+        .from('chat_sessions')
+        .select('admin_active')
+        .eq('id', sid)
+        .single();
+
+      if (sessionData?.admin_active) {
+        setTerminalHistory((h) => [...h, { type: 'system', content: '⏳ Waiting for Sreevallabh to reply...' }]);
+        return;
+      }
+    } catch (err) {
+      console.error('Failed to check admin status:', err);
+    }
+
+    // AI responds
+    setTerminalHistory((h) => [...h, { type: 'system', content: '🤖 Analyzing query...' }]);
+
+    try {
+      if (!GROQ_API_KEY) throw new Error('API key not configured');
+
+      const apiMessages = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...conversationHistory.map(msg => ({ role: msg.role, content: msg.content })),
+        { role: 'user', content: input }
       ];
 
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${GROQ_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: messages,
-          temperature: 0.7,
-          max_tokens: 400,
-          top_p: 0.9,
-          stream: false
-        })
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: apiMessages, temperature: 0.7, max_tokens: 400, top_p: 0.9, stream: false })
       });
 
       if (!response.ok) {
@@ -797,48 +904,34 @@ What's your favorite show? Let's discuss!`;
       }
 
       const data = await response.json();
-      
-      if (data.choices && data.choices[0] && data.choices[0].message) {
-        const botReply = data.choices[0].message.content || "I don't have that information about Sreevallabh. Please ask about his projects, experience, or skills! 🤔";
-        
-        // Add bot response to conversation history
+
+      if (data.choices?.[0]?.message) {
+        const botReply = data.choices[0].message.content || "I don't have that information about Sreevallabh.";
         setConversationHistory(prev => [...prev, { role: 'assistant', content: botReply }]);
-        
-        // Update terminal history - remove loading message and add bot response in ONE update
+
+        // Store AI reply in Supabase (realtime will deliver it, but also update locally to remove loading)
+        await supabase.from('messages').insert([{ session_id: sid, content: botReply, sender: 'ai' }]);
+
+        // Remove loading and add response
         setTerminalHistory((h) => {
-          const newHistory = [...h];
-          // Remove the loading message (last item)
-          newHistory.pop();
-          // Add bot response
-          newHistory.push({ type: 'system', content: botReply });
-          return newHistory;
+          const newHistory = h.filter(item => item.content !== '🤖 Analyzing query...');
+          return [...newHistory, { type: 'system', content: botReply }];
         });
       } else {
         throw new Error('Invalid response format from API');
       }
     } catch (err) {
       console.error('Groq API Error:', err);
-      
       let errorMessage = 'Oops! Something went wrong. 🤯 ';
-      
-      if (err.message.includes('API key not configured')) {
-        errorMessage += 'API key is not configured properly.';
-      } else if (err.message.includes('429') || err.message.includes('rate_limit')) {
-        errorMessage += 'Too many requests! Please wait a moment and try again.';
-      } else if (err.message.includes('401')) {
-        errorMessage += 'Authentication failed! Please check the API key.';
-      } else if (!navigator.onLine) {
-        errorMessage += 'You appear to be offline. Please check your internet connection.';
-      } else {
-        errorMessage += 'Please try asking about Sreevallabh\'s projects, experience, or skills!';
-      }
-      
-      // Update terminal history - remove loading and add error in ONE update
+      if (err.message.includes('API key not configured')) errorMessage += 'API key is not configured properly.';
+      else if (err.message.includes('429')) errorMessage += 'Too many requests! Please wait a moment.';
+      else if (err.message.includes('401')) errorMessage += 'Authentication failed!';
+      else if (!navigator.onLine) errorMessage += 'You appear to be offline.';
+      else errorMessage += 'Please try asking about Sreevallabh\'s projects, experience, or skills!';
+
       setTerminalHistory((h) => {
-        const newHistory = [...h];
-        newHistory.pop(); // Remove loading message
-        newHistory.push({ type: 'error', content: errorMessage });
-        return newHistory;
+        const newHistory = h.filter(item => item.content !== '🤖 Analyzing query...');
+        return [...newHistory, { type: 'error', content: errorMessage }];
       });
     }
   };
