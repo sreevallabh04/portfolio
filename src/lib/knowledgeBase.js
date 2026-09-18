@@ -3,7 +3,8 @@ export const KNOWLEDGE_BASE = `
 
 ## PERSONAL INFORMATION
 - Full Name: Sreevallabh Kakarala
-- Current Status: 4th year integrated M.Tech Software Engineering student
+- Role: AI Engineer (building RAG systems, time-series forecasting models and LLM agents)
+- Current Status: Final-year integrated M.Tech student, specialising in AI/ML
 - University: Vellore Institute of Technology (VIT Chennai)
 - Duration: Sep 2022 - June 2027
 - Location: India
@@ -14,20 +15,24 @@ export const KNOWLEDGE_BASE = `
 ## PROFESSIONAL EXPERIENCE
 
 ### AI Intern at WellDoc (Current)
-- Built RAG pipelines using LangChain for domain-specific Q&A
-- Document ingestion, chunking, embedding generation, and retrieval tuning across 500+ internal documents
-- Developed evaluation loops to improve answer grounding and reduce hallucinations by 30%
-- Integrated into internal assistant workflow, cutting knowledge lookup time by 50%
-- Experimented with prompt engineering, vector databases (FAISS, ChromaDB), and open-source LLMs
-- Technologies: LangChain, FAISS, ChromaDB, Python, RAG, NLP, LLMs
+- Finetuned a time-series forecasting model for CGM (continuous glucose monitoring) and weight prediction, achieving state-of-the-art results
+- Built a de-identified patient engagement insights agent using OpenClaw
+- Worked on the conversational chatbot, including retrieval and response quality
+- Technologies: Python, time-series forecasting, OpenClaw, LLMs, RAG, PyTorch
 
 ### Research Intern - Agriculture Domain Research, VIT Chennai (Jan 2025 - Present)
-- Classification of spongy tissue disorder in mangoes using deep learning
-- Developing CNN models for fruit disease detection
-- Data preprocessing and augmentation techniques
-- Model optimization and performance analysis
-- Research paper preparation and documentation
+- Deep learning for mango disease detection; FIRST AUTHOR on a peer-reviewed paper
+- Cross-modal knowledge transfer from RGB to synthetic thermal imagery, so the model needs no thermal camera at inference time
+- CNN models for fruit disease and spongy tissue disorder detection
+- Data preprocessing, augmentation and synthetic thermal generation
 - Technologies: Python, TensorFlow, OpenCV, NumPy, Pandas, Matplotlib
+
+## PUBLICATION
+- Title: "Cross-modal knowledge transfer for cost-effective mango disease detection using synthetic thermal imaging"
+- Venue: Frontiers in Agronomy, June 2026
+- Authors: Kakarala Sreevallabh (first author), Kothapalli Anusha, Ayesha Shaik, Ananthakrishnan Balasundaram
+- DOI: 10.3389/fagro.2026.1798543
+- Link: https://www.frontiersin.org/journals/agronomy/articles/10.3389/fagro.2026.1798543/full
 
 ### Freelance Web Developer - Metic Synergy Website (Dec 2024 - Apr 2025)
 - Developed interactive corporate website with CMS and SEO improvements
@@ -90,22 +95,20 @@ export const KNOWLEDGE_BASE = `
 ## TECHNICAL SKILLS
 
 ### Programming Languages
-- Python (Advanced), Java, C/C++, JavaScript, SQL, Bash, Git
+- Python (Advanced), SQL, Bash, JavaScript
 
-### Web Development Frameworks
-- Flask, HTML, CSS, PHP, ReactJS, NextJS
+### ML & Deep Learning
+- PyTorch, TensorFlow, Scikit-learn, NumPy, Pandas, OpenCV
+- Time-series forecasting, CNNs, computer vision, cross-modal transfer
 
-### Machine Learning Frameworks
-- NumPy, Pandas, Scikit-learn, Matplotlib, TensorFlow, OpenCV
+### LLMs & Agents
+- LangChain, RAG, OpenClaw, prompt engineering, Groq, Hugging Face
 
-### Databases
-- DynamoDB, Aurora, SQLite, MySQL, Firestore
+### Vector & Data Stores
+- FAISS, ChromaDB, PostgreSQL, MySQL
 
-### Cloud Technologies
-- Firebase, Google Cloud Platform (GCP), AWS
-
-### Design Tools
-- Figma, Adobe XD
+### MLOps & Infrastructure
+- Docker, AWS, Google Cloud Platform (GCP), Git, Linux
 
 ### Other Technologies
 - Linux, Android, Notion, Docker

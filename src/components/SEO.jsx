@@ -1,12 +1,22 @@
 import { Helmet } from 'react-helmet-async';
 
-const SEO = ({ 
-  title, 
-  description, 
-  image = '/HopeCore.png',
-  url = 'https://streamvallabh.life',
+const SITE_URL = 'https://streamvallabh.life';
+
+// Crawlers resolve og:image and canonical against their own base, so relative
+// paths are unreliable. Normalise everything to an absolute URL here.
+const absolute = (value) => {
+  if (!value) return undefined;
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${SITE_URL}${value.startsWith('/') ? '' : '/'}${value}`;
+};
+
+const SEO = ({
+  title,
+  description,
+  image = `${SITE_URL}/HopeCore.png`,
+  url = SITE_URL,
   type = 'website',
-  keywords = 'Sreevallabh Kakarala, software developer, web development, React, full stack developer',
+  keywords = 'Sreevallabh Kakarala, AI engineer, machine learning engineer, LLM, RAG, LangChain, PyTorch, time series forecasting',
   author = 'Sreevallabh Kakarala',
   publishedTime,
   modifiedTime,
@@ -14,62 +24,12 @@ const SEO = ({
   isArticle = false
 }) => {
   const fullTitle = `${title} | Sreevallabh Kakarala`;
-  
-  // Base schema for the website
-  const websiteSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Sreevallabh Kakarala Portfolio",
-    "url": "https://streamvallabh.life",
-    "description": "Personal portfolio website of Sreevallabh Kakarala, showcasing software development projects and professional experience.",
-    "author": {
-      "@type": "Person",
-      "name": "Sreevallabh Kakarala",
-      "url": "https://streamvallabh.life",
-      "image": "/HopeCore.png",
-      "jobTitle": "Software Developer",
-      "alumniOf": {
-        "@type": "CollegeOrUniversity",
-        "name": "Vellore Institute of Technology, Chennai",
-        "url": "https://chennai.vit.ac.in/"
-      },
-      "sameAs": [
-        "https://github.com/sreevallabh04",
-        "https://linkedin.com/in/sreevallabh-kakarala-52ab8a248"
-      ]
-    }
-  };
+  const canonicalUrl = absolute(url);
+  const imageUrl = absolute(image);
 
-  // Person schema with detailed information
-  const personSchema = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Sreevallabh Kakarala",
-    "description": "Software Engineering student specializing in full-stack development and AI/ML solutions",
-    "url": "https://streamvallabh.life",
-    "image": "/HopeCore.png",
-    "email": "srivallabhkakarala@gmail.com",
-    "jobTitle": "Software Developer",
-    "alumniOf": {
-      "@type": "CollegeOrUniversity",
-      "name": "Vellore Institute of Technology, Chennai",
-      "url": "https://chennai.vit.ac.in/"
-    },
-    "knowsAbout": [
-      "Web Development",
-      "Software Engineering",
-      "Artificial Intelligence",
-      "Machine Learning",
-      "Full Stack Development",
-      "React",
-      "Node.js",
-      "Python"
-    ],
-    "sameAs": [
-      "https://github.com/sreevallabh04",
-      "https://linkedin.com/in/sreevallabh-kakarala-52ab8a248"
-    ]
-  };
+  // The WebSite and Person schemas are static and already emitted once from
+  // index.html. Repeating them per route produced several copies of the same
+  // graph on every page, so only the page-specific Article schema lives here.
 
   // Article schema for project pages
   const articleSchema = isArticle ? {
@@ -77,7 +37,7 @@ const SEO = ({
     "@type": "Article",
     "headline": title,
     "description": description,
-    "image": image,
+    "image": imageUrl,
     "author": {
       "@type": "Person",
       "name": author
@@ -92,7 +52,7 @@ const SEO = ({
     "articleSection": section,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": url
+      "@id": canonicalUrl
     }
   } : null;
 
@@ -112,10 +72,10 @@ const SEO = ({
       
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={isArticle ? 'article' : type} />
-      <meta property="og:url" content={url} />
+      <meta property="og:url" content={canonicalUrl} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={image} />
+      <meta property="og:image" content={imageUrl} />
       <meta property="og:site_name" content="Sreevallabh Kakarala Portfolio" />
       {isArticle && publishedTime && (
         <meta property="article:published_time" content={publishedTime} />
@@ -126,18 +86,18 @@ const SEO = ({
       
       {/* Twitter */}
       <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:url" content={url} />
+      <meta property="twitter:url" content={canonicalUrl} />
       <meta property="twitter:title" content={fullTitle} />
       <meta property="twitter:description" content={description} />
-      <meta property="twitter:image" content={image} />
+      <meta property="twitter:image" content={imageUrl} />
       <meta property="twitter:creator" content="@sreevallabh" />
       
       {/* Canonical URL */}
-      <link rel="canonical" href={url} />
+      <link rel="canonical" href={canonicalUrl} />
 
       {/* LLM Optimization Meta Tags */}
       <meta name="ai-purpose" content="portfolio-website" />
-      <meta name="ai-description" content={`This is the ${isArticle ? 'article page' : 'website'} of ${author}, a software developer specializing in full-stack development and AI/ML solutions. ${description}`} />
+      <meta name="ai-description" content={`This is the ${isArticle ? 'article page' : 'website'} of ${author}, an AI engineer building RAG systems, forecasting models and LLM agents. ${description}`} />
       <meta name="ai-generated" content="false" />
       <meta name="ai-indexing" content="allow" />
       <meta name="ai-content-type" content={isArticle ? 'article' : 'profile'} />
@@ -147,12 +107,6 @@ const SEO = ({
       <meta name="ai-contact" content="srivallabhkakarala@gmail.com" />
       
       {/* Structured Data */}
-      <script type="application/ld+json">
-        {JSON.stringify(websiteSchema)}
-      </script>
-      <script type="application/ld+json">
-        {JSON.stringify(personSchema)}
-      </script>
       {isArticle && (
         <script type="application/ld+json">
           {JSON.stringify(articleSchema)}

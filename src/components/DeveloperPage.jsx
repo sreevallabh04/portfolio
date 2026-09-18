@@ -2,7 +2,14 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import StellarSystemSimulation from './StellarSystemSimulation';
-import { KNOWLEDGE_BASE, SYSTEM_PROMPT } from '@/lib/knowledgeBase';
+import { SYSTEM_PROMPT } from '@/lib/knowledgeBase';
+import BootSequence from './dev/BootSequence';
+import TrophyDrawer from './dev/TrophyDrawer';
+import {
+  AchievementProvider,
+  AchievementToasts,
+  useAchievements,
+} from './dev/useAchievements';
 import { supabase } from '@/lib/supabase';
 import emailjs from '@emailjs/browser';
 
@@ -131,30 +138,28 @@ const SolarSystemSimulation = () => {
 };
 
 // --- Futuristic Hero Section ---
-const FuturisticHero = ({ onStart }) => {
+const FuturisticHero = ({ onStart, onKonami }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
-  const [keyPressCount, setKeyPressCount] = useState(0);
 
   // Easter egg handler
   useEffect(() => {
+    let count = 0;
     const handleKeyPress = (e) => {
       if (e.key === 'ArrowUp' && e.ctrlKey) {
-        setKeyPressCount(prev => {
-          const newCount = prev + 1;
-          if (newCount >= 3) {
-            setShowEasterEgg(true);
-            setTimeout(() => setShowEasterEgg(false), 3000);
-            return 0;
-          }
-          return newCount;
-        });
+        count += 1;
+        if (count >= 3) {
+          count = 0;
+          setShowEasterEgg(true);
+          onKonami?.();
+          setTimeout(() => setShowEasterEgg(false), 3000);
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  }, [onKonami]);
 
   return (
     <div className="relative flex flex-col items-center justify-center h-[500px] bg-black bg-opacity-80 rounded-2xl shadow-2xl overflow-hidden border border-[#39ff14] backdrop-blur-xl">
@@ -200,7 +205,7 @@ const FuturisticHero = ({ onStart }) => {
           onHoverStart={() => setIsHovered(true)}
           onHoverEnd={() => setIsHovered(false)}
         >
-          NETFLIX
+          DEVTERM
         </motion.h1>
 
         <motion.h2 
@@ -218,21 +223,17 @@ const FuturisticHero = ({ onStart }) => {
           Welcome to the Neo-Terminal Experience
         </motion.h2>
 
-        <motion.p 
-          className="text-lg text-gray-200 mb-8 max-w-2xl text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          A futuristic fusion of Linux, Netflix, and 3D graphics. Play, explore, and enjoy a visual masterpiece of code and creativity!
-        </motion.p>
+        {/* No entrance animation on this block. The button below is the only
+            way into the terminal, and this page runs a WebGL canvas plus twenty
+            animated particles, so anything that starts at opacity 0 here risks
+            never arriving on a busy main thread. */}
+        <p className="mb-8 max-w-2xl text-center text-lg text-gray-200">
+          A shell, four games and twelve hidden achievements. Type{' '}
+          <code className="rounded bg-white/10 px-1.5 py-0.5 text-[#39ff14]">help</code> once
+          you are in &mdash; or go looking for the ones it does not tell you about.
+        </p>
 
-        <motion.div
-          className="flex flex-col items-center space-y-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-        >
+        <div className="flex flex-col items-center space-y-4">
           <motion.button
             onClick={onStart}
             className="bg-gradient-to-r from-[#ff004f] via-[#39ff14] to-[#00eaff] text-white font-bold py-4 px-12 rounded-full text-2xl shadow-xl transition-all duration-200 border-2 border-[#00eaff] relative overflow-hidden group"
@@ -268,15 +269,10 @@ const FuturisticHero = ({ onStart }) => {
             />
           </motion.button>
 
-          <motion.div
-            className="text-sm text-gray-400"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-          >
+          <div className="text-sm text-gray-400">
             Press Ctrl + ↑ three times for a surprise!
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </motion.div>
 
       {/* Floating Elements */}
@@ -368,6 +364,8 @@ const Terminal = React.memo(({
   );
 });
 
+Terminal.displayName = 'Terminal';
+
 // --- Games Carousel ---
 const gamesList = [
   {
@@ -424,23 +422,19 @@ const GamesCarousel = ({ onSelect }) => (
 );
 
 // --- Skills/Projects as Netflix Cards ---
+// Local SVGs rather than the icons8 hotlinks this used to carry: those were an
+// external dependency on every page load, and the list itself was a web-dev
+// stack rather than the AI one the rest of the site now describes.
 const skills = [
-  { title: 'React', img: 'https://img.icons8.com/color/96/react-native.png' },
-  { title: 'Node.js', img: 'https://img.icons8.com/color/96/nodejs.png' },
-  { title: 'Linux', img: 'https://img.icons8.com/color/96/linux.png' },
-  { title: 'Docker', img: 'https://img.icons8.com/color/96/docker.png' },
-  { title: 'Python', img: 'https://img.icons8.com/color/96/python.png' },
-  { title: 'AWS', img: 'https://img.icons8.com/color/96/amazon-web-services.png' },
-  { title: 'MongoDB', img: 'https://img.icons8.com/color/96/mongodb.png' },
-  { title: 'TypeScript', img: 'https://img.icons8.com/color/96/typescript.png' },
+  { title: 'Python', img: '/skills/python.svg' },
+  { title: 'PyTorch', img: '/skills/pytorch.svg' },
+  { title: 'TensorFlow', img: '/skills/tensorflow.svg' },
+  { title: 'LangChain', img: '/skills/langchain.svg' },
+  { title: 'RAG', img: '/skills/rag.svg' },
+  { title: 'FAISS', img: '/skills/faiss.svg' },
+  { title: 'Docker', img: '/skills/docker.svg' },
+  { title: 'Linux', img: '/skills/linux.svg' },
 ];
-const projects = [
-  { title: 'Portfolio', img: 'https://img.icons8.com/fluency/96/source-code.png', desc: 'This very site, built with React & Tailwind!' },
-  { title: 'DevBot', img: 'https://img.icons8.com/fluency/96/robot-2.png', desc: 'AI-powered chatbot for devs.' },
-  { title: 'Netflix Clone', img: 'https://img.icons8.com/fluency/96/netflix-desktop-app.png', desc: 'A fullstack Netflix clone.' },
-  { title: 'Terminal Games', img: 'https://img.icons8.com/fluency/96/game-controller.png', desc: 'Fun games in the terminal.' },
-];
-
 const NetflixCards = ({ title, items }) => (
   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-10">
     <h2 className="netflix-title text-red-500 mb-6">{title}</h2>
@@ -480,6 +474,14 @@ const Footer = () => (
 
 // --- Main Page Component ---
 const DeveloperPage = () => {
+  const { unlock } = useAchievements();
+  const [booted, setBooted] = useState(() => {
+    try {
+      return sessionStorage.getItem('dev-booted') === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [showTerminal, setShowTerminal] = useState(false);
   const [terminalHistory, setTerminalHistory] = useState([
     { type: 'system', content: NETFLIX_ASCII + '\nWelcome to DevTerm v2.0.0' },
@@ -626,7 +628,23 @@ const DeveloperPage = () => {
   // Knowledge base imported from shared module
 
   // --- Command Processing ---
+  // Map terminal commands onto achievement unlocks.
+  const COMMAND_TROPHIES = {
+    help: 'help',
+    raazi: 'sudo',
+    neofetch: 'neofetch',
+    hire: 'hire',
+    coffee: 'coffee',
+    chatbot: 'chatbot',
+  };
+
   const processCommand = (input) => {
+    const trimmed = input.toLowerCase().trim();
+    unlock('first-command');
+    if (COMMAND_TROPHIES[trimmed]) {
+      unlock(COMMAND_TROPHIES[trimmed]);
+    }
+
     if (isChatbot) {
       // Handle special chatbot commands
       const lowerInput = input.toLowerCase().trim();
@@ -717,15 +735,67 @@ What would you like to know about Sreevallabh? 🚀` }
 - workout: Get a random workout tip
 - sports: Talk about sports
 - tvshows: Discuss TV shows
+- neofetch: System information
+- hire: The important question
+- coffee: Brew something
+- uptime: How long this has been running
+- whoami: Identity check
 - reveal-pin: ???`;
         break;
       case 'about':
-        response = `I'm Sreevallabh, a 4th year M.Tech Software Engineering student who loves sports, TV shows, working out, and building awesome tech! 💪🎬⚽`;
+        response = `I'm Sreevallabh, an AI Engineer and final-year integrated M.Tech student at VIT Chennai.
+I build RAG systems, finetune forecasting models, and ship LLM agents that survive contact with real users.
+First-author on a Frontiers in Agronomy paper. Lifts heavy. Watches The Office on loop. 💪🎬`;
         break;
       case 'skills':
-        response = `Tech Skills: React, Node.js, Linux, Docker, Python, AWS, MongoDB, TypeScript, and more!
-Sports: Cricket, Football, Basketball, Gym workouts
-TV Shows: The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Stranger Things, Breaking Bad`;
+        response = `AI/ML: PyTorch, TensorFlow, scikit-learn, OpenCV, time-series forecasting
+LLM stack: LangChain, RAG, FAISS, ChromaDB, OpenClaw, Groq, prompt engineering
+Languages: Python, SQL, Bash, JavaScript
+Infra: Docker, AWS, GCP, Git, Linux
+Outside the terminal: cricket, football, 75 Hard, The Office`;
+        break;
+      case 'neofetch':
+        response = `                   sreevallabh@streamvallabh
+      .---.        -------------------------
+     /     \\       OS      : StreamVallabh OS (Netflix Edition)
+     \\.@-@./       Host    : VIT Chennai
+     /\`\\_/\`\\       Kernel  : react-18.2.0
+    //  _  \\\\      Uptime  : 3 years of shipping
+   | \\     )|_     Shell   : DevTerm v2.0.0
+  /\`\\_\`>  <_/ \\    Role    : AI Engineer @ WellDoc
+  \\__/'---'\\__/    Stack   : Python · PyTorch · LangChain · RAG
+                   Papers  : 1 (first author, Frontiers in Agronomy)
+                   Memory  : 16GB (3GB used by browser tabs)`;
+        type = 'success';
+        break;
+      case 'hire':
+        response = `>>> Checking availability...
+
+  STATUS      : Open to AI/ML engineering roles
+  STRENGTHS   : RAG systems · forecasting · LLM agents · computer vision
+  SHIPPED     : SOTA CGM/weight forecasting · de-identified insights agent
+  PUBLISHED   : Frontiers in Agronomy, 2026 (first author)
+
+  Email       : srivallabhkakarala@gmail.com
+  LinkedIn    : linkedin.com/in/sreevallabh-kakarala-52ab8a248
+  Resume      : type "contact" for every link
+
+>>> Response time: faster than a cold start.`;
+        type = 'success';
+        break;
+      case 'coffee':
+        response = `HTTP 418 I'm a teapot.
+
+The requested entity body is short and stout.
+Try "workout" instead \u2014 it's the same stimulant, longer half-life.`;
+        type = 'error';
+        break;
+      case 'uptime':
+        response = ` ${new Date().toLocaleTimeString()}  up 3 years, 12 projects, 1 paper
+ load average: 0.75, 1.20, 2.40  (deadline-dependent)`;
+        break;
+      case 'whoami':
+        response = hasSudoAccess ? 'root' : 'guest';
         break;
       case 'tux':
         response = TUX_ASCII;
@@ -766,7 +836,7 @@ TV Shows: The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Stranger T
         }
         response = '🤖 Sreevallabh\'s AI Assistant activated!\n\nI specialize in answering questions about Sreevallabh Kakarala:\n• Projects (GitAlong, Quiznetic, Sarah AI, etc.)\n• Work experience (WellDoc, VIT research)\n• Technical skills and tech stack\n• Education at VIT Chennai\n• Interests (sports, TV shows, fitness)\n\nI won\'t answer general or unrelated questions!\nSreevallabh may jump in and reply personally at any time.\n\nWhat would you like to know about Sreevallabh?';
         break;
-      case 'workout':
+      case 'workout': {
         const workoutTips = [
           '💪 Start with compound movements like squats, deadlifts, and bench press!',
           '🔥 Progressive overload is key - gradually increase weight or reps!',
@@ -779,6 +849,7 @@ TV Shows: The Office, Friends, HIMYM, Big Bang Theory, Modern Family, Stranger T
         ];
         response = workoutTips[Math.floor(Math.random() * workoutTips.length)];
         break;
+      }
       case 'sports':
         response = `🏏 Cricket: Love watching IPL and international matches!
 ⚽ Football: Big fan of Premier League and Champions League!
@@ -960,11 +1031,11 @@ What's your favorite show? Let's discuss!`;
       itemType="http://schema.org/Person"
     >
       <meta itemProp="name" content="Sreevallabh Kakarala" />
-      <meta itemProp="jobTitle" content="Software Engineer" />
-      <meta itemProp="description" content="4th year integrated M.Tech Software Engineering student specializing in Web Development, AI/ML, and Blockchain" />
+      <meta itemProp="jobTitle" content="AI Engineer" />
+      <meta itemProp="description" content="AI Engineer building RAG systems, time-series forecasting models and LLM agents" />
       <meta itemProp="alumniOf" content="VIT Chennai" />
       <meta name="description" content="Interactive developer portfolio showcasing projects in Web Development, AI/ML, Blockchain, and more" />
-      <meta name="keywords" content="software engineer, web development, AI/ML, blockchain, React, NextJS, Python" />
+      <meta name="keywords" content="AI engineer, machine learning, LLM, RAG, LangChain, PyTorch, Python" />
       <meta property="og:type" content="profile" />
       <meta property="profile:first_name" content="Sreevallabh" />
       <meta property="profile:last_name" content="Kakarala" />
@@ -987,9 +1058,26 @@ What's your favorite show? Let's discuss!`;
         ))}
       </div>
 
+      {!booted && (
+        <BootSequence
+          onComplete={() => {
+            setBooted(true);
+            unlock('boot');
+            try {
+              sessionStorage.setItem('dev-booted', 'true');
+            } catch {
+              /* boot replays next visit if storage is unavailable */
+            }
+          }}
+        />
+      )}
+
+      <TrophyDrawer />
+      <AchievementToasts />
+
       <div className="relative z-10">
         {!showTerminal ? (
-          <FuturisticHero onStart={() => setShowTerminal(true)} />
+          <FuturisticHero onStart={() => setShowTerminal(true)} onKonami={() => unlock('konami')} />
         ) : (
           <>
             <motion.div 
@@ -1005,6 +1093,7 @@ What's your favorite show? Let's discuss!`;
                 <div className="flex justify-center mb-6">
                   <button
                     onClick={() => {
+                      unlock('chatbot');
                       setIsChatbot((v) => {
                         const newMode = !v;
                         // Clear conversation history when switching to chatbot mode
@@ -1043,7 +1132,25 @@ What's your favorite show? Let's discuss!`;
                 />
               </div>
             </motion.div>
-            <GamesCarousel onSelect={setActiveGame} />
+            <GamesCarousel
+              onSelect={(key) => {
+                setActiveGame(key);
+                unlock('gamer');
+                // Track which games have been opened so "Speedrunner" needs all four.
+                try {
+                  const played = new Set(
+                    JSON.parse(localStorage.getItem('dev-games-played') || '[]')
+                  );
+                  played.add(key);
+                  localStorage.setItem('dev-games-played', JSON.stringify([...played]));
+                  if (gamesList.every((game) => played.has(game.key))) {
+                    unlock('all-games');
+                  }
+                } catch {
+                  /* storage unavailable; the per-game trophy just will not unlock */
+                }
+              }}
+            />
             <AnimatePresence>
               {activeGame && (
                 <motion.div
@@ -1824,4 +1931,14 @@ const styleSheet = document.createElement("style");
 styleSheet.innerText = styles;
 document.head.appendChild(styleSheet);
 
-export default DeveloperPage; 
+/**
+ * The achievements context has to sit above the page, so the default export is
+ * a thin provider around it.
+ */
+const DeveloperPageWithAchievements = () => (
+  <AchievementProvider>
+    <DeveloperPage />
+  </AchievementProvider>
+);
+
+export default DeveloperPageWithAchievements; 

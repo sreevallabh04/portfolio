@@ -1,71 +1,39 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { ChevronDown } from 'lucide-react';
 
-const profiles = [
-  { 
-    id: 'recruiter', 
-    name: 'Recruiter',
-    color: 'bg-red-600',
-    avatar: '/avatars/avatar1.jpeg',
-  },
-  { 
-    id: 'developer', 
-    name: 'Developer',
-    color: 'bg-green-600',
-    avatar: '/avatars/avatar2.jpeg'
-  },
-  { 
-    id: 'stalker', 
-    name: 'Stalker',
-    color: 'bg-red-500',
-    avatar: '/avatars/avatar3.jpeg'
-  },
-  { 
-    id: 'memories', 
-    name: 'Memories',
-    color: 'bg-purple-600',
-    avatar: '/avatars/avatar4.jpeg'
-  }
+const PROFILES = [
+  { id: 'recruiter', name: 'Recruiter', avatar: '/avatars/avatar1.jpeg' },
+  { id: 'developer', name: 'Developer', avatar: '/avatars/avatar2.jpeg' },
+  { id: 'stalker', name: 'Stalker', avatar: '/avatars/avatar3.jpeg' },
+  { id: 'fitness', name: 'Fitness', avatar: '/avatars/avatar4.jpeg' },
 ];
 
 const ProfileSwitcher = ({ currentProfile }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [imagesLoaded, setImagesLoaded] = useState({});
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // Preload images
   useEffect(() => {
-    const preloadImages = () => {
-      const loadStatus = {};
-      profiles.forEach(profile => {
-        const img = new Image();
-        img.src = profile.avatar;
-        img.onload = () => {
-          loadStatus[profile.id] = true;
-          setImagesLoaded(prev => ({...prev, [profile.id]: true}));
-        };
-        img.onerror = () => {
-          loadStatus[profile.id] = false;
-          setImagesLoaded(prev => ({...prev, [profile.id]: false}));
-        };
-      });
-    };
-    preloadImages();
-  }, []);
+    if (!isOpen) return undefined;
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handlePointerDown = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
   const handleProfileSelect = (profileId) => {
     setIsOpen(false);
@@ -74,65 +42,84 @@ const ProfileSwitcher = ({ currentProfile }) => {
     }
   };
 
-  const currentProfileData = profiles.find(p => p.id === currentProfile);
+  const currentProfileData = PROFILES.find((p) => p.id === currentProfile);
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 focus:outline-none"
+        onClick={() => setIsOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        aria-label={
+          currentProfileData ? `Switch profile, currently ${currentProfileData.name}` : 'Choose a profile'
+        }
+        className="flex items-center gap-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
       >
-        <div className="w-8 h-8 rounded overflow-hidden border-2 border-transparent hover:border-white transition-all duration-300">
-          {currentProfileData && (
+        <span className="h-8 w-8 overflow-hidden rounded border-2 border-transparent transition-all duration-300 hover:border-white">
+          {currentProfileData ? (
             <img
               src={currentProfileData.avatar}
-              alt={currentProfileData.name}
-              className="w-full h-full object-cover"
+              alt=""
+              aria-hidden="true"
+              className="h-full w-full object-cover"
             />
+          ) : (
+            // No profile in the URL (/skills, /contact, /blog). Previously this
+            // silently showed the recruiter avatar even for other visitors.
+            <span className="flex h-full w-full items-center justify-center bg-zinc-800 text-xs font-bold text-white/60">
+              ?
+            </span>
           )}
-        </div>
-        <svg
-          className={`w-4 h-4 text-white transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 text-white transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+        />
       </button>
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
+          <motion.ul
+            role="menu"
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-2 w-48 bg-black/90 backdrop-blur-lg rounded-lg shadow-xl border border-gray-800 overflow-hidden"
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
+            className="absolute right-0 mt-2 w-48 overflow-hidden rounded-lg border border-white/10 bg-black/95 py-2 shadow-xl backdrop-blur-lg"
           >
-            <div className="py-2">
-              {profiles.map((profile) => (
-                <button
-                  key={profile.id}
-                  onClick={() => handleProfileSelect(profile.id)}
-                  className="w-full px-4 py-2 flex items-center space-x-3 hover:bg-white/10 transition-colors duration-200"
-                >
-                  <div className="w-8 h-8 rounded overflow-hidden">
-                    <img
-                      src={profile.avatar}
-                      alt={profile.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span className="text-white text-sm">{profile.name}</span>
-                </button>
-              ))}
-            </div>
-          </motion.div>
+            {PROFILES.map((profile) => {
+              const isCurrent = profile.id === currentProfile;
+              return (
+                <li key={profile.id} role="none">
+                  <button
+                    role="menuitem"
+                    onClick={() => handleProfileSelect(profile.id)}
+                    className={`flex w-full items-center gap-3 px-4 py-2 transition-colors duration-200 hover:bg-white/10 focus-visible:outline-none focus-visible:bg-white/10 ${
+                      isCurrent ? 'bg-white/5' : ''
+                    }`}
+                  >
+                    <span className="h-8 w-8 overflow-hidden rounded">
+                      <img
+                        src={profile.avatar}
+                        alt=""
+                        aria-hidden="true"
+                        className="h-full w-full object-cover"
+                      />
+                    </span>
+                    <span className="text-sm text-white">{profile.name}</span>
+                    {isCurrent && (
+                      <span className="ml-auto h-1.5 w-1.5 rounded-full bg-red-500" />
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </motion.ul>
         )}
       </AnimatePresence>
     </div>
   );
 };
 
-export default ProfileSwitcher; 
+export default ProfileSwitcher;

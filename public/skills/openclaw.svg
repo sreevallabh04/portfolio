@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="OpenClaw">
+  <g fill="none" stroke="#E8833A" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M40 24v34a24 24 0 0 0 48 0V24"/>
+    <path d="M64 82v22"/>
+    <path d="M46 104h36"/>
+  </g>
+  <circle cx="40" cy="20" r="8" fill="#E8833A"/>
+  <circle cx="88" cy="20" r="8" fill="#E8833A"/>
+</svg>

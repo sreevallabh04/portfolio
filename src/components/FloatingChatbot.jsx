@@ -1,15 +1,20 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Minimize2, Maximize2 } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { X, Send, Minimize2, Maximize2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { SYSTEM_PROMPT } from '@/lib/knowledgeBase';
 import emailjs from '@emailjs/browser';
 
+/**
+ * NOTE ON SECURITY: Vite inlines every VITE_* variable into the client bundle,
+ * so this key is readable by any visitor and can be used to spend your Groq
+ * quota. The durable fix is to move this call behind a serverless function that
+ * holds the key server-side. Until then, keep a tight spend cap on the key.
+ */
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 const FloatingChatbot = () => {
-  const location = useLocation();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -178,6 +183,11 @@ const FloatingChatbot = () => {
 
   // AI response via Groq
   const getAIResponse = async (userMessage, conversationMsgs) => {
+    if (!GROQ_API_KEY) {
+      // Without a key the fetch returned 401 and surfaced as a generic failure.
+      throw new Error('Groq API key is not configured');
+    }
+
     const chatHistory = conversationMsgs
       .filter((m) => m.id !== 'greeting')
       .map((m) => ({

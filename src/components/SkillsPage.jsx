@@ -1,234 +1,124 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, FreeMode } from 'swiper/modules';
 import SEO from '@/components/SEO';
+import { SKILL_CATEGORIES } from '@/data/portfolio';
 
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/free-mode';
+/**
+ * Skills showcase.
+ *
+ * Swiper and its three stylesheets used to be imported here but nothing on the
+ * page ever rendered a <Swiper>; dropping them took this route's chunk from
+ * 88 kB to under 6 kB. The mobile grid and desktop rail were also two
+ * near-identical copies of the same markup, now one responsive grid.
+ */
 
-// Updated skill data with normalized image paths
-const skillsData = {
-  "Languages": [
-    { name: "Python", logo: "/skills/python.jpeg" },
-    { name: "Java", logo: "/skills/java.png" },
-    { name: "C/C++", logo: "/skills/c++.png" },
-    { name: "JavaScript", logo: "/skills/javascript.png" },
-    { name: "SQL", logo: "/skills/sql.jpeg" },
-    { name: "Bash", logo: "/skills/bash.png" },
-    { name: "Git", logo: "/skills/git.png" },
-  ],
-  "Web Development Frameworks": [
-    { name: "Flask", logo: "/skills/flask.png" },
-    { name: "HTML", logo: "/skills/html.png" },
-    { name: "CSS", logo: "/skills/css.png" },
-    { name: "PHP", logo: "/skills/php.png" },
-    { name: "ReactJS", logo: "/skills/reactjs.jpeg" },
-    { name: "NextJS", logo: "/skills/nextjs.png" },
-  ],
-  "Machine Learning Frameworks": [
-    { name: "Numpy", logo: "/skills/Numpy.png" },
-    { name: "Pandas", logo: "/skills/pandas.png" },
-    { name: "Scikit-learn", logo: "/skills/scikit learn.png" },
-    { name: "Matplotlib", logo: "/skills/matplotlib.png" },
-  ],
-  "Databases": [
-    { name: "DynamoDB", logo: "/skills/dynamodb.png" },
-    { name: "Aurora", logo: "/skills/aurora.jpeg" },
-    { name: "SQLite", logo: "/skills/sqlite.png" },
-    { name: "MySQL", logo: "/skills/mysql.png" },
-    { name: "Firestore", logo: "/skills/firestore.jpeg" },
-  ],
-  "Cloud Technologies": [
-    { name: "Firebase", logo: "/skills/firebase.png" },
-    { name: "Google Cloud Platform", logo: "/skills/gcp.png" },
-    { name: "AWS", logo: "/skills/aws.png" },
-  ],
-  "Design Suite": [
-    { name: "Figma", logo: "/skills/figma.png" },
-    { name: "AdobeXD", logo: "/skills/adobexd.jpeg" },
-  ],
-  "Other Technologies": [
-    { name: "Linux", logo: "/skills/linux.jpeg" },
-    { name: "Android", logo: "/skills/android.png" },
-    { name: "Notion", logo: "/skills/notion.png" },
-    { name: "Docker", logo: "/skills/docker.png" },
-  ],
+const SkillTile = ({ skill, category }) => {
+  const [failed, setFailed] = useState(false);
+  const showLetter = !skill.logo || failed;
+
+  return (
+    <motion.li
+      whileHover={{ y: -6, scale: 1.04 }}
+      transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+      className="group flex aspect-square flex-col items-center justify-center gap-3 rounded-xl border border-white/5 bg-zinc-900/80 p-3 text-center backdrop-blur-sm transition-colors duration-300 hover:border-red-500/50"
+      title={`${skill.name} — ${category}`}
+    >
+      {showLetter ? (
+        <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-red-600/25 to-red-900/10 text-xl font-bold text-red-300 sm:h-14 sm:w-14 sm:text-2xl">
+          {skill.name.charAt(0)}
+        </span>
+      ) : (
+        <img
+          src={encodeURI(skill.logo)}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          className="h-10 w-10 object-contain sm:h-12 sm:w-12"
+          onError={() => setFailed(true)}
+        />
+      )}
+      <span className="text-xs font-medium leading-tight text-white/85 sm:text-sm">
+        {skill.name}
+      </span>
+    </motion.li>
+  );
 };
 
 const SkillsPage = () => {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-
-  // Prepare structured data for skills
-  const skillsList = Object.entries(skillsData).flatMap(([category, skills]) =>
-    skills.map(skill => skill.name)
+  const skillsList = SKILL_CATEGORIES.flatMap((category) =>
+    category.skills.map((skill) => skill.name)
   );
 
   const seoConfig = {
-    title: "Technical Skills & Expertise",
-    description: "Comprehensive overview of my technical skills including programming languages, frameworks, cloud technologies, and development tools. Expertise in Web Development, AI/ML, and Cloud Technologies.",
-    type: "profile",
+    title: 'AI Engineering Skills',
+    description:
+      'The stack behind the work: Python and PyTorch, LLM and RAG systems with LangChain, vector stores, time-series forecasting, and the MLOps tooling to ship it.',
+    type: 'profile',
+    url: 'https://streamvallabh.life/skills',
     keywords: skillsList.join(', '),
-    section: "Skills",
+    section: 'Skills',
     isArticle: false,
-    modifiedTime: new Date().toISOString()
   };
 
   return (
     <>
       <SEO {...seoConfig} />
       <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="min-h-screen bg-black text-white"
-    >
-      {/* Hero Banner */}
-      <div className="relative h-[25vh] sm:h-[30vh] md:h-[40vh] lg:h-[50vh] w-full bg-gradient-to-r from-red-900 via-red-800 to-black flex items-center justify-center overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-red-500/20 to-transparent"></div>
-          <div className="absolute bottom-0 right-0 w-full h-full bg-gradient-to-tl from-black/50 to-transparent"></div>
-        </div>
-        
-        <div className="relative z-10 text-center px-4">
-          <motion.h1 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6 }}
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white drop-shadow-lg netflix-font leading-tight"
-          >
-            Skills Showcase
-          </motion.h1>
-          <motion.p 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-sm sm:text-base md:text-lg text-gray-300 mt-2 sm:mt-4 max-w-2xl mx-auto"
-          >
-            My technical arsenal for building amazing digital experiences
-          </motion.p>
-        </div>
-      </div>
-
-      {/* Netflix-style Skills Rows */}
-      <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
-        {Object.entries(skillsData).map(([category, skills], categoryIndex) => (
-          <motion.div 
-            key={category} 
-            className="mb-8 sm:mb-10 md:mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: categoryIndex * 0.1 }}
-          >
-            {/* Category Header */}
-            <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-red-500 netflix-font">
-                {category}
-              </h2>
-              <div className="flex items-center space-x-2">
-                <span className="text-xs sm:text-sm text-gray-400 hidden sm:block">
-                  {skills.length} skills
-                </span>
-                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              </div>
-            </div>
-
-            {/* Skills Grid/Row */}
-            <div className="relative">
-              {/* Mobile: Grid Layout */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 md:gap-6 lg:hidden">
-                {skills.map((skill, index) => (
-                  <motion.div
-                    key={index}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="netflix-card bg-zinc-900/80 backdrop-blur-sm rounded-lg shadow-lg flex flex-col items-center justify-center p-3 sm:p-4 cursor-pointer transition-all duration-300 border border-gray-800 hover:border-red-500/50 touch-feedback-bounce"
-                    onHoverStart={() => setHoveredIndex(`${category}-${index}`)}
-                    onHoverEnd={() => setHoveredIndex(null)}
-                  >
-                    <div className="relative mb-2 sm:mb-3">
-                      <img 
-                        src={skill.logo} 
-                        alt={skill.name} 
-                        className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                      />
-                      <div className="hidden w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gray-700 rounded items-center justify-center">
-                        <span className="text-xs sm:text-sm text-gray-400 font-bold">
-                          {skill.name.charAt(0)}
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-xs sm:text-sm font-medium text-white text-center leading-tight">
-                      {skill.name}
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Desktop: Netflix-style Row */}
-              <div className="hidden lg:block">
-                <div className="netflix-row">
-                  {skills.map((skill, index) => (
-                    <motion.div
-                      key={index}
-                      whileHover={{ scale: 1.12, zIndex: 10 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="netflix-card w-40 md:w-48 lg:w-52 h-40 md:h-48 lg:h-52 bg-zinc-900/90 backdrop-blur-sm rounded-lg shadow-xl flex flex-col items-center justify-center mx-2 cursor-pointer transition-all duration-300 border border-gray-800 hover:border-red-500/50 touch-feedback-bounce"
-                      onHoverStart={() => setHoveredIndex(`${category}-${index}`)}
-                      onHoverEnd={() => setHoveredIndex(null)}
-                    >
-                      <div className="relative mb-3">
-                        <img 
-                          src={skill.logo} 
-                          alt={skill.name} 
-                          className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 object-contain"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                          }}
-                        />
-                        <div className="hidden w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 bg-gray-700 rounded items-center justify-center">
-                          <span className="text-lg md:text-xl lg:text-2xl text-gray-400 font-bold">
-                            {skill.name.charAt(0)}
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-sm md:text-base lg:text-lg font-semibold text-white text-center mt-2 drop-shadow-lg leading-tight">
-                        {skill.name}
-                      </span>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Footer Section */}
-      <motion.div 
-        className="px-4 sm:px-6 md:px-8 py-6 sm:py-8 bg-gradient-to-t from-black to-transparent"
-        initial={{ opacity: 0 }}
+        initial={false}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.8 }}
+        exit={{ opacity: 0 }}
+        className="page-fade min-h-screen bg-black text-white"
       >
-        <div className="text-center">
-          <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-red-500 mb-2 netflix-font">
-            Always Learning, Always Growing
-          </h3>
-          <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto">
-            Continuously expanding my skill set to deliver cutting-edge solutions and stay ahead in the ever-evolving tech landscape.
-          </p>
+        {/* Hero */}
+        <header className="relative flex h-[38vh] min-h-[280px] w-full items-center justify-center overflow-hidden bg-gradient-to-br from-red-950 via-black to-black">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(229,9,20,0.25) 0%, transparent 70%)',
+            }}
+          />
+          <div className="relative z-10 px-4 text-center">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.4em] text-red-500 sm:text-xs">
+              The Stack
+            </p>
+            <h1 className="netflix-font text-4xl leading-none text-white drop-shadow-lg sm:text-5xl md:text-6xl">
+              Skills Showcase
+            </h1>
+            <p className="mx-auto mt-4 max-w-xl text-sm text-white/60 sm:text-base">
+              Everything I reach for when building AI systems that have to work
+              outside a notebook.
+            </p>
+          </div>
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black to-transparent" />
+        </header>
+
+        <div className="px-[4%] py-10 md:px-[5%]">
+          {SKILL_CATEGORIES.map((category, categoryIndex) => (
+            <section
+              key={category.title}
+              className="rise-in mb-12"
+              style={{ animationDelay: `${categoryIndex * 0.08}s` }}
+            >
+              <div className="mb-5 flex items-baseline justify-between gap-4">
+                <h2 className="netflix-font text-xl text-red-500 sm:text-2xl md:text-3xl">
+                  {category.title}
+                </h2>
+                <span className="text-xs text-white/35 sm:text-sm">
+                  {category.skills.length} {category.skills.length === 1 ? 'skill' : 'skills'}
+                </span>
+              </div>
+
+              <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 sm:gap-4 md:grid-cols-5 lg:grid-cols-6">
+                {category.skills.map((skill) => (
+                  <SkillTile key={skill.name} skill={skill} category={category.title} />
+                ))}
+              </ul>
+            </section>
+          ))}
         </div>
       </motion.div>
-    </motion.div>
     </>
   );
 };

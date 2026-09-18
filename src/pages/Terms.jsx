@@ -29,7 +29,7 @@ const Terms = () => {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-black to-red-900 py-8 px-4 border-b border-zinc-800">
+      <div className="bg-gradient-to-r from-black to-red-900 px-4 pb-8 pt-24 border-b border-zinc-800">
         <div className="max-w-6xl mx-auto">
           <button
             onClick={() => navigate(-1)}
@@ -301,15 +301,15 @@ const Terms = () => {
               </p>
               <div className="bg-black/50 rounded-lg p-6">
                 <div className="space-y-3">
-                  <p className="flex items-center gap-3">
+                  <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span className="text-red-400 font-semibold">📧 Email:</span>
-                    <span className="text-white">srivallabhkakarala@gmail.com</span>
+                    <span className="text-white break-all">srivallabhkakarala@gmail.com</span>
                   </p>
-                  <p className="flex items-center gap-3">
+                  <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span className="text-red-400 font-semibold">👨‍💻 Developer:</span>
                     <span className="text-white">Sreevallabh Kakarala</span>
                   </p>
-                  <p className="flex items-center gap-3">
+                  <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <span className="text-red-400 font-semibold">📍 Location:</span>
                     <span className="text-white">India</span>
                   </p>

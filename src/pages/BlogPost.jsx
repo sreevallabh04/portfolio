@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+
 import { ArrowLeft, Calendar, Clock, Tag } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -19,6 +19,8 @@ const BlogPost = () => {
         author: 'Sreevallabh Kakarala',
         image: post.heroImage,
         publishedTime: post.publishDate,
+        isArticle: true,
+        url: `https://streamvallabh.life/blog/${slug}`,
       }
     : {
         title: 'Loading… | Sreevallabh Blog',
@@ -29,9 +31,9 @@ const BlogPost = () => {
     <>
       <SEO {...seoConfig} />
       <div className="min-h-screen bg-black text-white">
-        <div className="mx-auto max-w-4xl px-4 py-10 sm:px-8">
+        <div className="mx-auto max-w-4xl px-4 pb-10 pt-28 sm:px-8">
           <Link
-            to="/browse/blog"
+            to="/blog"
             className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-red-400 transition-colors hover:text-red-300"
           >
             <ArrowLeft size={16} />
@@ -41,7 +43,7 @@ const BlogPost = () => {
           {!post && (
             <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-8 text-center text-red-200">
               <p>This post is not available.</p>
-              <Link to="/browse/blog" className="mt-4 inline-block text-red-300 hover:text-red-200">
+              <Link to="/blog" className="mt-4 inline-block text-red-300 hover:text-red-200">
                 ← Back to blog
               </Link>
             </div>

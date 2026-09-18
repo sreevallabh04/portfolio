@@ -2,6 +2,14 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Send, LogOut, UserCheck, Bot, Trash2, ArrowLeft } from 'lucide-react';
 
+/**
+ * NOTE ON SECURITY: this password is compared in the browser and Vite inlines
+ * every VITE_* variable into the JavaScript bundle, so it is readable by anyone
+ * who opens devtools. It keeps the console out of sight of casual visitors and
+ * nothing more. Real protection has to come from Supabase auth plus row-level
+ * security policies on `chat_sessions` and `messages`, so that the data cannot
+ * be read even if someone renders this component.
+ */
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
 const Admin = () => {
@@ -20,6 +28,13 @@ const Admin = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
+    // Guard the unconfigured case explicitly. Comparing against an undefined
+    // env var made every attempt fail with a generic "Incorrect password",
+    // which looks identical to a typo and gives no way to diagnose it.
+    if (!ADMIN_PASSWORD) {
+      setPasswordError('VITE_ADMIN_PASSWORD is not set for this build.');
+      return;
+    }
     if (passwordInput === ADMIN_PASSWORD) {
       setAuthenticated(true);
       setPasswordError('');

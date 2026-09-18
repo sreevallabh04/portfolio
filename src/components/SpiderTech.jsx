@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaSpider, FaRobot, FaCode, FaTools } from 'react-icons/fa';
 
 const TechContainer = styled.div`

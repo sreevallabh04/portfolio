@@ -24,6 +24,7 @@ const Blog = () => {
     type: 'article',
     author: 'Sreevallabh Kakarala',
     keywords: 'blog, software engineering, technology, product, learning',
+    url: 'https://streamvallabh.life/blog',
   };
 
   return (
@@ -121,7 +122,7 @@ const Blog = () => {
                     </div>
 
                     <Link
-                      to={`/browse/blog/${post.slug}`}
+                      to={`/blog/${post.slug}`}
                       className="group inline-flex items-center gap-2 text-sm font-semibold text-red-400 transition-colors hover:text-red-300"
                     >
                       Continue reading

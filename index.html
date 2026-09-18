@@ -2,13 +2,14 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
+		<!-- sv.png is the only icon asset that ships; the previously referenced
+		     favicon-16/32 and apple-touch-icon files did not exist and 404'd. -->
 		<link rel="icon" type="image/png" href="/sv.png" />
-		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+		<link rel="apple-touch-icon" href="/sv.png" />
 		<link rel="manifest" href="/site.webmanifest" />
-		<meta name="generator" content="Hostinger Horizons" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="theme-color" content="#000000" />
+		<meta name="color-scheme" content="dark" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 		
 		<!-- Netflix-style Fonts -->
 		<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -16,26 +17,26 @@
 		<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
 		
 		<!-- Primary Meta Tags -->
-		<title>Sreevallabh Kakarala | Software Developer & Portfolio</title>
-		<meta name="title" content="Sreevallabh Kakarala | Software Developer & Portfolio">
-		<meta name="description" content="Sreevallabh Kakarala - Software Developer specializing in web development. View my portfolio, projects, and professional experience. Contact me for opportunities.">
+		<title>Sreevallabh Kakarala | AI Engineer & Portfolio</title>
+		<meta name="title" content="Sreevallabh Kakarala | AI Engineer & Portfolio">
+		<meta name="description" content="Sreevallabh Kakarala - AI Engineer building RAG systems, time-series forecasting models and LLM agents. View my portfolio, research and experience.">
 		
 		<!-- Open Graph / Facebook -->
 		<meta property="og:type" content="website">
 		<meta property="og:url" content="https://streamvallabh.life/">
-		<meta property="og:title" content="Sreevallabh Kakarala | Software Developer & Portfolio">
-		<meta property="og:description" content="Sreevallabh Kakarala - Software Developer specializing in web development. View my portfolio, projects, and professional experience. Contact me for opportunities.">
-		<meta property="og:image" content="/HopeCore.png">
+		<meta property="og:title" content="Sreevallabh Kakarala | AI Engineer & Portfolio">
+		<meta property="og:description" content="Sreevallabh Kakarala - AI Engineer building RAG systems, time-series forecasting models and LLM agents. View my portfolio, research and experience.">
+		<meta property="og:image" content="https://streamvallabh.life/HopeCore.png">
 		
 		<!-- Twitter -->
 		<meta property="twitter:card" content="summary_large_image">
 		<meta property="twitter:url" content="https://streamvallabh.life/">
-		<meta property="twitter:title" content="Sreevallabh Kakarala | Software Developer & Portfolio">
-		<meta property="twitter:description" content="Sreevallabh Kakarala - Software Developer specializing in web development. View my portfolio, projects, and professional experience. Contact me for opportunities.">
-		<meta property="twitter:image" content="/HopeCore.png">
+		<meta property="twitter:title" content="Sreevallabh Kakarala | AI Engineer & Portfolio">
+		<meta property="twitter:description" content="Sreevallabh Kakarala - AI Engineer building RAG systems, time-series forecasting models and LLM agents. View my portfolio, research and experience.">
+		<meta property="twitter:image" content="https://streamvallabh.life/HopeCore.png">
 		
 		<!-- Additional SEO Meta Tags -->
-		<meta name="keywords" content="Sreevallabh Kakarala, Sreevallabh, Kakarala, software developer, web development, portfolio, projects, skills, React developer, full stack developer">
+		<meta name="keywords" content="Sreevallabh Kakarala, Sreevallabh, Kakarala, AI engineer, machine learning engineer, LLM, RAG, LangChain, PyTorch, time series forecasting, portfolio, research">
 		<meta name="author" content="Sreevallabh Kakarala">
 		<meta name="robots" content="index, follow">
 		<link rel="canonical" href="https://streamvallabh.life/">
@@ -44,19 +45,46 @@
 		<script type="application/ld+json">
 		{
 			"@context": "https://schema.org",
-			"@type": "Person",
-			"name": "Sreevallabh Kakarala",
-			"url": "https://streamvallabh.life",
-			"image": "/HopeCore.png",
-			"sameAs": [
-				"https://github.com/your-github",
-				"https://linkedin.com/in/your-linkedin"
-			],
-			"jobTitle": "Software Developer",
-			"worksFor": {
-				"@type": "Organization",
-				"name": "Independent Developer"
-			}
+			"@graph": [
+				{
+					"@type": "WebSite",
+					"@id": "https://streamvallabh.life/#website",
+					"name": "Sreevallabh Kakarala Portfolio",
+					"url": "https://streamvallabh.life",
+					"description": "Personal portfolio of Sreevallabh Kakarala, AI Engineer — applied AI projects, published research and professional experience.",
+					"author": { "@id": "https://streamvallabh.life/#person" }
+				},
+				{
+					"@type": "Person",
+					"@id": "https://streamvallabh.life/#person",
+					"name": "Sreevallabh Kakarala",
+					"description": "AI Engineer building RAG systems, time-series forecasting models and LLM agents in production",
+					"url": "https://streamvallabh.life",
+					"image": "https://streamvallabh.life/HopeCore.png",
+					"email": "srivallabhkakarala@gmail.com",
+					"jobTitle": "AI Engineer",
+					"alumniOf": {
+						"@type": "CollegeOrUniversity",
+						"name": "Vellore Institute of Technology, Chennai",
+						"url": "https://chennai.vit.ac.in/"
+					},
+					"knowsAbout": [
+						"Artificial Intelligence",
+						"Machine Learning",
+						"Large Language Models",
+						"Retrieval Augmented Generation",
+						"Time Series Forecasting",
+						"Deep Learning",
+						"Computer Vision",
+						"Python",
+						"PyTorch"
+					],
+					"sameAs": [
+						"https://github.com/sreevallabh04",
+						"https://linkedin.com/in/sreevallabh-kakarala-52ab8a248"
+					]
+				}
+			]
 		}
 		</script>
 	</head>

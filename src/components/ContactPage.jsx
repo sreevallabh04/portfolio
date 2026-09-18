@@ -1,32 +1,31 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Linkedin, Github, MapPin, Phone } from 'lucide-react';
 import { useForm, ValidationError } from '@formspree/react';
+import { CONTACT } from '@/data/portfolio';
 
 const ContactPage = () => {
-  const [state, handleSubmit] = useForm("mvgrzwle");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [state, handleSubmit] = useForm('mvgrzwle');
+
+  // Formspree already exposes `state.submitting`. The component used to keep a
+  // second `isSubmitting` flag around the same call, which could disagree with
+  // it (and left the button enabled if handleSubmit threw).
+  const isSubmitting = state.submitting;
 
   const contactInfo = {
-    email: "srivallabhkakarala@gmail.com",
-    linkedin: "linkedin.com/in/sreevallabh-kakarala-52ab8a248/",
-    github: "github.com/sreevallabh04",
-    location: "Chennai, India",
-    phone: "+91 9381704258" // Replace with your actual phone number
-  };
-
-  const onSubmit = async (e) => {
-    setIsSubmitting(true);
-    await handleSubmit(e);
-    setIsSubmitting(false);
+    email: CONTACT.email,
+    linkedin: CONTACT.linkedin,
+    github: CONTACT.github,
+    location: CONTACT.location,
+    phone: CONTACT.phone,
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
+      initial={false}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-black text-white"
+      className="page-fade min-h-screen bg-black text-white"
     >
       {/* Hero Banner */}
       <div className="relative h-[30vh] sm:h-[40vh] md:h-[50vh] w-full bg-gradient-to-r from-red-900 to-black flex items-center justify-center">
@@ -38,13 +37,12 @@ const ContactPage = () => {
       {/* Contact Content */}
       <div className="px-2 sm:px-[4%] py-8 sm:py-12 max-w-full sm:max-w-4xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          {/* Contact Information */}
-          <motion.div
-            initial={{ x: -30, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="space-y-4 sm:space-y-6"
-          >
+          {/* Contact Information.
+              These two columns used to slide in from x: -30 / +30. On a phone
+              the right-hand column started 30px past the container edge, which
+              gave the whole page a horizontal scrollbar while the animation
+              ran. The CSS entrance moves vertically only. */}
+          <div className="rise-in min-w-0 space-y-4 sm:space-y-6">
             <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Contact Information</h2>
             
             <div className="space-y-4">
@@ -57,7 +55,7 @@ const ContactPage = () => {
               </a>
 
               <a
-                href={`https://${contactInfo.linkedin}`}
+                href={contactInfo.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-4 responsive-padding-sm bg-[#181818] rounded-lg hover:bg-[#252525] transition-colors duration-200 touch-feedback hover-lift"
@@ -67,7 +65,7 @@ const ContactPage = () => {
               </a>
 
               <a
-                href={`https://${contactInfo.github}`}
+                href={contactInfo.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-4 responsive-padding-sm bg-[#181818] rounded-lg hover:bg-[#252525] transition-colors duration-200 touch-feedback hover-lift"
@@ -89,14 +87,12 @@ const ContactPage = () => {
                 <span className="text-sm sm:text-base">{contactInfo.phone}</span>
               </a>
             </div>
-          </motion.div>
+          </div>
 
           {/* Anonymous Message Form */}
-          <motion.div
-            initial={{ x: 30, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="space-y-4 sm:space-y-6"
+          <div
+            className="rise-in min-w-0 space-y-4 sm:space-y-6"
+            style={{ animationDelay: '0.12s' }}
           >
             <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Send an Anonymous Message</h2>
             
@@ -110,7 +106,7 @@ const ContactPage = () => {
                 <p className="text-sm text-gray-400">I'll get back to you soon.</p>
               </motion.div>
             ) : (
-              <form onSubmit={onSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <textarea
                     name="message"
@@ -140,7 +136,7 @@ const ContactPage = () => {
                 </button>
               </form>
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
     </motion.div>

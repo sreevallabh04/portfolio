@@ -560,3 +560,199 @@
 .pull-to-refresh {
   animation: pullToRefresh 1s ease-in-out;
 }
+
+/* Intro gate: seamless marquee of blurred title art. The track renders the
+   tile list twice, so translating by -50% lands exactly on the duplicate. */
+@keyframes intro-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [style*='intro-marquee'] {
+    animation: none !important;
+  }
+}
+
+/* Entrance animation for above-the-fold content.
+   Deliberately CSS rather than JS: a rAF-driven library leaves elements stuck
+   at their `initial` opacity if the main thread is starved (backgrounded tab,
+   slow device, throttled rAF), which hides the content entirely. A CSS
+   animation with `both` fill runs on the compositor and always lands on its
+   end state. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise-in {
+  animation: rise-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Route-level fade-in. Pages used to start at opacity 0 via framer-motion,
+   which meant a stalled animation frame left the whole page blank. This is the
+   same effect in CSS, where the `both` fill guarantees the end state. */
+@keyframes page-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.page-fade {
+  animation: page-fade 0.4s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-fade {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Netflix-style wordmark unfold: a lone "S" that opens out into SREEVALLABH.
+
+   Each trailing letter animates from zero width to its natural width while
+   un-squashing vertically, which reads as a ribbon unfurling. `both` fill means
+   the finished wordmark is always the resting state, even if the animation is
+   never actually painted.
+   --------------------------------------------------------------------------- */
+
+.logo-unfold-lead,
+.logo-unfold-letter {
+  display: inline-block;
+  font-size: clamp(3.5rem, 13vw, 9rem);
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 0 40px rgba(229, 9, 20, 0.55),
+    0 6px 34px rgba(0, 0, 0, 0.85);
+  transform-origin: center bottom;
+  will-change: transform, max-width;
+}
+
+/* The lead "S" drops in on its own, slightly oversized, then settles. */
+.logo-unfold-lead {
+  animation: logo-lead-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes logo-lead-in {
+  from {
+    opacity: 0;
+    transform: scale(1.5) translateY(6%);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Trailing letters unfurl out from behind the S. max-width rather than width so
+   each letter settles at its own natural glyph width. */
+.logo-unfold-letter {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  animation: logo-unfurl 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes logo-unfurl {
+  from {
+    max-width: 0;
+    opacity: 0;
+    transform: scaleY(1.45) scaleX(0.55);
+    filter: brightness(2.4);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    max-width: 1.3em;
+    opacity: 1;
+    transform: scaleY(1) scaleX(1);
+    filter: brightness(1);
+  }
+}
+
+/* Specular sweep across the finished mark. */
+.logo-unfold-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 62%
+  );
+  transform: translateX(-120%);
+  animation: logo-sheen 1.1s ease-out both;
+}
+
+@keyframes logo-sheen {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
+
+.logo-unfold-surname {
+  margin-top: 0.35rem;
+  font-size: clamp(0.85rem, 2.6vw, 1.6rem);
+  letter-spacing: 0.72em;
+  text-indent: 0.72em; /* balance the trailing letter-spacing */
+  animation: logo-surname 0.7s ease both;
+}
+
+@keyframes logo-surname {
+  from {
+    opacity: 0;
+    letter-spacing: 0.3em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.72em;
+  }
+}
+
+/* Reduced motion: show the finished wordmark with no unfolding at all. */
+@media (prefers-reduced-motion: reduce) {
+  .logo-unfold-lead,
+  .logo-unfold-letter,
+  .logo-unfold-surname,
+  .logo-unfold-sheen {
+    animation: none;
+  }
+
+  .logo-unfold-letter {
+    max-width: 1.3em;
+    opacity: 1;
+    transform: none;
+  }
+
+  .logo-unfold-sheen {
+    display: none;
+  }
+}

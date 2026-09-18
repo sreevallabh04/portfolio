@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useParams, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import SplashScreen from '@/components/SplashScreen';
 import ProfileSelection from '@/components/ProfileSelection';
 import Navbar from '@/components/Navbar';
 import FloatingChatbot from '@/components/FloatingChatbot';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import IntroGate from '@/components/IntroGate';
 import { Toaster } from '@/components/ui/toaster';
 import SEO from '@/components/SEO';
 
@@ -16,32 +17,85 @@ const ContactPage = lazy(() => import('@/components/ContactPage'));
 const StalkerPage = lazy(() => import('@/components/StalkerPage'));
 const RecruiterProjectsPage = lazy(() => import('@/components/RecruiterProjectsPage'));
 const DeveloperPage = lazy(() => import('@/components/DeveloperPage'));
-const MemoriesPage = lazy(() => import('@/pages/MemoriesPage'));
+const FitnessPage = lazy(() => import('@/pages/FitnessPage'));
+const Blog = lazy(() => import('@/pages/Blog'));
+const BlogPost = lazy(() => import('@/pages/BlogPost'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const Admin = lazy(() => import('@/pages/Admin'));
 
-// Loading component for route transitions
+const SITE_URL = 'https://streamvallabh.life';
+const PROFILE_KEY = 'selectedProfile';
+const ENTERED_KEY = 'hasEntered';
+const VALID_PROFILES = ['recruiter', 'developer', 'stalker', 'fitness'];
+
+// localStorage throws in private-mode Safari and when cookies are blocked.
+const safeStorage = {
+  get(storage, key) {
+    try {
+      return storage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  set(storage, key, value) {
+    try {
+      storage.setItem(key, value);
+    } catch {
+      /* storage unavailable - fall back to in-memory state only */
+    }
+  },
+};
+
+const profileFromPath = (pathname) => {
+  const match = pathname.match(/^\/browse\/([A-Za-z]+)/);
+  const candidate = match ? match[1].toLowerCase() : null;
+  return VALID_PROFILES.includes(candidate) ? candidate : null;
+};
+
+// Branded loading state for lazy route chunks.
 const LoadingSpinner = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-red-600"></div>
+  <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-black">
+    <div className="relative h-16 w-16">
+      <div className="absolute inset-0 rounded-full border-2 border-red-600/20" />
+      <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-red-600" />
+    </div>
+    <p className="netflix-font text-sm tracking-[0.4em] text-white/50">LOADING</p>
   </div>
 );
 
 // 404 Page component
-const NotFound = () => (
-  <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
-    <h1 className="text-6xl font-bold mb-4">404</h1>
-    <p className="text-xl mb-8">Page not found</p>
-    <button
-      onClick={() => window.history.back()}
-      className="px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-    >
-      Go Back
-    </button>
-  </div>
-);
+const NotFound = () => {
+  const navigate = useNavigate();
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-black px-6 text-center text-white">
+      <p className="netflix-font text-[22vw] leading-none text-red-600/20 sm:text-[12rem]">404</p>
+      <h1 className="-mt-6 text-2xl font-bold sm:text-4xl">Lost your way?</h1>
+      <p className="mt-3 max-w-md text-sm text-white/60 sm:text-base">
+        This page isn&apos;t in the catalogue. It may have been moved, or the link
+        might be a typo.
+      </p>
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <button
+          onClick={() => navigate('/')}
+          className="rounded-md bg-red-600 px-6 py-3 font-semibold transition-colors hover:bg-red-700"
+        >
+          Browse profiles
+        </button>
+        <button
+          onClick={() => navigate(-1)}
+          className="rounded-md border border-white/30 bg-white/10 px-6 py-3 font-semibold transition-colors hover:bg-white/20"
+        >
+          Go back
+        </button>
+      </div>
+    </div>
+  );
+};
 
-// Protected Route component
+// Gate the profile-scoped routes. `profile` is resolved synchronously by the
+// caller (URL first, then the remembered choice) so a direct link or a refresh
+// no longer bounces to the profile picker before an effect has had a chance to
+// populate the state.
 const ProtectedRoute = ({ children, profile }) => {
   if (!profile) {
     return <Navigate to="/" replace />;
@@ -49,93 +103,103 @@ const ProtectedRoute = ({ children, profile }) => {
   return children;
 };
 
-// Simple Button component for styling consistency (optional)
-const EnterButton = ({ onClick }) => (
-  <button
-    onClick={onClick}
-    style={{
-      padding: '15px 30px',
-      fontSize: '1.2rem',
-      cursor: 'pointer',
-      backgroundColor: '#e50914', // Netflix red
-      color: 'white',
-      border: 'none',
-      borderRadius: '3px',
-      fontWeight: 'bold',
-    }}
-  >
-    Click to Enter
-  </button>
-);
-
 // Component to conditionally show chatbot
 const ConditionalChatbot = () => {
   const location = useLocation();
-  
-  const isRecruiterPage = location.pathname.includes('/browse/recruiter');
-  const isProfileSelectionPage = location.pathname === '/';
-  const isDeveloperPage = location.pathname.includes('/browse/developer');
-  const isAdminPage = location.pathname === '/admin';
-  const isMemoriesPage = location.pathname.includes('/browse/memories');
-  
-  if (isRecruiterPage || isProfileSelectionPage || isDeveloperPage || isAdminPage || isMemoriesPage) {
+
+  const hiddenOn = [
+    (p) => p === '/',
+    (p) => p.startsWith('/browse/recruiter'),
+    (p) => p.startsWith('/browse/developer'),
+    (p) => p.startsWith('/browse/fitness'),
+    (p) => p.startsWith('/admin'),
+  ];
+
+  if (hiddenOn.some((test) => test(location.pathname))) {
     return null;
   }
-  
+
   return <FloatingChatbot />;
 };
 
-// SEO configurations for different routes
-const getSEOConfig = (pathname, profile) => {
+// Reset scroll on navigation. Without this, moving between routes keeps the
+// previous scroll offset and lands the visitor mid-page.
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
+// Routes that render their own <SEO> with richer, page-specific metadata. The
+// app-level tag is skipped for these, otherwise two components emit competing
+// <link rel="canonical"> and og: tags for the same page.
+const SELF_MANAGED_SEO = [/^\/skills/, /^\/browse\/recruiter\/projects/, /^\/blog/];
+
+const hasOwnSEO = (pathname) => SELF_MANAGED_SEO.some((pattern) => pattern.test(pathname));
+
+// SEO configurations for different routes. Absolute URLs throughout - crawlers
+// resolve og:image and canonical against the origin, so a bare "/HopeCore.png"
+// is ignored by most of them.
+const getSEOConfig = (pathname) => {
   const baseConfig = {
-    title: "Sreevallabh Kakarala",
-    description: "Software Engineering student specializing in full-stack development and AI/ML solutions. Explore my portfolio, projects, and professional experience.",
-    type: "website",
-    image: "/HopeCore.png",
-    url: `https://streamvallabh.life${pathname}`
+    title: 'Sreevallabh Kakarala',
+    description:
+      'AI Engineer building RAG systems, time-series forecasting models and LLM agents. Explore my portfolio, published research and professional experience.',
+    type: 'website',
+    image: `${SITE_URL}/HopeCore.png`,
+    url: `${SITE_URL}${pathname}`,
   };
 
   switch (true) {
     case pathname === '/':
       return {
         ...baseConfig,
-        title: "Choose Your Experience",
-        description: "Select your profile to explore Sreevallabh Kakarala's portfolio in different ways - Developer, Recruiter, or Memories."
+        url: `${SITE_URL}/`,
+        title: 'Choose Your Experience',
+        description:
+          "Select your profile to explore Sreevallabh Kakarala's portfolio in different ways - Recruiter, Developer, Stalker, or Fitness.",
       };
-    case pathname.includes('/browse/recruiter'):
+    case pathname.startsWith('/browse/recruiter'):
       return {
         ...baseConfig,
-        title: "Professional Portfolio",
-        description: "Explore my professional experience, projects, and technical skills. View my work in web development, AI/ML, and software engineering.",
-        type: "profile"
+        title: 'Professional Portfolio',
+        description:
+          'Applied AI experience, published research and projects: RAG pipelines, time-series forecasting, LLM agents and computer vision.',
+        type: 'profile',
       };
-    case pathname.includes('/browse/developer'):
+    case pathname.startsWith('/browse/developer'):
       return {
         ...baseConfig,
-        title: "Developer Portfolio",
-        description: "Technical deep-dive into my development projects, coding skills, and software engineering expertise.",
-        type: "profile"
+        title: 'Developer Portfolio',
+        description:
+          'Technical deep-dive into my development projects, coding skills, and software engineering expertise.',
+        type: 'profile',
       };
-    case pathname.includes('/skills'):
+    case pathname.startsWith('/skills'):
       return {
         ...baseConfig,
-        title: "Technical Skills",
-        description: "Comprehensive overview of my technical skills including programming languages, frameworks, and tools.",
-        type: "profile"
+        title: 'Technical Skills',
+        description:
+          'Comprehensive overview of my technical skills including programming languages, frameworks, and tools.',
+        type: 'profile',
       };
-    case pathname.includes('/browse/memories'):
+    case pathname.startsWith('/browse/fitness'):
       return {
         ...baseConfig,
-        title: "Memories",
-        description: "A personal photo gallery of moments, friends, family, and adventures from Sreevallabh's life.",
-        type: "website"
+        title: '75 Hard',
+        description:
+          'A seven-day Push/Pull/Legs and Upper/Lower hybrid run as a cut: two sessions daily, 2,250 kcal, 175 g protein, tracked lifts holding while the scale drops.',
+        type: 'website',
       };
-    case pathname.includes('/contact'):
+    case pathname.startsWith('/contact'):
       return {
         ...baseConfig,
-        title: "Contact",
-        description: "Get in touch with Sreevallabh Kakarala for professional opportunities, collaborations, or inquiries.",
-        type: "profile"
+        title: 'Contact',
+        description:
+          'Get in touch with Sreevallabh Kakarala for professional opportunities, collaborations, or inquiries.',
+        type: 'profile',
       };
     default:
       return baseConfig;
@@ -145,95 +209,95 @@ const getSEOConfig = (pathname, profile) => {
 function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [hasEntered, setHasEntered] = useState(false);
+
+  // The intro plays once per browser session. Refreshing a deep link inside the
+  // same session goes straight back to the page instead of replaying it.
+  const [hasEntered, setHasEntered] = useState(
+    () => safeStorage.get(sessionStorage, ENTERED_KEY) === 'true'
+  );
   const [showSplash, setShowSplash] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState(null);
+
+  // Remembered profile, used when the URL itself carries no profile (/skills,
+  // /contact). Resolved synchronously so ProtectedRoute never sees a stale null.
+  const [storedProfile, setStoredProfile] = useState(() => {
+    const value = safeStorage.get(localStorage, PROFILE_KEY);
+    return VALID_PROFILES.includes(value) ? value : null;
+  });
+
+  const urlProfile = profileFromPath(location.pathname);
+  const activeProfile = urlProfile || storedProfile;
   const audioContextResumed = useRef(false);
-  const seoConfig = getSEOConfig(location.pathname, selectedProfile);
+  const seoConfig = getSEOConfig(location.pathname);
 
-  // Helper: get profile from URL
-  const getProfileFromPath = () => {
-    const match = location.pathname.match(/^\/browse\/(\w+)/);
-    return match ? match[1] : null;
-  };
-
-  // On mount: restore profile from URL or localStorage
+  // Persist whichever profile the URL is currently showing.
   useEffect(() => {
-    const urlProfile = getProfileFromPath();
-    const storedProfile = localStorage.getItem('selectedProfile');
-    if (urlProfile) {
-      setSelectedProfile(urlProfile);
-      localStorage.setItem('selectedProfile', urlProfile);
+    if (urlProfile && urlProfile !== storedProfile) {
+      setStoredProfile(urlProfile);
+      safeStorage.set(localStorage, PROFILE_KEY, urlProfile);
     }
-    // Don't auto-restore stored profile - let user choose on root path
-  }, [location.pathname]);
+  }, [urlProfile, storedProfile]);
 
-  // Save selectedProfile to localStorage when it changes
-  useEffect(() => {
-    if (selectedProfile) {
-      localStorage.setItem('selectedProfile', selectedProfile);
-    }
-  }, [selectedProfile]);
-
-  // Function to handle the initial "Enter" click
-  const handleEnter = async () => {
+  const handleEnter = useCallback(async () => {
+    // Unlock audio playback while we still hold the user gesture, so the splash
+    // jingle is allowed to start.
     try {
-      const context = new (window.AudioContext || window.webkitAudioContext)();
-      if (context.state === 'suspended') {
-        await context.resume();
-        console.log('AudioContext resumed successfully on enter.');
+      const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextCtor) {
+        const context = new AudioContextCtor();
+        if (context.state === 'suspended') {
+          await context.resume();
+        }
+        await context.close();
+        audioContextResumed.current = true;
       }
-      await context.close();
-      audioContextResumed.current = true;
-    } catch (e) {
-      console.error('Failed to resume AudioContext on enter:', e);
+    } catch {
       audioContextResumed.current = false;
     }
 
+    safeStorage.set(sessionStorage, ENTERED_KEY, 'true');
     setHasEntered(true);
     setShowSplash(true);
-  };
+  }, []);
 
-  // Function to be called when the splash screen audio ends (or times out)
-  const handleAudioEnd = () => {
+  const handleAudioEnd = useCallback(() => {
     setShowSplash(false);
-  };
+  }, []);
 
-  // Function to handle profile selection
-  const handleProfileSelect = (profileId) => {
-    setSelectedProfile(profileId);
-    navigate(`/browse/${profileId}`);
-  };
+  const handleProfileSelect = useCallback(
+    (profileId) => {
+      setStoredProfile(profileId);
+      safeStorage.set(localStorage, PROFILE_KEY, profileId);
+      navigate(`/browse/${profileId}`);
+    },
+    [navigate]
+  );
 
   if (!hasEntered) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'black' }}>
-        <EnterButton onClick={handleEnter} />
-      </div>
-    );
+    return <IntroGate onEnter={handleEnter} />;
   }
 
   if (showSplash) {
     return <SplashScreen onAudioEnd={handleAudioEnd} />;
   }
 
+  // The navbar links to profile-scoped pages, so it is noise on the picker, and
+  // the admin console is its own full-screen layout.
+  const hideNavbar =
+    location.pathname === '/' || location.pathname.startsWith('/admin');
+
   return (
     <>
-      <SEO {...seoConfig} />
-      <Navbar />
-      <AnimatePresence mode="wait">
+      {!hasOwnSEO(location.pathname) && <SEO {...seoConfig} />}
+      <ScrollToTop />
+      {!hideNavbar && <Navbar />}
+      <ErrorBoundary>
         <Suspense fallback={<LoadingSpinner />}>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <ProfileSelection onProfileSelect={handleProfileSelect} />
-              }
-            />
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<ProfileSelection onProfileSelect={handleProfileSelect} />} />
             <Route
               path="/browse/:profile"
               element={
-                <ProtectedRoute profile={selectedProfile}>
+                <ProtectedRoute profile={activeProfile}>
                   <Dashboard />
                 </ProtectedRoute>
               }
@@ -241,7 +305,7 @@ function AppContent() {
             <Route
               path="/skills"
               element={
-                <ProtectedRoute profile={selectedProfile}>
+                <ProtectedRoute profile={activeProfile}>
                   <SkillsPage />
                 </ProtectedRoute>
               }
@@ -249,7 +313,7 @@ function AppContent() {
             <Route
               path="/contact"
               element={
-                <ProtectedRoute profile={selectedProfile}>
+                <ProtectedRoute profile={activeProfile}>
                   <ContactPage />
                 </ProtectedRoute>
               }
@@ -257,7 +321,7 @@ function AppContent() {
             <Route
               path="/browse/stalker"
               element={
-                <ProtectedRoute profile={selectedProfile}>
+                <ProtectedRoute profile={activeProfile}>
                   <StalkerPage />
                 </ProtectedRoute>
               }
@@ -265,7 +329,7 @@ function AppContent() {
             <Route
               path="/browse/recruiter/projects"
               element={
-                <ProtectedRoute profile={selectedProfile}>
+                <ProtectedRoute profile={activeProfile}>
                   <RecruiterProjectsPage />
                 </ProtectedRoute>
               }
@@ -273,25 +337,27 @@ function AppContent() {
             <Route
               path="/browse/developer"
               element={
-                <ProtectedRoute profile={selectedProfile}>
+                <ProtectedRoute profile={activeProfile}>
                   <DeveloperPage />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/browse/memories"
+              path="/browse/fitness"
               element={
-                <ProtectedRoute profile={selectedProfile}>
-                  <MemoriesPage />
+                <ProtectedRoute profile={activeProfile}>
+                  <FitnessPage />
                 </ProtectedRoute>
               }
             />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
-      </AnimatePresence>
+      </ErrorBoundary>
       <ConditionalChatbot />
       <Toaster />
     </>
@@ -301,9 +367,11 @@ function AppContent() {
 function App() {
   return (
     <HelmetProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <ErrorBoundary>
+        <Router>
+          <AppContent />
+        </Router>
+      </ErrorBoundary>
     </HelmetProvider>
   );
 }

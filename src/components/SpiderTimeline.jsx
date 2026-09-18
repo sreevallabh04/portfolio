@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaSpider, FaCode, FaLaptopCode, FaRobot } from 'react-icons/fa';
 
 const TimelineContainer = styled.div`

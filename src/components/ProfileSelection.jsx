@@ -1,104 +1,122 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-// Using actual avatar images with explicit paths
-const profiles = [
-  { 
-    id: 'recruiter', 
+/**
+ * Profile picker.
+ *
+ * The entrance stagger is CSS (`.rise-in` + an animation-delay) rather than a
+ * JS animation library on purpose: this screen is the only way into the rest of
+ * the site, so its content must never depend on rAF actually running to become
+ * visible.
+ */
+
+const PROFILES = [
+  {
+    id: 'recruiter',
     name: 'Recruiter',
-    color: 'bg-red-600',  // Fallback color
-    avatar: '/avatars/avatar1.jpeg', 
-    content: {
-      education: 'Vellore Institute of Technology, Chennai - Integrated MTech in Software Engineering',
-      experience: 'Research Intern at VIT Chennai, Freelance Web Developer',
-      projects: 'VHTOP - Hostel Management Suite, Sarah - AI Virtual Assistant',
-      skills: 'Python, Java, JavaScript, NextJS, Machine Learning'
-    }
+    blurb: 'Experience, projects and the resume',
+    avatar: '/avatars/avatar1.jpeg',
+    accent: 'group-hover:ring-red-500',
   },
-  { 
-    id: 'developer', 
+  {
+    id: 'developer',
     name: 'Developer',
-    color: 'bg-green-600',  // Fallback color
-    avatar: '/avatars/avatar2.jpeg'
+    blurb: 'A terminal, some games, and the stack',
+    avatar: '/avatars/avatar2.jpeg',
+    accent: 'group-hover:ring-emerald-400',
   },
-  { 
-    id: 'stalker', 
+  {
+    id: 'stalker',
     name: 'Stalker',
-    color: 'bg-red-500',  // Fallback color
-    avatar: '/avatars/avatar3.jpeg'
+    blurb: 'The trailer and every social link',
+    avatar: '/avatars/avatar3.jpeg',
+    accent: 'group-hover:ring-amber-400',
   },
-  { 
-    id: 'memories', 
-    name: 'Memories',
-    color: 'bg-purple-600',
-    avatar: '/avatars/avatar4.jpeg'
-  }
+  {
+    id: 'fitness',
+    name: 'Fitness',
+    blurb: '75 Hard — the training block, in full',
+    avatar: '/avatars/avatar4.jpeg',
+    accent: 'group-hover:ring-purple-400',
+  },
 ];
 
 const ProfileSelection = ({ onProfileSelect }) => {
-  // State to track if images are loaded
-  const [imagesLoaded, setImagesLoaded] = useState({});
-
-  // Preload images
-  useEffect(() => {
-    const preloadImages = () => {
-      const loadStatus = {};
-      
-      profiles.forEach(profile => {
-        const img = new Image();
-        img.src = profile.avatar;
-        
-        img.onload = () => {
-          loadStatus[profile.id] = true;
-          setImagesLoaded(prev => ({...prev, [profile.id]: true}));
-        };
-        
-        img.onerror = () => {
-          loadStatus[profile.id] = false;
-          setImagesLoaded(prev => ({...prev, [profile.id]: false}));
-          console.error(`Failed to load image for ${profile.id}`);
-        };
-      });
-    };
-    
-    preloadImages();
-  }, []);
+  const [failed, setFailed] = useState({});
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="flex min-h-screen flex-col items-center bg-[#121212] p-4 sm:p-8"
-    >
-      <h1 className="mt-[30px] mb-10 text-center text-3xl sm:text-4xl md:text-[48px] font-light text-white font-sans">
-        Who's Watching?
+    <main className="flex min-h-[100dvh] flex-col items-center justify-center bg-[#141414] px-4 py-16">
+      <h1 className="rise-in netflix-font text-center text-4xl tracking-wide text-white sm:text-5xl md:text-6xl">
+        Who&apos;s Watching?
       </h1>
+      <p
+        className="rise-in mt-3 text-center text-sm text-white/45 sm:text-base"
+        style={{ animationDelay: '0.1s' }}
+      >
+        Each profile tells the same story a different way.
+      </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-[30px] mt-8 w-full max-w-4xl mx-auto">
-        {profiles.map((profile) => (
-          <motion.div
+      <ul className="mt-12 grid w-full max-w-5xl grid-cols-2 gap-6 sm:gap-10 lg:grid-cols-4">
+        {PROFILES.map((profile, index) => (
+          <li
             key={profile.id}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex flex-col items-center touch-feedback-bounce"
-            onClick={() => onProfileSelect(profile.id)}
+            className="rise-in flex justify-center"
+            style={{ animationDelay: `${0.18 + index * 0.08}s` }}
           >
-            <div className={`w-28 h-28 sm:w-[120px] sm:h-[120px] md:w-[160px] md:h-[160px] cursor-pointer rounded-lg shadow-lg shadow-black/50 hover-glow transition-all duration-300 overflow-hidden touch-target ${!imagesLoaded[profile.id] ? profile.color : ''}`}>
-              {/* Display image if loaded, otherwise show colored background */}
-              {imagesLoaded[profile.id] !== false && (
-                <img 
-                  src={profile.avatar}
-                  alt={`${profile.name} Avatar`}
-                  className="h-full w-full object-cover border-2 border-transparent hover:border-white transition-all duration-300"
-                />
-              )}
-            </div>
-            <h2 className="mt-2 sm:mt-[10px] text-center text-base sm:text-lg text-white font-sans">{profile.name}</h2>
-          </motion.div>
+            <button
+              onClick={() => onProfileSelect(profile.id)}
+              className="group flex w-full max-w-[200px] flex-col items-center focus-visible:outline-none"
+            >
+              <span
+                className={`relative block aspect-square w-full overflow-hidden rounded-lg bg-zinc-800 shadow-lg shadow-black/50 ring-2 ring-transparent transition-all duration-300 group-hover:scale-105 group-focus-visible:ring-white ${profile.accent}`}
+              >
+                {failed[profile.id] ? (
+                  <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-900 text-4xl font-bold text-white/50">
+                    {profile.name.charAt(0)}
+                  </span>
+                ) : (
+                  <img
+                    src={profile.avatar}
+                    alt=""
+                    aria-hidden="true"
+                    className="h-full w-full object-cover"
+                    onError={() => setFailed((prev) => ({ ...prev, [profile.id]: true }))}
+                  />
+                )}
+                <span className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10" />
+              </span>
+
+              <span className="mt-3 text-base font-medium text-white/70 transition-colors duration-300 group-hover:text-white sm:text-lg">
+                {profile.name}
+              </span>
+              <span className="mt-1 h-8 text-center text-xs leading-snug text-white/0 transition-colors duration-300 group-hover:text-white/45">
+                {profile.blurb}
+              </span>
+            </button>
+          </li>
         ))}
-      </div>
-    </motion.div>
+      </ul>
+
+      <nav
+        className="rise-in mt-14 flex items-center gap-6 text-xs text-white/35"
+        style={{ animationDelay: '0.55s' }}
+      >
+        <Link to="/blog" className="transition-colors hover:text-white/70">
+          Blog
+        </Link>
+        <span aria-hidden="true">&middot;</span>
+        <Link to="/terms" className="transition-colors hover:text-white/70">
+          Terms
+        </Link>
+        <span aria-hidden="true">&middot;</span>
+        <a
+          href="mailto:srivallabhkakarala@gmail.com"
+          className="transition-colors hover:text-white/70"
+        >
+          Email
+        </a>
+      </nav>
+    </main>
   );
 };
 
