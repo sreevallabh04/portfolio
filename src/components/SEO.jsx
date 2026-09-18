@@ -1,14 +1,8 @@
 import { Helmet } from 'react-helmet-async';
-
-const SITE_URL = 'https://streamvallabh.life';
+import { SITE_URL, absoluteUrl as absolute } from '@/lib/site';
 
 // Crawlers resolve og:image and canonical against their own base, so relative
-// paths are unreliable. Normalise everything to an absolute URL here.
-const absolute = (value) => {
-  if (!value) return undefined;
-  if (/^https?:\/\//i.test(value)) return value;
-  return `${SITE_URL}${value.startsWith('/') ? '' : '/'}${value}`;
-};
+// paths are unreliable; `absolute` normalises everything against SITE_URL.
 
 const SEO = ({
   title,
@@ -45,7 +39,7 @@ const SEO = ({
     "publisher": {
       "@type": "Person",
       "name": author,
-      "url": "https://streamvallabh.life"
+      "url": SITE_URL
     },
     "datePublished": publishedTime,
     "dateModified": modifiedTime || publishedTime,

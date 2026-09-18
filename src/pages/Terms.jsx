@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { SITE_URL } from '@/lib/site';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -84,7 +85,7 @@ const Terms = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-3xl font-bold text-red-500">Terms & Conditions</h2>
               <button
-                onClick={() => navigator.clipboard.writeText(`https://streamvallabh.life/terms#terms-conditions`)}
+                onClick={() => navigator.clipboard.writeText(`${SITE_URL}/terms#terms-conditions`)}
                 className="text-gray-400 hover:text-white text-sm underline"
               >
                 Copy Link
@@ -167,7 +168,7 @@ const Terms = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-3xl font-bold text-red-500">Refund and Cancellation Policy</h2>
               <button
-                onClick={() => navigator.clipboard.writeText(`https://streamvallabh.life/terms#refund-policy`)}
+                onClick={() => navigator.clipboard.writeText(`${SITE_URL}/terms#refund-policy`)}
                 className="text-gray-400 hover:text-white text-sm underline"
               >
                 Copy Link
@@ -215,7 +216,7 @@ const Terms = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-3xl font-bold text-red-500">Shipping and Delivery Policy</h2>
               <button
-                onClick={() => navigator.clipboard.writeText(`https://streamvallabh.life/terms#shipping-policy`)}
+                onClick={() => navigator.clipboard.writeText(`${SITE_URL}/terms#shipping-policy`)}
                 className="text-gray-400 hover:text-white text-sm underline"
               >
                 Copy Link
@@ -272,15 +273,15 @@ const Terms = () => {
                 <div className="space-y-3">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <span className="text-red-400 font-semibold">Terms & Conditions:</span>
-                    <span className="text-white text-sm break-all">https://streamvallabh.life/terms#terms-conditions</span>
+                    <span className="text-white text-sm break-all">{`${SITE_URL}/terms#terms-conditions`}</span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <span className="text-red-400 font-semibold">Refund Policy:</span>
-                    <span className="text-white text-sm break-all">https://streamvallabh.life/terms#refund-policy</span>
+                    <span className="text-white text-sm break-all">{`${SITE_URL}/terms#refund-policy`}</span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <span className="text-red-400 font-semibold">Shipping Policy:</span>
-                    <span className="text-white text-sm break-all">https://streamvallabh.life/terms#shipping-policy</span>
+                    <span className="text-white text-sm break-all">{`${SITE_URL}/terms#shipping-policy`}</span>
                   </div>
                 </div>
               </div>

@@ -10,8 +10,8 @@ const seoConfig = {
   title: 'Projects Portfolio',
   description:
     'Explore my portfolio of projects across Web Development, AI/ML, Blockchain, Games and Mobile Apps. Tech stacks, source code and live demos.',
-  url: 'https://streamvallabh.life/browse/recruiter/projects',
-  image: 'https://streamvallabh.life/HopeCore.png',
+  url: '/browse/recruiter/projects',
+  image: '/HopeCore.png',
   type: 'website',
   section: 'Projects',
   keywords:

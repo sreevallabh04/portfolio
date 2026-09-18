@@ -6,6 +6,8 @@
 module.exports = {
   root: true,
   env: { browser: true, es2022: true, node: true },
+  // Injected by vite.config.js at build time.
+  globals: { __BUILD_SITE_URL__: 'readonly' },
   extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:react-hooks/recommended'],
   parserOptions: {
     ecmaVersion: 'latest',

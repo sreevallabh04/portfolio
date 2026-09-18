@@ -23,7 +23,6 @@ const BlogPost = lazy(() => import('@/pages/BlogPost'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const Admin = lazy(() => import('@/pages/Admin'));
 
-const SITE_URL = 'https://streamvallabh.life';
 const PROFILE_KEY = 'selectedProfile';
 const ENTERED_KEY = 'hasEntered';
 const VALID_PROFILES = ['recruiter', 'developer', 'stalker', 'fitness'];
@@ -139,24 +138,24 @@ const SELF_MANAGED_SEO = [/^\/skills/, /^\/browse\/recruiter\/projects/, /^\/blo
 
 const hasOwnSEO = (pathname) => SELF_MANAGED_SEO.some((pattern) => pattern.test(pathname));
 
-// SEO configurations for different routes. Absolute URLs throughout - crawlers
-// resolve og:image and canonical against the origin, so a bare "/HopeCore.png"
-// is ignored by most of them.
+// SEO configurations for different routes. Paths are relative here; <SEO>
+// resolves them against SITE_URL (see src/lib/site.js), which is the single
+// place the domain is defined.
 const getSEOConfig = (pathname) => {
   const baseConfig = {
     title: 'Sreevallabh Kakarala',
     description:
       'AI Engineer building RAG systems, time-series forecasting models and LLM agents. Explore my portfolio, published research and professional experience.',
     type: 'website',
-    image: `${SITE_URL}/HopeCore.png`,
-    url: `${SITE_URL}${pathname}`,
+    image: '/HopeCore.png',
+    url: pathname,
   };
 
   switch (true) {
     case pathname === '/':
       return {
         ...baseConfig,
-        url: `${SITE_URL}/`,
+        url: '/',
         title: 'Choose Your Experience',
         description:
           "Select your profile to explore Sreevallabh Kakarala's portfolio in different ways - Recruiter, Developer, Stalker, or Fitness.",

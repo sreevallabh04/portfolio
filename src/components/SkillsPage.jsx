@@ -54,7 +54,7 @@ const SkillsPage = () => {
     description:
       'The stack behind the work: Python and PyTorch, LLM and RAG systems with LangChain, vector stores, time-series forecasting, and the MLOps tooling to ship it.',
     type: 'profile',
-    url: 'https://streamvallabh.life/skills',
+    url: '/skills',
     keywords: skillsList.join(', '),
     section: 'Skills',
     isArticle: false,

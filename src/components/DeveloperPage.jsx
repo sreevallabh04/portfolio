@@ -755,7 +755,7 @@ Infra: Docker, AWS, GCP, Git, Linux
 Outside the terminal: cricket, football, 75 Hard, The Office`;
         break;
       case 'neofetch':
-        response = `                   sreevallabh@streamvallabh
+        response = `                   sreevallabh@sreevallabh-me
       .---.        -------------------------
      /     \\       OS      : StreamVallabh OS (Netflix Edition)
      \\.@-@./       Host    : VIT Chennai

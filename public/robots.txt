@@ -1,9 +1,9 @@
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://streamvallabh.life/sitemap.xml
+# Sitemap location (__SITE_URL__ is substituted at build time)
+Sitemap: __SITE_URL__/sitemap.xml
 
-# Disallow admin or private routes
-Disallow: /admin/
-Disallow: /private/ 
+# The admin console. Matches both /admin and anything beneath it; the previous
+# "/admin/" rule with a trailing slash did not match the actual /admin route.
+Disallow: /admin

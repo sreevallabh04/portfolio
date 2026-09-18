@@ -20,7 +20,7 @@ const BlogPost = () => {
         image: post.heroImage,
         publishedTime: post.publishDate,
         isArticle: true,
-        url: `https://streamvallabh.life/blog/${slug}`,
+        url: `/blog/${slug}`,
       }
     : {
         title: 'Loading… | Sreevallabh Blog',

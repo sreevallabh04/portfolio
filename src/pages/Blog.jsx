@@ -24,7 +24,7 @@ const Blog = () => {
     type: 'article',
     author: 'Sreevallabh Kakarala',
     keywords: 'blog, software engineering, technology, product, learning',
-    url: 'https://streamvallabh.life/blog',
+    url: '/blog',
   };
 
   return (

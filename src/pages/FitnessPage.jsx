@@ -143,7 +143,7 @@ const FitnessPage = () => {
       <SEO
         title="75 Hard"
         description="A seven-day Push/Pull/Legs and Upper/Lower hybrid run as a cut: two sessions daily, 2,250 kcal, 175 g protein, tracked lifts holding while the scale drops."
-        url="https://streamvallabh.life/browse/fitness"
+        url="/browse/fitness"
         type="website"
       />
 
