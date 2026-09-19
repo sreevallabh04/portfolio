@@ -28,8 +28,6 @@ const HERO = {
   title: 'HopeCore',
   type: 'Film',
   genres: ['Slick', 'Suspenseful', 'Thriller', 'Conspiracy', 'Trailer'],
-  description:
-    'Sometimes writes bugs just to fix them and feel productive. Gym rat. Code addict. Meme lord in training.',
   // Leading slash matters: without it the browser resolves this against
   // /browse/stalker/ and the poster 404s.
   poster: '/HopeCore.png',
@@ -294,11 +292,7 @@ const StalkerPage = () => {
             ))}
           </ul>
 
-          <p className="mb-7 max-w-2xl text-lg font-medium text-white/90 drop-shadow sm:text-2xl">
-            {HERO.description}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="mt-7 flex flex-wrap items-center gap-3">
             <button
               onClick={handleOpenFullscreen}
               className="flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-lg font-bold text-black shadow-2xl transition-all hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"

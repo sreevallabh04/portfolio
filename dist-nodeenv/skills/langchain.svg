@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="LangChain">
+  <g fill="none" stroke="#1C3C3C" stroke-width="9" stroke-linecap="round">
+    <path d="M44 44H36a20 20 0 0 0 0 40h8" stroke="#2F6F6F"/>
+    <path d="M84 44h8a20 20 0 0 1 0 40h-8" stroke="#2F6F6F"/>
+    <path d="M46 64h36" stroke="#5FBFA8"/>
+  </g>
+  <circle cx="64" cy="26" r="7" fill="#5FBFA8"/>
+  <circle cx="64" cy="102" r="7" fill="#5FBFA8"/>
+</svg>
