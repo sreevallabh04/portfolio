@@ -49,18 +49,10 @@ const IntroGate = ({ onEnter }) => (
         style={{ animationDelay: '2.4s' }}
       />
 
-      <p
-        className="rise-in mt-7 max-w-md text-[15px] leading-relaxed text-white/55 sm:text-base"
-        style={{ animationDelay: '2.55s' }}
-      >
-        RAG systems, time-series forecasting and LLM agents &mdash; built to
-        survive contact with production.
-      </p>
-
       {/* The wrapper carries the entrance animation. `.rise-in` fills `both`,
           so putting it on the button itself would pin its transform and kill
           the hover translate. */}
-      <span className="rise-in mt-10" style={{ animationDelay: '2.7s' }}>
+      <span className="rise-in mt-9" style={{ animationDelay: '2.55s' }}>
         <button
           onClick={onEnter}
           className="group inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/[0.04] py-3.5 pl-7 pr-6 text-sm font-medium tracking-wide text-white backdrop-blur-sm transition-colors duration-300 hover:border-white/40 hover:bg-white/[0.09] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] sm:text-[15px]"
@@ -76,7 +68,7 @@ const IntroGate = ({ onEnter }) => (
 
     <p
       className="rise-in absolute inset-x-0 bottom-7 z-10 text-center text-[11px] tracking-wide text-white/25"
-      style={{ animationDelay: '2.95s' }}
+      style={{ animationDelay: '2.75s' }}
     >
       Best experienced with sound on
     </p>
