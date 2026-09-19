@@ -49,13 +49,6 @@ const LogoUnfold = ({ className = '' }) => {
             </span>
           );
         })}
-
-        {/* Light sweep across the finished wordmark, as the ident does. */}
-        <span
-          aria-hidden="true"
-          className="logo-unfold-sheen"
-          style={{ animationDelay: `${lastLetterEnd}s` }}
-        />
       </h1>
 
       <span

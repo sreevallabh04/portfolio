@@ -94,9 +94,12 @@ const MatrixRain = () => {
     scene.add(particles);
     particlesRef.current = particles;
 
-    // Animation
+    // Animation. The frame id is captured so cleanup can cancel it — without
+    // that, the loop kept rendering into a detached canvas forever after the
+    // component unmounted.
+    let frameId;
     const animate = () => {
-      requestAnimationFrame(animate);
+      frameId = requestAnimationFrame(animate);
 
       if (particlesRef.current) {
         particlesRef.current.rotation.y += 0.001;
@@ -119,13 +122,24 @@ const MatrixRain = () => {
 
     window.addEventListener('resize', handleResize);
 
-    // Cleanup
+    // Cleanup.
+    //
+    // Previously this only removed the canvas from the DOM. The render loop
+    // kept running, and the WebGL context, geometry and material were never
+    // released — browsers cap concurrent WebGL contexts (~16), so navigating
+    // in and out of this page enough times exhausted them and the canvas
+    // silently stopped drawing.
+    const container = containerRef.current;
     return () => {
+      cancelAnimationFrame(frameId);
       window.removeEventListener('resize', handleResize);
-      if (containerRef.current && rendererRef.current) {
-        containerRef.current.removeChild(rendererRef.current.domElement);
+      if (container && renderer.domElement.parentNode === container) {
+        container.removeChild(renderer.domElement);
       }
-      scene.clear();
+      scene.remove(particles);
+      geometry.dispose();
+      material.dispose();
+      renderer.dispose();
     };
   }, []);
 
@@ -141,6 +155,16 @@ const SolarSystemSimulation = () => {
 const FuturisticHero = ({ onStart, onKonami }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showEasterEgg, setShowEasterEgg] = useState(false);
+  // Generated once per mount; see the note on the floating elements below.
+  const [heroSparks] = useState(() =>
+    Array.from({ length: 20 }, () => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      scale: Math.random() * 0.5 + 0.5,
+      duration: Math.random() * 2 + 2,
+      delay: Math.random() * 2,
+    }))
+  );
 
   // Easter egg handler
   useEffect(() => {
@@ -162,7 +186,7 @@ const FuturisticHero = ({ onStart, onKonami }) => {
   }, [onKonami]);
 
   return (
-    <div className="relative flex flex-col items-center justify-center h-[500px] bg-black bg-opacity-80 rounded-2xl shadow-2xl overflow-hidden border border-[#39ff14] backdrop-blur-xl">
+    <div className="relative flex min-h-[26rem] flex-col items-center justify-center overflow-hidden rounded-2xl border border-[#39ff14] bg-black/80 px-5 py-14 shadow-2xl backdrop-blur-xl sm:min-h-[31rem] sm:px-8">
       <MatrixRain />
       
       {/* Easter Egg */}
@@ -191,7 +215,7 @@ const FuturisticHero = ({ onStart, onKonami }) => {
         className="text-center z-10"
       >
         <motion.h1 
-          className="text-6xl md:text-8xl font-extrabold text-center mb-4 tracking-widest select-none"
+          className="mb-4 select-none text-center text-4xl font-extrabold tracking-widest sm:text-6xl md:text-8xl"
           style={{ 
             fontFamily: 'monospace', 
             letterSpacing: '0.2em',
@@ -209,7 +233,7 @@ const FuturisticHero = ({ onStart, onKonami }) => {
         </motion.h1>
 
         <motion.h2 
-          className="text-2xl md:text-3xl text-[#00eaff] font-semibold mb-6 text-center drop-shadow-lg"
+          className="mb-6 text-center text-lg font-semibold text-[#00eaff] drop-shadow-lg sm:text-2xl md:text-3xl"
           animate={{
             opacity: [0.5, 1],
             y: [0, -5, 0]
@@ -227,7 +251,7 @@ const FuturisticHero = ({ onStart, onKonami }) => {
             way into the terminal, and this page runs a WebGL canvas plus twenty
             animated particles, so anything that starts at opacity 0 here risks
             never arriving on a busy main thread. */}
-        <p className="mb-8 max-w-2xl text-center text-lg text-gray-200">
+        <p className="mb-8 max-w-2xl text-center text-sm leading-relaxed text-gray-200 sm:text-lg">
           A shell, four games and twelve hidden achievements. Type{' '}
           <code className="rounded bg-white/10 px-1.5 py-0.5 text-[#39ff14]">help</code> once
           you are in &mdash; or go looking for the ones it does not tell you about.
@@ -236,7 +260,7 @@ const FuturisticHero = ({ onStart, onKonami }) => {
         <div className="flex flex-col items-center space-y-4">
           <motion.button
             onClick={onStart}
-            className="bg-gradient-to-r from-[#ff004f] via-[#39ff14] to-[#00eaff] text-white font-bold py-4 px-12 rounded-full text-2xl shadow-xl transition-all duration-200 border-2 border-[#00eaff] relative overflow-hidden group"
+            className="group relative overflow-hidden rounded-full border-2 border-[#00eaff] bg-gradient-to-r from-[#ff004f] via-[#39ff14] to-[#00eaff] px-8 py-3 text-lg font-bold text-white shadow-xl transition-all duration-200 sm:px-12 sm:py-4 sm:text-2xl"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             animate={{
@@ -275,25 +299,26 @@ const FuturisticHero = ({ onStart, onKonami }) => {
         </div>
       </motion.div>
 
-      {/* Floating Elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+      {/* Floating elements. The positions are generated once and held in state:
+          calling Math.random() inline meant every re-render reshuffled all
+          twenty dots, so they visibly teleported whenever anything above them
+          changed. They are also sized off the hero box rather than
+          window.innerWidth, which overflowed the container on a phone. */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {heroSparks.map((spark, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-green-500 rounded-full"
-            initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-              scale: Math.random() * 0.5 + 0.5
-            }}
+            style={{ left: `${spark.left}%`, top: `${spark.top}%` }}
+            initial={{ scale: spark.scale }}
             animate={{
               y: [0, -20, 0],
               opacity: [0.5, 1, 0.5]
             }}
             transition={{
-              duration: Math.random() * 2 + 2,
+              duration: spark.duration,
               repeat: Infinity,
-              delay: Math.random() * 2
+              delay: spark.delay
             }}
           />
         ))}
@@ -1075,7 +1100,10 @@ What's your favorite show? Let's discuss!`;
       <TrophyDrawer />
       <AchievementToasts />
 
-      <div className="relative z-10">
+      {/* Top padding clears the fixed navbar — without it the DEVTERM wordmark
+          sat on top of the logo on a phone. Side padding keeps the bordered
+          hero box off the viewport edges. */}
+      <div className="relative z-10 px-4 pb-10 pt-20 sm:px-6 sm:pt-24">
         {!showTerminal ? (
           <FuturisticHero onStart={() => setShowTerminal(true)} onKonami={() => unlock('konami')} />
         ) : (

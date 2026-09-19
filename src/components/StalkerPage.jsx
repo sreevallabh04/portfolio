@@ -160,8 +160,9 @@ const StalkerPage = () => {
       exit={{ opacity: 0 }}
       className="page-fade min-h-screen bg-black"
     >
-      {/* Hero */}
-      <section className="relative flex h-[85vh] min-h-[500px] w-full items-end overflow-hidden">
+      {/* Hero. `min-h` rather than a fixed 85vh so the copy can never overflow
+          the section on a short phone viewport. */}
+      <section className="relative flex min-h-[34rem] w-full items-end overflow-hidden pt-20 md:min-h-[85vh]">
         {videoFailed ? (
           <img
             src={HERO.poster}
@@ -193,7 +194,12 @@ const StalkerPage = () => {
           />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/20" />
+        {/* Two scrims. The poster art has its own large lettering baked in, and
+            a single light gradient left it legible straight through the title
+            block. The lower one anchors the copy, the upper one clears the
+            navbar. */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/85 to-black/60" />
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/90 to-transparent" />
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}

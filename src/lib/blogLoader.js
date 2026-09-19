@@ -57,10 +57,13 @@ const parseFrontMatter = (content) => {
   return { data, content: markdownContent };
 };
 
-// Import all markdown files from the content/blog directory
-const blogPostsContext = import.meta.glob('/content/blog/*.md', { 
+// Import all markdown files from the content/blog directory.
+// `as: 'raw'` is deprecated in Vite 6 and warns on every build; the query form
+// is the supported equivalent.
+const blogPostsContext = import.meta.glob('/content/blog/*.md', {
   eager: true,
-  as: 'raw'
+  query: '?raw',
+  import: 'default',
 });
 
 export const getAllBlogPosts = () => {

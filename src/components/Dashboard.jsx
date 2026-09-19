@@ -71,21 +71,29 @@ const Dashboard = () => {
       exit={{ opacity: 0 }}
       className="page-fade min-h-screen bg-black text-white"
     >
-      {/* Hero */}
-      <header className="relative h-[55vh] w-full md:h-[70vh] lg:h-[80vh]">
+      {/*
+        Hero.
+
+        The copy sits in normal flow inside a flex container rather than being
+        absolutely positioned inside a fixed `h-[55vh]` box. On a phone that
+        block is taller than 55vh, so it used to overflow upward and collide
+        with the fixed navbar — on a Galaxy S23 the "AI ENGINEER" label landed
+        on top of the logo. `min-h` lets the hero grow to fit instead, and the
+        top padding keeps the first line clear of the navbar.
+      */}
+      <header className="relative flex min-h-[34rem] w-full items-end overflow-hidden pt-20 md:min-h-[70vh] lg:min-h-[80vh]">
         <img
           src={PROFILE.bannerImage}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full object-cover object-right md:object-[85%_center]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/30 md:to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/90 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent" />
 
-        {/* Constrained on both sides. With only `left` + `max-w-xl` the block
-            was wider than a phone viewport, which made the whole page scroll
-            sideways and clipped the copy. */}
-        <div className="absolute inset-x-[4%] bottom-[12%] z-10 max-w-xl md:inset-x-[5%] lg:max-w-2xl">
+        <div className="relative z-10 w-full px-[4%] pb-10 md:px-[5%] md:pb-[6%]">
+          <div className="max-w-xl lg:max-w-2xl">
           <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.25em] text-red-500 sm:text-sm">
             <span className="netflix-font text-lg text-red-600">N</span>
             {PROFILE.role}
@@ -122,6 +130,7 @@ const Dashboard = () => {
               All projects
               <ArrowRight size={18} />
             </Link>
+          </div>
           </div>
         </div>
       </header>
