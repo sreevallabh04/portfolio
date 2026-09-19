@@ -4,7 +4,6 @@ import { HelmetProvider } from 'react-helmet-async';
 import SplashScreen from '@/components/SplashScreen';
 import ProfileSelection from '@/components/ProfileSelection';
 import Navbar from '@/components/Navbar';
-import FloatingChatbot from '@/components/FloatingChatbot';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import IntroGate from '@/components/IntroGate';
 import { Toaster } from '@/components/ui/toaster';
@@ -22,6 +21,10 @@ const Blog = lazy(() => import('@/pages/Blog'));
 const BlogPost = lazy(() => import('@/pages/BlogPost'));
 const Terms = lazy(() => import('@/pages/Terms'));
 const Admin = lazy(() => import('@/pages/Admin'));
+// Lazy too: its tree pulls in @supabase/supabase-js, @emailjs/browser and the
+// knowledge base, which as a static import sat in the eager entry bundle on
+// every route — including the ones that deliberately never render it.
+const FloatingChatbot = lazy(() => import('@/components/FloatingChatbot'));
 
 const PROFILE_KEY = 'selectedProfile';
 const ENTERED_KEY = 'hasEntered';
@@ -118,7 +121,11 @@ const ConditionalChatbot = () => {
     return null;
   }
 
-  return <FloatingChatbot />;
+  return (
+    <Suspense fallback={null}>
+      <FloatingChatbot />
+    </Suspense>
+  );
 };
 
 // Reset scroll on navigation. Without this, moving between routes keeps the

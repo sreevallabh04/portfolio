@@ -83,9 +83,19 @@ export default defineConfig(({ mode }) => {
 			sourcemap: false,
 			rollupOptions: {
 				output: {
-					manualChunks: {
-						vendor: ['react', 'react-dom', 'react-router-dom'],
-						three: ['three', '@react-three/fiber', '@react-three/drei'],
+					// Function form rather than the object form. The object form
+					// only matches a package imported by that exact specifier, so a
+					// transitively-reached copy of react or three leaked into the
+					// entry chunk instead of landing here. Matching on the resolved
+					// module path catches those too.
+					manualChunks(id) {
+						if (!id.includes('node_modules')) return undefined;
+						const path = id.replace(/\\/g, '/');
+						if (/node_modules\/(three|@react-three)\//.test(path)) return 'three';
+						if (/node_modules\/(react|react-dom|react-router|react-router-dom|scheduler)\//.test(path)) {
+							return 'vendor';
+						}
+						return undefined;
 					},
 				},
 			},

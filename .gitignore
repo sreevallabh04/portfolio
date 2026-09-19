@@ -4,6 +4,8 @@ node_modules/
 # Build artifacts
 dist/
 build/
+# Scratch build dirs from perf experiments
+dist-*/
 .vite/
 *.tsbuildinfo
 
