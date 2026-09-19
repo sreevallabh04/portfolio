@@ -1,21 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { supabase } from '@/lib/supabase';
-import { Send, LogOut, UserCheck, Bot, Trash2, ArrowLeft } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import {
+  Send, LogOut, UserCheck, Bot, Trash2, ArrowLeft,
+  PenSquare, MessagesSquare, Loader2, ShieldCheck,
+} from 'lucide-react';
+import { useAdminAuth } from '@/lib/useAdminAuth';
+import PostEditor from '@/components/admin/PostEditor';
 
-/**
- * NOTE ON SECURITY: this password is compared in the browser and Vite inlines
- * every VITE_* variable into the JavaScript bundle, so it is readable by anyone
- * who opens devtools. It keeps the console out of sight of casual visitors and
- * nothing more. Real protection has to come from Supabase auth plus row-level
- * security policies on `chat_sessions` and `messages`, so that the data cannot
- * be read even if someone renders this component.
- */
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
-
-const Admin = () => {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [passwordInput, setPasswordInput] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+const ChatConsole = ({ onSignOut }) => {
   const [sessions, setSessions] = useState([]);
   const [selectedSession, setSelectedSession] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -25,23 +17,6 @@ const Admin = () => {
   const messagesEndRef = useRef(null);
   const messagesChannelRef = useRef(null);
   const sessionsChannelRef = useRef(null);
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // Guard the unconfigured case explicitly. Comparing against an undefined
-    // env var made every attempt fail with a generic "Incorrect password",
-    // which looks identical to a typo and gives no way to diagnose it.
-    if (!ADMIN_PASSWORD) {
-      setPasswordError('VITE_ADMIN_PASSWORD is not set for this build.');
-      return;
-    }
-    if (passwordInput === ADMIN_PASSWORD) {
-      setAuthenticated(true);
-      setPasswordError('');
-    } else {
-      setPasswordError('Incorrect password');
-    }
-  };
 
   // Fetch active sessions
   const fetchSessions = useCallback(async () => {
@@ -81,7 +56,6 @@ const Admin = () => {
 
   // Subscribe to sessions realtime
   useEffect(() => {
-    if (!authenticated) return;
 
     fetchSessions();
 
@@ -108,7 +82,7 @@ const Admin = () => {
         supabase.removeChannel(sessionsChannelRef.current);
       }
     };
-  }, [authenticated, fetchSessions]);
+  }, [fetchSessions]);
 
   // Fetch messages for a session
   const fetchMessages = useCallback(async (sessionId) => {
@@ -220,36 +194,8 @@ const Admin = () => {
     };
   }, []);
 
-  // Password gate
-  if (!authenticated) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        <form onSubmit={handleLogin} className="bg-zinc-900 rounded-xl p-8 w-full max-w-sm border border-zinc-800">
-          <h1 className="text-2xl font-bold text-white mb-2">Admin Panel</h1>
-          <p className="text-gray-400 text-sm mb-6">Enter password to access the live chat dashboard.</p>
-          <input
-            type="password"
-            value={passwordInput}
-            onChange={(e) => setPasswordInput(e.target.value)}
-            placeholder="Password"
-            className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-red-500 mb-4 text-base"
-            autoFocus
-          />
-          {passwordError && <p className="text-red-500 text-sm mb-4">{passwordError}</p>}
-          <button
-            type="submit"
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-colors"
-          >
-            Login
-          </button>
-        </form>
-      </div>
-    );
-  }
-
-  // Admin dashboard
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col md:flex-row">
+    <div className="flex min-h-0 flex-1 flex-col text-white md:flex-row">
       {/* Sessions sidebar */}
       <div
         className={`${
@@ -259,7 +205,7 @@ const Admin = () => {
         <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
           <h2 className="text-lg font-bold">Live Sessions</h2>
           <button
-            onClick={() => setAuthenticated(false)}
+            onClick={onSignOut}
             className="text-gray-400 hover:text-white transition-colors"
             title="Logout"
           >
@@ -437,6 +383,125 @@ const Admin = () => {
           </>
         )}
       </div>
+    </div>
+  );
+};
+
+/**
+ * Sign-in for the console.
+ *
+ * This replaces a password compared in the browser against an inlined VITE_*
+ * value. That version protected nothing: the string was readable in devtools,
+ * and every query ran under the public anon key, so the data was reachable
+ * from the REST API whether or not anyone loaded this page. Now the session is
+ * a real Supabase JWT and the database enforces access via row-level security
+ * (see supabase/migrations/001_posts.sql).
+ */
+const SignIn = ({ onSubmit, error, busy }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-black p-4">
+      <form
+        onSubmit={(e) => { e.preventDefault(); onSubmit(email, password); }}
+        className="w-full max-w-sm rounded-xl border border-zinc-800 bg-zinc-900 p-8"
+      >
+        <h1 className="mb-1 flex items-center gap-2 text-2xl font-bold text-white">
+          <ShieldCheck size={22} className="text-red-500" />
+          Console
+        </h1>
+        <p className="mb-6 text-sm text-gray-400">
+          Sign in with your Supabase account to write posts and answer chats.
+        </p>
+
+        <input
+          type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email" autoComplete="username" autoFocus
+          className="mb-3 w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-base text-white placeholder-gray-500 focus:border-red-500 focus:outline-none"
+        />
+        <input
+          type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password" autoComplete="current-password"
+          className="mb-4 w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-base text-white placeholder-gray-500 focus:border-red-500 focus:outline-none"
+        />
+
+        {!isSupabaseConfigured && (
+          <p className="mb-4 text-sm text-amber-400">
+            Supabase is not configured for this build.
+          </p>
+        )}
+        {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+
+        <button
+          type="submit" disabled={busy}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-600 py-3 font-semibold text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+        >
+          {busy && <Loader2 size={16} className="animate-spin" />}
+          Sign in
+        </button>
+      </form>
+    </div>
+  );
+};
+
+const TABS = [
+  { id: 'write', label: 'Writing', icon: PenSquare },
+  { id: 'chat', label: 'Live Chat', icon: MessagesSquare },
+];
+
+const Admin = () => {
+  const { isAuthenticated, loading, error, signIn, signOut, user } = useAdminAuth();
+  const [tab, setTab] = useState('write');
+  const [busy, setBusy] = useState(false);
+
+  const handleSignIn = async (email, password) => {
+    setBusy(true);
+    await signIn(email, password);
+    setBusy(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black">
+        <Loader2 size={24} className="animate-spin text-red-500" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <SignIn onSubmit={handleSignIn} error={error} busy={busy} />;
+  }
+
+  return (
+    <div className="flex h-screen flex-col bg-black text-white">
+      <header className="flex flex-shrink-0 items-center gap-1 border-b border-zinc-800 px-3">
+        {TABS.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
+              tab === id
+                ? 'border-red-600 text-white'
+                : 'border-transparent text-zinc-500 hover:text-white'
+            }`}
+          >
+            <Icon size={15} />
+            {label}
+          </button>
+        ))}
+
+        <span className="ml-auto hidden text-xs text-zinc-600 sm:block">{user?.email}</span>
+        <button
+          onClick={signOut}
+          title="Sign out"
+          className="ml-3 p-2 text-zinc-500 transition-colors hover:text-white"
+        >
+          <LogOut size={16} />
+        </button>
+      </header>
+
+      {tab === 'write' ? <PostEditor /> : <ChatConsole onSignOut={signOut} />}
     </div>
   );
 };

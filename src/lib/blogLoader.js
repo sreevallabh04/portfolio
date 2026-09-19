@@ -79,8 +79,11 @@ export const getAllBlogPosts = () => {
       tags: Array.isArray(data.tags) ? data.tags : (data.tags ? [data.tags] : []),
       heroImage: data.heroImage || null,
       content,
-      ...data
     };
+    // The `...data` spread that used to be here re-applied the raw front
+    // matter over the normalised fields, so an unbracketed `tags: welcome`
+    // overwrote the normalised array with a bare string and `post.tags.map`
+    // then threw.
   });
 
   // Sort by publish date (newest first)

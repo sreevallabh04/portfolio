@@ -1,15 +1,27 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 import { ArrowLeft, Calendar, Clock, Tag } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import SEO from '@/components/SEO';
-import { getBlogPostBySlug } from '@/lib/blogLoader';
+import { fetchPostBySlug } from '@/lib/posts';
 
 const BlogPost = () => {
   const { slug } = useParams();
-  const post = useMemo(() => getBlogPostBySlug(slug), [slug]);
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    fetchPostBySlug(slug).then((result) => {
+      if (!active) return;
+      setPost(result);
+      setLoading(false);
+    });
+    return () => { active = false; };
+  }, [slug]);
 
   const seoConfig = post
     ? {
@@ -40,7 +52,7 @@ const BlogPost = () => {
             Back to all posts
           </Link>
 
-          {!post && (
+          {!loading && !post && (
             <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-8 text-center text-red-200">
               <p>This post is not available.</p>
               <Link to="/blog" className="mt-4 inline-block text-red-300 hover:text-red-200">

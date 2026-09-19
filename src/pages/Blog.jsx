@@ -1,15 +1,30 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ExternalLink, Calendar, Tag, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
-import { getAllBlogPosts, getAllTags } from '@/lib/blogLoader';
+import { fetchPublishedPosts, collectTags } from '@/lib/posts';
 
 const Blog = () => {
   const [selectedTag, setSelectedTag] = useState('All');
 
-  const posts = useMemo(() => getAllBlogPosts(), []);
-  const tags = useMemo(() => ['All', ...getAllTags()], []);
+  // Posts are fetched at runtime so publishing from /admin appears immediately,
+  // with no rebuild. fetchPublishedPosts never throws and falls back to the
+  // markdown bundled at build time if Supabase is unreachable.
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    fetchPublishedPosts().then((result) => {
+      if (!active) return;
+      setPosts(result);
+      setLoading(false);
+    });
+    return () => { active = false; };
+  }, []);
+
+  const tags = useMemo(() => ['All', ...collectTags(posts)], [posts]);
 
   const filteredPosts = useMemo(() => {
     if (selectedTag === 'All') {
@@ -65,12 +80,22 @@ const Blog = () => {
             </div>
           </section>
 
-          {filteredPosts.length === 0 && (
+          {/* Gated on `loading`: posts are fetched at runtime now, so without
+              this the empty state flashes on every visit before the first
+              response lands. */}
+          {loading && (
+            <div className="rounded-xl border border-white/10 bg-white/5 p-12 text-center text-white/40">
+              <p>Loading posts…</p>
+            </div>
+          )}
+
+          {!loading && filteredPosts.length === 0 && (
             <div className="rounded-xl border border-white/10 bg-white/5 p-12 text-center text-white/60">
               <BookOpen className="mx-auto mb-4 h-10 w-10" />
               <p>No posts found for this filter yet.</p>
               <p className="mt-2 text-sm text-white/40">
-                Create a new markdown file in <code className="px-2 py-1 bg-white/10 rounded">content/blog/</code> to get started!
+                Write one at <code className="rounded bg-white/10 px-2 py-1">/admin</code>, or drop a
+                markdown file into <code className="rounded bg-white/10 px-2 py-1">content/drafts/</code>.
               </p>
             </div>
           )}

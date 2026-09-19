@@ -14,6 +14,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# Local drafts — working files for the watcher, published to Supabase
+content/drafts/*
+!content/drafts/.gitkeep
+
 # Environment variables — never commit these.
 # Every VITE_* value is inlined into the client bundle at build time, so
 # anything in here is public once deployed. Keep .env.example as the template.

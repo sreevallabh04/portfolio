@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "lint": "eslint src --ext js,jsx --report-unused-disable-directives",
     "lint:strict": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "format": "prettier --write \"src/**/*.{js,jsx}\""
+    "format": "prettier --write \"src/**/*.{js,jsx}\"",
+    "write": "node --env-file=.env.local scripts/publish-posts.mjs --watch",
+    "publish": "node --env-file=.env.local scripts/publish-posts.mjs --once"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

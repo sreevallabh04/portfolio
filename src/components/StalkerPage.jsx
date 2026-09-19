@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Info, X, Volume2, VolumeX, ExternalLink, Instagram } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Play, Pause, Info, X, Volume2, VolumeX, ExternalLink, Instagram, PenLine } from 'lucide-react';
 import { CONTACT } from '@/data/portfolio';
+import { fetchPublishedPosts } from '@/lib/posts';
 
 // --- Social icons not covered by lucide ---
 const PinterestIcon = ({ className }) => (
@@ -51,6 +53,67 @@ const FACTS = [
   { label: 'Gym split', value: 'Push / Pull / Legs' },
   { label: 'Comfort watch', value: 'The Office (again)' },
 ];
+
+/**
+ * Latest writing, matching this page's card idiom rather than /blog's.
+ *
+ * Posts are fetched at runtime, so anything published from /admin shows up
+ * here without a rebuild. Renders nothing at all when there are no posts —
+ * an empty "Writing" heading is worse than no section.
+ */
+const WritingRail = () => {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    fetchPublishedPosts().then((all) => active && setPosts(all.slice(0, 3)));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (posts.length === 0) return null;
+
+  return (
+    <section className="px-[6%] py-14">
+      <div className="mb-6 flex flex-wrap items-baseline justify-between gap-3">
+        <h2 className="text-2xl font-bold text-white">Recently written</h2>
+        <Link
+          to="/blog"
+          className="text-sm text-white/50 transition-colors hover:text-white"
+        >
+          All posts &rarr;
+        </Link>
+      </div>
+
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => (
+          <li key={post.slug}>
+            <Link
+              to={`/blog/${post.slug}`}
+              className="group flex h-full flex-col justify-between gap-6 rounded-xl bg-zinc-900 p-5 ring-1 ring-white/5 transition-all duration-200 hover:-translate-y-1 hover:ring-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+            >
+              <PenLine className="h-7 w-7 text-[#e50914] transition-transform duration-200 group-hover:scale-110" />
+              <div>
+                <p className="font-semibold leading-snug text-white">{post.title}</p>
+                {post.excerpt && (
+                  <p className="mt-1.5 line-clamp-2 text-sm text-white/50">{post.excerpt}</p>
+                )}
+                <p className="mt-2 text-xs text-white/35">
+                  {new Date(post.publishDate).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </p>
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+};
 
 const StalkerPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -317,6 +380,8 @@ const StalkerPage = () => {
           ))}
         </ul>
       </section>
+
+      <WritingRail />
 
       {/* Fullscreen player */}
       <AnimatePresence>
