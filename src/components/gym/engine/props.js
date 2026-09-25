@@ -985,6 +985,68 @@ export function planter() {
   );
 }
 
+/** A chunky CRT on a low cabinet in the lobby — Goggins TV. */
+export function tvStand() {
+  const w = 30;
+  const h = 30;
+  return place(
+    sprite(w, h, (p) => {
+      // cabinet
+      p.r(1, 20, 28, 9, C.woodLo);
+      p.h(1, 20, 28, C.wood);
+      p.r(4, 23, 10, 4, '#3d2716');
+      p.r(16, 23, 10, 4, '#3d2716');
+      // set
+      p.r(3, 2, 24, 18, '#23262e');
+      p.h(3, 2, 24, '#3a3f4b');
+      p.r(5, 4, 17, 13, '#0b1622');
+      // a glowing picture: a figure at a lectern
+      p.r(6, 5, 15, 11, '#12314a');
+      p.r(12, 7, 3, 3, '#a8704a');
+      p.r(11, 10, 5, 4, '#16181e');
+      p.h(6, 14, 15, '#1d4a6b');
+      p.r(23, 5, 2, 2, '#ff3b4c');
+      p.r(23, 9, 2, 6, '#15171d');
+      p.r(23, 16, 2, 1, '#3ee08f');
+    }),
+    w,
+    h,
+    2,
+    1
+  );
+}
+
+/** A chalkboard A-frame on the sidewalk, where the run club posts its routes. */
+export function runBoard() {
+  const w = 26;
+  const h = 30;
+  return place(
+    sprite(w, h, (p, ctx) => {
+      // A-frame legs
+      p.line(3, 29, 6, 4, C.woodLo);
+      p.line(22, 29, 19, 4, C.woodLo);
+      // frame + board
+      p.r(3, 2, 20, 21, C.wood);
+      p.h(3, 2, 20, C.woodHi);
+      p.r(5, 4, 16, 17, '#1f3a2c');
+      p.r(5, 4, 16, 1, '#2a4d3a');
+      drawText(ctx, 'RUN', 7, 6, '#e9efe9');
+      // chalk route with an orange finish dot
+      p.line(7, 18, 10, 14, '#cfd8cf');
+      p.line(10, 14, 13, 16, '#cfd8cf');
+      p.line(13, 16, 17, 12, '#cfd8cf');
+      p.r(17, 11, 2, 2, '#fc5200');
+      p.r(6, 18, 2, 2, '#3ee08f');
+      p.h(3, 23, 20, C.woodLo);
+    }),
+    w,
+    h,
+    1,
+    1,
+    { dx: 0 }
+  );
+}
+
 export function bike() {
   const w = 26;
   const h = 16;
@@ -1051,5 +1113,7 @@ export function buildProps({ benchPlates, squatPlates, smithPlates, pressPlates,
     trash: trashCan(),
     planter: planter(),
     bike: bike(),
+    runboard: runBoard(),
+    tvstand: tvStand(),
   };
 }

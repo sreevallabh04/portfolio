@@ -3,7 +3,7 @@
  * with the real heaviest set from the log, so the bench bar shows 90 kg of
  * plates because that is the heaviest bench on record.
  */
-import { characters, buildBackSprite, buildCat } from './characters';
+import { characters, buildBackSprite, buildCat, buildGogginsCorner } from './characters';
 import { buildProps } from './props';
 import { buildGym, buildStreet } from './maps';
 import { EXERCISE_BY_ID, platesPerSide } from '../gameData';
@@ -17,7 +17,7 @@ let cache = null;
 
 export function buildAssets() {
   if (cache) return cache;
-  const chars = { ...characters(), cat: buildCat(), sreeBack: buildBackSprite() };
+  const chars = { ...characters(), cat: buildCat(), sreeBack: buildBackSprite(), gogginsCorner: buildGogginsCorner() };
   const props = buildProps({
     benchPlates: platesPerSide(heaviest('bench-press-barbell', 60)),
     squatPlates: platesPerSide(heaviest('squat-barbell', 60)),

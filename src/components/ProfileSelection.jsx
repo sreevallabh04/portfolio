@@ -21,7 +21,7 @@ const PROFILES = [
   {
     id: 'developer',
     name: 'Developer',
-    blurb: 'A gym RPG built from my real training log',
+    blurb: 'A pixel gym built from my real training logs',
     avatar: '/avatars/avatar2.jpeg',
     accent: 'group-hover:ring-emerald-400',
   },
@@ -103,10 +103,6 @@ const ProfileSelection = ({ onProfileSelect }) => {
       >
         <Link to="/blog" className="transition-colors hover:text-white/70">
           Blog
-        </Link>
-        <span aria-hidden="true">&middot;</span>
-        <Link to="/terms" className="transition-colors hover:text-white/70">
-          Terms
         </Link>
         <span aria-hidden="true">&middot;</span>
         <a

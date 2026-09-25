@@ -58,6 +58,12 @@ export class World {
     this.particles = [];
     this.rain = [];
     this.layer = null;
+    // GOGGINS walks one tile behind, HeartGold-style. Not an NPC: he is never
+    // solid, never triggers doors, and moves only when SREE does.
+    this.follower = null;
+    this.barkText = null;
+    this.barkAt = 0;
+    this.barkUntil = 0;
     this.loop = this.loop.bind(this);
   }
 
@@ -135,6 +141,8 @@ export class World {
       wait: 1.5 + Math.random() * 2,
       phase: Math.random() * 10,
     }));
+    this.follower = this.chars.goggins ? this.placeFollower(s) : null;
+    this.barkText = null;
     this.path = null;
     this.zone = this.zoneAt(s.x, s.y);
     this.particles = [];
@@ -152,9 +160,48 @@ export class World {
     } else this.updateFocus();
   }
 
-  /** Holds the victory pose for a moment (the mirror). */
+  /** Holds the victory pose for a moment (the mirror). GOGGINS joins in. */
   flex(ms = 1500) {
     if (this.player) this.player.flexUntil = performance.now() + ms;
+    if (this.follower) this.follower.flexUntil = performance.now() + ms;
+  }
+
+  /** A few words over GOGGINS's head that don't stop the game. */
+  bark(text, ms = 2400) {
+    if (!this.follower || !text) return;
+    this.barkText = String(text).toUpperCase();
+    this.barkAt = performance.now();
+    this.barkUntil = this.barkAt + ms;
+  }
+
+  /**
+   * On a new map he appears on the tile behind the spawn, as if he walked
+   * through the door a step after you, or on the spawn itself if that tile
+   * is taken. Standing on the spawn, he steps out on SREE's first move.
+   */
+  placeFollower(spawn) {
+    const [dx, dy] = DIRS[spawn.dir || 'down'];
+    let x = spawn.x - dx;
+    let y = spawn.y - dy;
+    if (this.blocked(x, y)) {
+      x = spawn.x;
+      y = spawn.y;
+    }
+    return {
+      id: 'goggins',
+      sprite: 'goggins',
+      x,
+      y,
+      px: x * T,
+      py: y * T,
+      dir: spawn.dir || 'down',
+      moving: false,
+      fromX: x,
+      fromY: y,
+      t: 0,
+      running: false,
+      parity: false,
+    };
   }
 
   setStatus(status) {
@@ -214,6 +261,8 @@ export class World {
     if (npc) return { type: 'npc', id: npc.id, npc, name: npc.id };
     const runner = this.npcs.find((n) => n.id === 'runner' && n.x === x && (n.y === y || n.y + 1 === y));
     if (runner) return { type: 'npc', id: runner.id, npc: runner };
+    const f = this.follower;
+    if (f && !f.moving && f.x === x && f.y === y) return { type: 'npc', id: f.id, npc: f, name: f.id };
     const object = this.map.objectAt(x, y);
     if (object) return { type: 'object', id: object.id, object };
     if (y <= 1 && this.map.id === 'gym') return { type: 'wall', id: `wall-${x}`, x };
@@ -270,6 +319,13 @@ export class World {
       if (nx >= n.px && nx < n.px + T && ny >= n.py - 4 + (n.oy || 0) && ny < n.py + T + (n.oy || 0)) {
         hits.push({ sort: n.py + T + 1, footprint: { x: n.x, y: n.y, w: 1, h: n.id === 'runner' ? 2 : 1 } });
       }
+    }
+    // Tapping GOGGINS walks up to him and talks, unless he is standing
+    // under SREE (right after a door), where the tap means "walk here".
+    const f = this.follower;
+    const p = this.player;
+    if (f && !(f.x === p.x && f.y === p.y) && nx >= f.px && nx < f.px + T && ny >= f.py - 4 && ny < f.py + T) {
+      hits.push({ sort: f.py + T + 0.25, footprint: { x: f.x, y: f.y, w: 1, h: 1 } });
     }
     hits.sort((a, b) => b.sort - a.sort);
     const tx = Math.floor(nx / T);
@@ -372,6 +428,8 @@ export class World {
     if (!this.map) return;
     this.updateNpcs(dt);
     this.updateParticles(dt);
+    // The follower first, so on the frame SREE lands he has landed too.
+    this.advanceFollower(dt);
     if (!this.paused) this.updatePlayer(dt);
     else if (this.player.moving) this.advance(dt);
   }
@@ -440,6 +498,54 @@ export class World {
     p.t = 0;
     p.running = !!(this.input?.held.has('b') || this.input?.held.has('run'));
     this.stepParity = !this.stepParity;
+    this.followTo(p.fromX, p.fromY, p.running);
+  }
+
+  /*
+   * GOGGINS steps onto the tile SREE just left, at SREE's pace. Walking back
+   * into him swaps the two of you, since he is never solid.
+   */
+  followTo(tx, ty, running) {
+    const f = this.follower;
+    if (!f) return;
+    if (f.moving) this.settleFollower();
+    if (f.x === tx && f.y === ty) return;
+    const dx = tx - f.x;
+    const dy = ty - f.y;
+    if (Math.abs(dx) + Math.abs(dy) > 1) {
+      // Separated somehow (never on a normal walk): catch up in one hop.
+      Object.assign(f, { x: tx, y: ty, fromX: tx, fromY: ty, px: tx * T, py: ty * T });
+      return;
+    }
+    f.dir = dx < 0 ? 'left' : dx > 0 ? 'right' : dy < 0 ? 'up' : 'down';
+    f.fromX = f.x;
+    f.fromY = f.y;
+    f.x = tx;
+    f.y = ty;
+    f.t = 0;
+    f.moving = true;
+    f.running = running;
+    f.parity = !f.parity;
+  }
+
+  advanceFollower(dt) {
+    const f = this.follower;
+    if (!f || !f.moving) return;
+    f.t += dt / (f.running ? RUN_TIME : WALK_TIME);
+    if (f.t >= 1) {
+      this.settleFollower();
+      return;
+    }
+    f.px = (f.fromX + (f.x - f.fromX) * f.t) * T;
+    f.py = (f.fromY + (f.y - f.fromY) * f.t) * T;
+  }
+
+  settleFollower() {
+    const f = this.follower;
+    f.t = 1;
+    f.moving = false;
+    f.px = f.x * T;
+    f.py = f.y * T;
   }
 
   advance(dt) {
@@ -508,7 +614,9 @@ export class World {
       const inArea = tx >= r.x && tx < r.x + r.w && ty >= r.y && ty < r.y + r.h;
       const p = this.player;
       const playerThere = (p.x === tx && p.y === ty) || (p.fromX === tx && p.fromY === ty && p.moving);
-      if (inArea && !playerThere && !this.blocked(tx, ty)) {
+      const f = this.follower;
+      const followerThere = f && ((f.x === tx && f.y === ty) || (f.moving && f.fromX === tx && f.fromY === ty));
+      if (inArea && !playerThere && !followerThere && !this.blocked(tx, ty)) {
         n.moving = true;
         n.toX = tx;
         n.toY = ty;
@@ -608,6 +716,9 @@ export class World {
     for (const n of this.npcs) {
       drawables.push({ sort: n.py + T + (n.oy || 0) + (n.id === 'runner' ? 12 : 0), draw: () => this.drawNpc(ctx, n, cx, cy) });
     }
+    const f = this.follower;
+    // A hair in front of anything on his row, a hair behind SREE on the same tile.
+    if (f) drawables.push({ sort: f.py + T + 0.25, draw: () => this.drawFollower(ctx, f, cx, cy) });
     const p = this.player;
     drawables.push({
       sort: p.py + T + 0.5,
@@ -636,6 +747,7 @@ export class World {
     ctx.globalCompositeOperation = 'source-over';
 
     this.drawMarkers(ctx, cx, cy);
+    this.drawBark(ctx, cx, cy);
     this.drawRain(ctx, cx, cy);
 
     if (this.fade > 0) {
@@ -648,6 +760,73 @@ export class World {
     ctx.fillStyle = 'rgba(0,0,0,0.32)';
     ctx.fillRect(Math.round(x + 3), Math.round(y + 14), 10, 2);
     ctx.fillRect(Math.round(x + 4), Math.round(y + 13), 8, 4);
+  }
+
+  drawFollower(ctx, f, cx, cy) {
+    const sprites = this.chars.goggins;
+    const frame =
+      f.flexUntil > performance.now() && !f.moving ? sprites.flex : this.characterFrame(sprites, f.dir, f.moving, f.t, f.parity);
+    this.shadow(ctx, f.px - cx, f.py - cy);
+    const hop = f.moving && f.running && f.t < 0.5 ? 1 : 0;
+    ctx.drawImage(frame, Math.round(f.px - cx), Math.round(f.py - cy - 4 - hop));
+  }
+
+  /** The bark: a white speech bubble in the world font, tail down to his head. */
+  drawBark(ctx, cx, cy) {
+    const f = this.follower;
+    if (!f || !this.barkText) return;
+    const left = this.barkUntil - performance.now();
+    if (left <= 0) {
+      this.barkText = null;
+      return;
+    }
+    const text = this.barkText;
+    const w = textWidth(text) + 6;
+    const h = 11;
+    const headX = Math.round(f.px - cx + 8);
+    const headY = Math.round(f.py - cy - 4);
+    // Pops up from his head over the first few frames.
+    const pop = this.reducedMotion ? 0 : Math.max(0, 3 - Math.floor((performance.now() - this.barkAt) / 30));
+    // Straight after a door SREE stands on the tile above him, where the
+    // bubble would cover SREE's head, so it moves to his side instead.
+    const p = this.player;
+    const above = p && Math.abs(p.px - f.px) < T && p.py < f.py && f.py - p.py <= T;
+    const side = !above ? 'up' : headX + 10 + w <= this.viewW - 2 ? 'right' : 'left';
+    let x;
+    let y;
+    if (side === 'up') {
+      // Kept on screen, since he's often at the edge of the camera by a door.
+      x = clamp(headX - Math.round(w / 2), 2, this.viewW - w - 2);
+      y = headY - h - 6 + pop;
+    } else {
+      x = side === 'right' ? headX + 10 : headX - 10 - w;
+      y = headY + 2;
+    }
+    const ink = '#0b0c10';
+    ctx.fillStyle = ink;
+    ctx.fillRect(x - 1, y, w + 2, h);
+    ctx.fillRect(x, y - 1, w, h + 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x, y, w, h);
+    // The tail, drawn over the border so it joins the bubble cleanly.
+    if (side === 'up') {
+      const tx = clamp(headX, x + 3, x + w - 4);
+      ctx.fillStyle = ink;
+      ctx.fillRect(tx - 1, y + h, 4, 2);
+      ctx.fillRect(tx, y + h + 2, 2, 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(tx, y + h, 2, 1);
+      ctx.fillRect(tx, y + h + 1, 1, 1);
+    } else {
+      const edge = side === 'right' ? x - 1 : x + w;
+      const out = side === 'right' ? -1 : 1;
+      ctx.fillStyle = ink;
+      ctx.fillRect(Math.min(edge, edge + out * 2), y + 3, 3, 4);
+      ctx.fillRect(edge + out * 3, y + 4, 1, 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(Math.min(edge, edge + out), y + 4, 2, 2);
+    }
+    drawText(ctx, text, x + 3, y + 3, ink);
   }
 
   drawNpc(ctx, n, cx, cy) {

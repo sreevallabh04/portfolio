@@ -1,16 +1,8 @@
 import React from 'react';
 import { LAYER, useInputLayer } from '../engine/input';
-import { MINIGAME_INFO } from '../engine/minigames';
-import { BADGES_FOR_BOSS } from '../gameData';
+import { LOG } from '../gameData';
 
-const GAMES = [
-  ['meter', 'Barbells & Smith'],
-  ['grind', 'Machines'],
-  ['tempo', 'Cables'],
-  ['control', 'Bodyweight'],
-  ['alternate', 'Dumbbells'],
-];
-
+/** What this page is and how to get around it — short enough to read in one go. */
 export default function HowToPlay({ input, audio, onClose, touch }) {
   useInputLayer(
     input,
@@ -25,13 +17,28 @@ export default function HowToPlay({ input, audio, onClose, touch }) {
     LAYER.menu + 2
   );
 
+  const keys = touch
+    ? [
+        ['D-PAD', 'Walk. Or just tap where you want to go.'],
+        ['A', 'Use a machine, talk, confirm'],
+        ['B', 'Back. Hold while walking to run.'],
+        ['MENU', 'LiftDex, runs, trainer card, TV, sound'],
+      ]
+    : [
+        ['ARROWS / WASD', 'Walk. Or click where you want to go.'],
+        ['Z / SPACE / ENTER', 'Use a machine, talk, confirm'],
+        ['X / ESC', 'Back'],
+        ['SHIFT', 'Run'],
+        ['M', 'Menu'],
+      ];
+
   return (
-    <div className="gym-overlay" role="dialog" aria-label="How to play" onClick={onClose}>
+    <div className="gym-overlay" role="dialog" aria-label="How it works" onClick={onClose}>
       <div className="gym-sheet gym-help px-box" onClick={(e) => e.stopPropagation()}>
         <header className="gym-sheet-head">
           <div>
-            <p className="gym-eyebrow">HOW TO PLAY</p>
-            <h2 className="gym-sheet-title">BEAT THE LOG</h2>
+            <p className="gym-eyebrow">HOW IT WORKS</p>
+            <h2 className="gym-sheet-title">A GYM MADE OF A TRAINING LOG</h2>
           </div>
           <button type="button" className="gym-close" onClick={onClose}>
             A · GOT IT
@@ -39,44 +46,35 @@ export default function HowToPlay({ input, audio, onClose, touch }) {
         </header>
         <div className="gym-help-body">
           <p>
-            Every machine holds the lifts actually logged on it, with the best set on record. Walk up,
-            pick a lift, and try to beat it: <strong>+1 rep</strong>, <strong>+1 plate</strong>, or a{' '}
-            <strong>true max single</strong>. Break enough PRs in a muscle group to earn its badge;
-            {Number.isFinite(BADGES_FOR_BOSS)
-              ? ` ${BADGES_FOR_BOSS} badges and the coach on the platform will see you.`
-              : ' collect them all.'}
+            Everything here is built from {LOG.totals.sessions} real sessions logged in Hevy and the runs synced
+            from Strava. Walk up to any machine and it replays what was lifted on it: the bar loads with that
+            day&apos;s real plates, the top set plays out rep by rep, and you can step through every session to
+            watch the weight climb.
           </p>
           <dl className="gym-help-keys">
-            {touch ? (
-              <>
-                <div><dt>D-PAD</dt><dd>Walk. Or tap anywhere to walk there.</dd></div>
-                <div><dt>A</dt><dd>Use, talk, confirm</dd></div>
-                <div><dt>B</dt><dd>Back. Hold while walking to run.</dd></div>
-                <div><dt>MENU</dt><dd>LiftDex, trainer card, log, sound</dd></div>
-              </>
-            ) : (
-              <>
-                <div><dt>ARROWS / WASD</dt><dd>Walk. Or click anything to walk to it.</dd></div>
-                <div><dt>Z / SPACE / ENTER</dt><dd>Use, talk, confirm</dd></div>
-                <div><dt>X / ESC</dt><dd>Back</dd></div>
-                <div><dt>SHIFT</dt><dd>Run</dd></div>
-                <div><dt>M</dt><dd>Menu</dd></div>
-              </>
-            )}
-          </dl>
-          <p className="gym-eyebrow">EVERY REP IS A MINI-GAME</p>
-          <ul className="gym-help-games">
-            {GAMES.map(([id, kit]) => (
-              <li key={id}>
-                <strong>{MINIGAME_INFO[id].name}</strong>
-                <span className="gym-muted">{kit}</span>
-                <span>{touch ? MINIGAME_INFO[id].touch : MINIGAME_INFO[id].hint}</span>
-              </li>
+            {keys.map(([k, v]) => (
+              <div key={k}>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </div>
             ))}
+          </dl>
+          <ul className="gym-help-games">
+            <li>
+              <strong>★ GOLD STARS</strong>
+              <span>Machines where a new all-time best was set in the log&apos;s last week.</span>
+            </li>
+            <li>
+              <strong>TREADMILLS</strong>
+              <span>The run club: every Strava run, with route maps and splits.</span>
+            </li>
+            <li>
+              <strong>THE LOBBY TV</strong>
+              <span>David Goggins, in his own words, from official uploads on YouTube.</span>
+            </li>
           </ul>
-          <p className="gym-muted">
-            In a set: CHALK widens the target, PRE-WORKOUT slows everything down, SALTS bring stamina
-            back. A missed rep costs stamina; run out and the bar wins.
+          <p className="gym-muted gym-tribute">
+            David Goggins appears as a fan tribute. Not affiliated with or endorsed by him.
           </p>
         </div>
       </div>

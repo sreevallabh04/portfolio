@@ -2,7 +2,7 @@
  * The site's public origin — the single place the domain is defined.
  *
  * It used to be hardcoded in 33 places across 11 files (canonical URLs, OG and
- * Twitter images, JSON-LD, the sitemap, the Terms copy). When the domain
+ * Twitter images, JSON-LD, the sitemap). When the domain
  * lapsed, every one of those pointed at a host that no longer resolved, and
  * moving to a new domain meant a find-and-replace across the whole tree.
  *

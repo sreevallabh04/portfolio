@@ -40,23 +40,9 @@ export const STATIONS = {
   preacher: { name: 'PREACHER CURL', zone: 'pull' },
 };
 
-/*
- * kind decides both the enemy sprite and the rep mini-game:
- *   barbell / smith / ezbar → power meter    stack / plates → grind (mash)
- *   cable → tempo (rhythm)                   dumbbell → alternate (L/R)
- *   bodyweight / weighted → control (hold)
- */
-const MINIGAME_FOR_KIND = {
-  barbell: 'meter',
-  smith: 'meter',
-  ezbar: 'meter',
-  stack: 'grind',
-  plates: 'grind',
-  cable: 'tempo',
-  dumbbell: 'alternate',
-  bodyweight: 'control',
-  weighted: 'control',
-};
+// kind decides how the showcase draws the kit: a loaded barbell (barbell,
+// smith, ezbar), a pinned weight stack (stack, cable), a plate-loaded sled
+// (plates), a pair of dumbbells, or a bar for bodyweight work.
 
 // [station, group, kind, display name]
 const KNOWN = {
@@ -172,48 +158,9 @@ function inferMeta(name, weighted) {
   return [station, group, kind, short];
 }
 
-/* --------------------------------------------------------------- loading */
-
-/** Weight step for a PR attempt, matched to how that kit actually loads. */
-export function incrementFor(kind, weight) {
-  if (kind === 'barbell' || kind === 'smith' || kind === 'ezbar' || kind === 'weighted') return 2.5;
-  if (kind === 'dumbbell') return weight < 10 ? 1 : 2.5;
-  if (kind === 'plates') return weight < 20 ? 2.5 : 5;
-  return weight < 15 ? 2.5 : 5;
-}
-
-const ceilTo = (value, step) => Math.ceil(value / step - 1e-9) * step;
-const round1 = (value) => Math.round(value * 100) / 100;
-
-/**
- * The three PR attempts every lift offers:
- *   ★   one more rep at the heaviest weight
- *   ★★  one weight step up for the same reps
- *   ★★★ a true single at (just above) the estimated max
- * Bodyweight lifts step reps instead.
- */
-export function challengesFor(exercise) {
-  const { best, kind } = exercise;
-  if (!exercise.weighted) {
-    const reps = best.reps;
-    return [
-      { stars: 1, label: '+1 REP', weight: 0, reps: reps + 1 },
-      { stars: 2, label: '+3 REPS', weight: 0, reps: reps + 3 },
-      { stars: 3, label: 'LEGEND', weight: 0, reps: Math.max(reps + 4, Math.ceil(reps * 1.5) + 1) },
-    ];
-  }
-  const step = incrementFor(kind, best.weight);
-  const oneRm = exercise.bestEstimate?.e1rm || best.weight;
-  const max = Math.max(ceilTo(oneRm + step / 2, step), best.weight + step * 2);
-  return [
-    { stars: 1, label: '+1 REP', weight: best.weight, reps: best.reps + 1 },
-    { stars: 2, label: `+${step} KG`, weight: round1(best.weight + step), reps: best.reps },
-    { stars: 3, label: 'MAX OUT', weight: round1(max), reps: 1 },
-  ];
-}
-
 /* --------------------------------------------------------------- plates */
 
+const round1 = (value) => Math.round(value * 100) / 100;
 const PLATE_SIZES = [25, 20, 15, 10, 5, 2.5, 1.25];
 
 /** Plates for one side. Barbells assume a 20 kg bar; under that it's a fixed bar. */
@@ -243,11 +190,9 @@ export const EXERCISES = LOG.exercises
       station,
       group,
       kind: resolvedKind,
-      minigame: MINIGAME_FOR_KIND[resolvedKind] || 'grind',
       short,
     };
   })
-  .map((exercise) => ({ ...exercise, challenges: challengesFor(exercise) }))
   .sort(
     (a, b) =>
       GROUP_RANK[a.group] - GROUP_RANK[b.group] ||
@@ -260,27 +205,14 @@ export const EXERCISE_BY_ID = Object.fromEntries(EXERCISES.map((e) => [e.id, e])
 
 export const exercisesAt = (stationId) => EXERCISES.filter((e) => e.station === stationId);
 
-/** Muscle groups the log actually trained; badges only exist for these. */
-export const ACTIVE_GROUPS = GROUP_ORDER.filter((g) => EXERCISES.some((e) => e.group === g));
-
-export const badgeRequirement = (group) =>
-  Math.min(3, EXERCISES.filter((e) => e.group === group).length);
-
 /* ------------------------------------------------------------------ level */
 
-// Pokémon's "medium fast" curve: level n needs n³ experience. Real training
-// volume in kilograms is the base experience, so the level on the card is
-// earned in the actual gym; PRs in here stack on top.
+// Pokémon's "medium fast" curve: level n needs n³ experience, and the
+// experience is real training volume in kilograms — the level is earned in
+// the actual gym, and the next one comes from lifting, not from this page.
 export const levelForXp = (xp) => Math.max(1, Math.min(100, Math.floor(Math.cbrt(Math.max(1, xp)))));
 export const xpForLevel = (level) => level ** 3;
 export const BASE_XP = Math.round(LOG.totals.volume);
-
-/** XP for landing a PR: the set's tonnage, scaled by how hard the attempt was. */
-export function xpForChallenge(exercise, challenge) {
-  const load = exercise.weighted ? challenge.weight : 60; // bodyweight counted as ~60 kg
-  const multiplier = [0, 2, 3.5, 6][challenge.stars];
-  return Math.max(120, Math.round(load * challenge.reps * multiplier));
-}
 
 /* ------------------------------------------------------------------ stats */
 
@@ -317,28 +249,14 @@ const [busiestHour, minutes] = [...byHour.entries()].sort((x, y) => y[1].length 
 const typicalMinute = [...minutes].sort((x, y) => x - y)[Math.floor(minutes.length / 2)];
 export const TYPICAL_START = `${((busiestHour + 11) % 12) + 1}:${String(typicalMinute).padStart(2, '0')} ${busiestHour >= 12 ? 'PM' : 'AM'}`;
 
-/* ------------------------------------------------------------------- boss */
+/* ------------------------------------------------------------ fresh PRs */
 
-// The gym leader's team: the heaviest lift in legs, chest and back.
-const pickBoss = (predicate, fallbackStars) => {
-  const exercise = bestIn(predicate);
-  return exercise ? { id: exercise.id, stars: fallbackStars } : null;
-};
-
-export const BOSS_TEAM = [
-  EXERCISE_BY_ID['squat-barbell']
-    ? { id: 'squat-barbell', stars: 2 }
-    : pickBoss((e) => e.group === 'legs' && e.weighted, 2),
-  EXERCISE_BY_ID['bench-press-barbell']
-    ? { id: 'bench-press-barbell', stars: 2 }
-    : pickBoss((e) => e.group === 'chest' && e.weighted, 2),
-  EXERCISE_BY_ID['pull-up']
-    ? { id: 'pull-up', stars: 2 }
-    : pickBoss((e) => e.group === 'back', 2),
-].filter(Boolean);
-
-// No boss when the log has nothing to build a team from.
-export const BADGES_FOR_BOSS = BOSS_TEAM.length ? Math.min(3, ACTIVE_GROUPS.length) : Infinity;
+// A lift whose all-time best set came in the last week of the log. These are
+// the stations that get a gold star on the floor.
+const FRESH_DAYS = 7;
+export const isFreshPr = (exercise) =>
+  exercise.sessionCount > 1 && (LOG.totals.lastDate - exercise.best.date) / 86400000 <= FRESH_DAYS;
+export const FRESH_PR_STATIONS = [...new Set(EXERCISES.filter(isFreshPr).map((e) => e.station))];
 
 /* ------------------------------------------------------------- formatting */
 

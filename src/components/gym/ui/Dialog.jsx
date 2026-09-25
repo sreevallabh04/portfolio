@@ -1,9 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useInputLayer, LAYER } from '../engine/input';
+import { GOGGINS_NAME } from '../goggins';
 import Menu from './Menu';
 
 const CHARS_PER_TICK = 2;
 const TICK_MS = 24;
+
+// The typing sound doubles as a voice. GOGGINS gets a low, gruff one.
+const VOICES = { [GOGGINS_NAME]: 'gogginsBlip' };
 
 /**
  * The text box. Pages type out; A (or a tap) finishes the page, then
@@ -17,6 +21,7 @@ export default function Dialog({ dialog, input, audio, onClose }) {
   const typing = shown < text.length;
   const last = page >= pages.length - 1;
   const timer = useRef(0);
+  const voice = VOICES[speaker] || 'blip';
 
   useEffect(() => {
     clearInterval(timer.current);
@@ -24,12 +29,12 @@ export default function Dialog({ dialog, input, audio, onClose }) {
     timer.current = setInterval(() => {
       setShown((n) => {
         const next = Math.min(text.length, n + CHARS_PER_TICK);
-        if (next % 6 < CHARS_PER_TICK) audio?.play('blip');
+        if (next % 6 < CHARS_PER_TICK) audio?.play(voice);
         return next;
       });
     }, TICK_MS);
     return () => clearInterval(timer.current);
-  }, [text, shown >= text.length, audio]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [text, shown >= text.length, audio, voice]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const advance = () => {
     if (typing) {
@@ -80,7 +85,9 @@ export default function Dialog({ dialog, input, audio, onClose }) {
           </div>
         )}
         <button type="button" className="gym-dialog px-box" onClick={advance}>
-          {speaker && <span className="gym-dialog-speaker">{speaker}</span>}
+          {speaker && (
+            <span className={`gym-dialog-speaker ${speaker === GOGGINS_NAME ? 'is-goggins' : ''}`}>{speaker}</span>
+          )}
           <span className="gym-dialog-text">
             {text.slice(0, shown)}
             <span className="gym-ghost" aria-hidden="true">

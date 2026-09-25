@@ -1,0 +1,1020 @@
+/*
+ * PR Quest — the run club: the route map and the Strava log sheet with its
+ * activity replay. Uses the tokens .gym-root defines in gym.css. The map and
+ * the charts are the smooth, vector things on screen (they're meant to read
+ * like a real fitness app's), framed in the same hard pixel boxes as
+ * everything else.
+ *
+ * Several rules pair a class with a gym.css one (.gym-sheet.gym-runlog):
+ * gym.css can load after this file, and these need to win.
+ */
+
+/* ------------------------------------------------------------ route map */
+
+.gym-routemap {
+  position: relative;
+  width: 100%;
+  min-height: 120px;
+  overflow: hidden;
+  background: #15171c;
+}
+
+.gym-routemap-svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.gym-map-label {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  fill: #c9cedb;
+  paint-order: stroke;
+  stroke: #0b0c10;
+  stroke-width: 2.4px;
+}
+
+.gym-routemap.is-animate .gym-route-draw {
+  stroke-dasharray: 1000;
+  animation: gym-route-draw 1.3s cubic-bezier(0.45, 0.05, 0.25, 1) both;
+}
+
+.gym-routemap.is-animate .gym-route-marks {
+  animation: gym-rl-marks-in 0.3s steps(3) 0.9s both;
+}
+
+@keyframes gym-rl-marks-in {
+  from { opacity: 0; }
+}
+
+@keyframes gym-route-draw {
+  from { stroke-dashoffset: 1000; }
+  to { stroke-dashoffset: 0; }
+}
+
+.gym-route-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0.45;
+  animation: gym-route-pulse 1.1s ease-out infinite;
+}
+
+@keyframes gym-route-pulse {
+  from { transform: scale(1); opacity: 0.5; }
+  to { transform: scale(2.6); opacity: 0; }
+}
+
+.gym-routemap-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  text-align: center;
+  background: rgba(10, 11, 14, 0.62);
+}
+
+.gym-routemap-empty .px-font {
+  margin: 0;
+  font-size: 10px;
+  color: var(--text);
+}
+
+.gym-routemap-note {
+  max-width: 34ch;
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- sheet */
+
+.gym-sheet.gym-runlog {
+  width: min(1140px, 100%);
+  max-height: min(860px, calc(100dvh - 32px));
+}
+
+.gym-rl-strava {
+  color: #fc5200;
+}
+
+.gym-rl-top {
+  display: grid;
+  grid-template-columns: minmax(0, 430px) minmax(0, 1fr);
+  border-bottom: 2px solid var(--line);
+}
+
+.gym-rl-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  box-shadow: inset -2px 0 0 var(--line);
+}
+
+.gym-rl-totals > div {
+  padding: 10px 14px 9px;
+  box-shadow: inset -2px -2px 0 #1c1f29;
+}
+
+.gym-rl-totals dt,
+.gym-rl-stats dt,
+.gym-rl-readout dt {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.gym-rl-totals dd {
+  margin: 5px 0 0;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.is-gold {
+  color: var(--gold);
+}
+
+/* Weekly distance */
+
+.gym-rl-weeks {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  padding: 10px 16px 8px;
+}
+
+.gym-rl-weeks figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--muted);
+}
+
+.gym-rl-weeks figcaption b {
+  font-weight: 400;
+  color: var(--text);
+}
+
+.gym-rl-weeks figcaption b.is-gold {
+  color: var(--gold);
+}
+
+.gym-rl-weeks-legend {
+  display: flex;
+  gap: 10px;
+}
+
+.gym-rl-weeks-legend i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 4px;
+}
+
+.gym-rl-weeks-sum {
+  margin-left: auto;
+}
+
+.gym-rl-weeks-plot {
+  position: relative;
+  flex: 1;
+  min-height: 44px;
+  margin-top: 8px;
+}
+
+.gym-rl-weeks-plot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gym-rl-weeks-base {
+  stroke: #333847;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.gym-rl-weeks-now {
+  fill: rgba(255, 204, 61, 0.14);
+}
+
+.gym-rl-weeks-sel {
+  fill: rgba(255, 255, 255, 0.12);
+}
+
+.gym-rl-weeks-tag {
+  position: absolute;
+  top: -2px;
+  transform: translate(-100%, 0);
+  padding: 2px 4px 1px;
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  color: var(--ink);
+  background: var(--gold);
+}
+
+.gym-rl-weeks-axis {
+  position: relative;
+  height: 11px;
+  margin-top: 4px;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--muted);
+}
+
+.gym-rl-weeks-axis span {
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+}
+
+.gym-rl-weeks-axis .is-only-sparse {
+  display: none;
+}
+
+/* Tabs and list */
+
+.gym-tabs.gym-rl-tabs {
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.gym-rl-count {
+  margin-left: 3px;
+  opacity: 0.6;
+}
+
+.gym-rl-keys {
+  margin-left: auto;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--muted);
+}
+
+.gym-sheet-body.gym-rl-body {
+  grid-template-columns: minmax(270px, 340px) minmax(0, 1fr);
+}
+
+/* The names are long and nowrap; keep the grid track from growing to fit them. */
+.gym-rl-list .gym-menu {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.gym-rl-list .gym-menu-item {
+  align-items: center;
+  min-height: 52px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #1c1f29;
+}
+
+.gym-rl-list .gym-menu-label {
+  flex: 1;
+}
+
+.gym-rl-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.gym-rl-row-meta {
+  font-size: 8px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.gym-rl-row-flag {
+  color: var(--red);
+}
+
+.gym-rl-row-name {
+  overflow: hidden;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.gym-rl-row-nums {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  font-size: 8px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.gym-rl-empty {
+  padding: 12px 10px;
+}
+
+/* ---------------------------------------------------------------- detail */
+
+.gym-sheet-detail.gym-rl-pane {
+  gap: 14px;
+}
+
+.gym-rl-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gym-rl-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gym-rl-head-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.gym-rl-date {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.gym-rl-title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+/* The hero: the map (or the splits, with no map) and the live readout. */
+
+.gym-rl-hero {
+  --bw: 2px;
+  position: relative;
+  flex: none;
+  height: 320px;
+  margin: 4px;
+  overflow: hidden;
+  background: #15171c;
+}
+
+.gym-rl-hero > .gym-routemap {
+  position: absolute;
+  inset: 0;
+}
+
+.gym-rl-readout {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, auto));
+  gap: 9px 18px;
+  margin: 0;
+  padding: 10px 12px 9px;
+  background: rgba(11, 12, 16, 0.88);
+  box-shadow: 0 0 0 2px var(--ink), 0 0 0 3px rgba(255, 255, 255, 0.12);
+  pointer-events: none;
+}
+
+.gym-rl-readout dd {
+  margin: 3px 0 0;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.gym-rl-readout dd.is-orange { color: #ff7a33; }
+.gym-rl-readout dd.is-red { color: #ff6b78; }
+
+.gym-rl-readout.is-live dt::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 5px;
+  vertical-align: 1px;
+  background: #fc5200;
+  animation: gym-rl-rec 1s steps(1) infinite;
+}
+
+@keyframes gym-rl-rec {
+  50% { opacity: 0.2; }
+}
+
+.gym-rl-maptag {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  padding: 5px 7px 4px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: #fff;
+  background: #fc5200;
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+/* No map: the readout becomes a strip, the splits fill the rest. */
+.gym-rl-hero.no-map {
+  display: flex;
+  flex-direction: column;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 4px),
+    #14161b;
+}
+
+.gym-rl-hero.no-map .gym-rl-readout {
+  position: static;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 10px;
+}
+
+.gym-rl-nomap {
+  position: absolute;
+  right: 12px;
+  top: 84px;
+  padding: 4px 6px 3px;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--muted);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.gym-rl-skyline {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 0 12px 6px;
+  cursor: ew-resize;
+  touch-action: pan-y;
+}
+
+.gym-rl-skyline svg {
+  position: absolute;
+  inset: 0 0 16px;
+  width: 100%;
+  height: calc(100% - 16px);
+}
+
+.gym-rl-col {
+  fill: #25324f;
+}
+
+.gym-rl-col.is-done {
+  fill: #3b6fd1;
+}
+
+.gym-rl-col.is-best {
+  fill: #5a4a1c;
+}
+
+.gym-rl-col.is-best.is-done {
+  fill: var(--gold);
+}
+
+.gym-rl-col.is-now {
+  fill: #8fb0f2;
+}
+
+.gym-rl-col.is-best.is-now {
+  fill: #ffe08a;
+}
+
+.gym-rl-skyline-line {
+  fill: none;
+  stroke: #fc5200;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.gym-rl-skyline-labels {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 12px;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--muted);
+}
+
+.gym-rl-skyline-labels span {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.gym-rl-skyline-labels span.is-best {
+  color: var(--gold);
+}
+
+.gym-rl-playhead {
+  stroke: #f2f3f7;
+  stroke-width: 1;
+  opacity: 0.75;
+  vector-effect: non-scaling-stroke;
+}
+
+.gym-rl-playhead.is-strong {
+  stroke-width: 2;
+  opacity: 0.9;
+}
+
+/* Replay controls */
+
+.gym-rl-scrub {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: -2px;
+}
+
+.gym-rl-play {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 7px 8px 6px 10px !important;
+  font-family: var(--font-pixel) !important;
+  font-size: 8px !important;
+  color: #fff !important;
+  background: #fc5200 !important;
+  box-shadow: inset 0 -3px 0 #a33500, inset 0 2px 0 #ff8a4d, 0 0 0 2px var(--ink);
+}
+
+.gym-rl-play:hover {
+  filter: brightness(1.1);
+}
+
+.gym-rl-play:active {
+  transform: translateY(2px);
+}
+
+.gym-rl-play > span:nth-of-type(1) {
+  min-width: 6ch;
+}
+
+.gym-rl-play-key {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  font-size: 7px;
+  color: #fc5200;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.gym-rl-scrub-time {
+  flex: none;
+  min-width: 5ch;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.gym-rl-scrub-time:last-child {
+  text-align: right;
+}
+
+.gym-rl-track {
+  position: relative;
+  flex: 1;
+  height: 10px;
+  cursor: pointer;
+  background: #1d2029;
+  box-shadow: 0 0 0 2px var(--ink), 0 0 0 3px #2b2f3c;
+  touch-action: none;
+}
+
+.gym-rl-track-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: #fc5200;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28);
+}
+
+.gym-rl-track-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: rgba(11, 12, 16, 0.55);
+}
+
+.gym-rl-track-knob {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 16px;
+  margin: -8px 0 0 -6px;
+  background: #fff;
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+/* Stats */
+
+.gym-rl-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  margin: 0;
+  background: var(--line);
+  box-shadow: 0 0 0 2px var(--line);
+}
+
+.gym-rl-stats > div {
+  padding: 10px 12px 9px;
+  background: var(--panel);
+}
+
+.gym-rl-stats dd {
+  margin: 5px 0 0;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.gym-rl-sub {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--muted);
+}
+
+.gym-rl-flag {
+  margin: 0;
+  padding: 9px 12px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--muted);
+  background: var(--panel-2);
+  box-shadow: inset 3px 0 0 var(--muted);
+}
+
+.gym-rl-flag .px-font {
+  margin-right: 6px;
+  font-size: 8px;
+  color: var(--text);
+}
+
+.gym-rl-flag.is-suspect {
+  color: #f0c3c7;
+  background: rgba(255, 59, 76, 0.08);
+  box-shadow: inset 3px 0 0 var(--red);
+}
+
+.gym-rl-flag.is-suspect .px-font {
+  color: var(--red);
+}
+
+/* Analysis: stacked profiles on one distance axis */
+
+.gym-rl-analysis {
+  padding: 12px 12px 8px;
+  background: var(--panel-2);
+  box-shadow: inset 0 0 0 2px var(--line);
+}
+
+.gym-rl-analysis-plots {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: ew-resize;
+  touch-action: pan-y;
+}
+
+.gym-rl-profile-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--muted);
+}
+
+.gym-rl-profile-head b {
+  font-weight: 400;
+  color: var(--spark);
+  font-variant-numeric: tabular-nums;
+}
+
+.gym-rl-profile-range {
+  margin-left: auto;
+  font-size: 7px;
+}
+
+.gym-rl-profile-plot {
+  position: relative;
+  height: 52px;
+  margin-top: 6px;
+}
+
+.gym-rl-profile-plot svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.gym-rl-profile-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: var(--spark);
+  box-shadow: 0 0 0 2px var(--ink);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.gym-rl-profile-dot.is-big {
+  width: 9px;
+  height: 9px;
+  background: #fc5200;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--ink);
+}
+
+.gym-rl-spark-grid {
+  stroke: #262a36;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.gym-rl-spark-area {
+  fill: var(--spark);
+  opacity: 0.16;
+}
+
+.gym-rl-spark-line {
+  fill: none;
+  stroke: var(--spark);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.gym-rl-axis {
+  position: relative;
+  height: 12px;
+  margin-top: 10px;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--muted);
+  box-shadow: 0 -1px 0 #2b2f3c;
+}
+
+.gym-rl-axis span {
+  position: absolute;
+  top: 4px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* Splits */
+
+.gym-rl-splits {
+  margin: 0;
+  padding: 12px 12px 10px;
+  background: var(--panel-2);
+  box-shadow: inset 0 0 0 2px var(--line);
+}
+
+.gym-rl-splits figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--muted);
+}
+
+.gym-rl-splits ol {
+  display: grid;
+  gap: 3px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gym-rl-splits li {
+  display: grid;
+  grid-template-columns: 34px 62px minmax(0, 1fr) 54px;
+  align-items: center;
+  gap: 8px;
+  min-height: 18px;
+  font-size: 14px;
+}
+
+.gym-rl-splits li.is-now {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: -4px 0 0 rgba(255, 255, 255, 0.06), 4px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+.gym-rl-split-km {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--muted);
+  text-align: right;
+}
+
+.gym-rl-split-pace {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.gym-rl-split-track {
+  height: 12px;
+}
+
+.gym-rl-split-bar {
+  display: block;
+  height: 100%;
+  background: #3b6fd1;
+  box-shadow: inset 0 2px 0 #6b95e6;
+}
+
+.gym-rl-splits li.is-now .gym-rl-split-bar {
+  background: #8fb0f2;
+}
+
+.gym-rl-splits li.is-best .gym-rl-split-bar {
+  background: var(--gold);
+  box-shadow: inset 0 2px 0 #fff0b3;
+}
+
+.gym-rl-splits li.is-best .gym-rl-split-pace {
+  color: var(--gold);
+}
+
+.gym-rl-split-tag {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--gold);
+}
+
+/* ----------------------------------------------------------- responsive */
+
+@media (max-width: 980px) {
+  .gym-rl-top {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gym-rl-totals {
+    box-shadow: inset 0 -2px 0 var(--line);
+  }
+
+  .gym-rl-weeks-plot {
+    flex: none;
+    height: 48px;
+  }
+}
+
+@media (max-width: 760px) {
+  /* One scroll for the whole sheet, so the header moves out of the way. */
+  .gym-sheet.gym-runlog {
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    touch-action: pan-y;
+  }
+
+  .gym-sheet.gym-runlog .gym-sheet-body.gym-rl-body {
+    flex: none;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: visible;
+  }
+
+  .gym-sheet-list.gym-rl-list {
+    max-height: 212px;
+  }
+
+  .gym-rl-totals > div {
+    padding: 9px 10px 8px;
+  }
+
+  .gym-rl-totals dt {
+    font-size: 7px;
+  }
+
+  .gym-rl-totals dd {
+    font-size: 16px;
+  }
+
+  .gym-rl-weeks {
+    padding: 10px 12px 8px;
+  }
+
+  .gym-rl-weeks-sum {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .gym-rl-weeks-axis span:not(.is-sparse) {
+    display: none;
+  }
+
+  .gym-rl-weeks-axis .is-only-sparse {
+    display: inline;
+  }
+
+  .gym-rl-profile-range {
+    display: none;
+  }
+
+  .gym-tabs.gym-rl-tabs {
+    gap: 6px;
+    padding: 10px 12px;
+  }
+
+  .gym-rl-tabs .gym-tab {
+    padding: 7px 7px 6px;
+  }
+
+  .gym-rl-count,
+  .gym-rl-keys {
+    display: none;
+  }
+
+  .gym-rl-title {
+    font-size: 21px;
+  }
+
+  .gym-rl-hero {
+    height: 250px;
+  }
+
+  .gym-rl-hero.no-map {
+    height: 300px;
+  }
+
+  .gym-rl-readout {
+    left: 8px;
+    top: 8px;
+    gap: 7px 12px;
+    padding: 8px 9px 7px;
+  }
+
+  .gym-rl-readout dt {
+    font-size: 6px;
+  }
+
+  .gym-rl-readout dd {
+    font-size: 14px;
+  }
+
+  .gym-rl-hero.no-map .gym-rl-readout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 8px;
+  }
+
+  .gym-rl-nomap {
+    top: 104px;
+  }
+
+  .gym-rl-play > span:nth-of-type(1) {
+    display: none;
+  }
+
+  .gym-rl-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gym-rl-stats dd {
+    font-size: 17px;
+  }
+
+  .gym-rl-splits li {
+    grid-template-columns: 30px 54px minmax(0, 1fr) 46px;
+    gap: 6px;
+  }
+}

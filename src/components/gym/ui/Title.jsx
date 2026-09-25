@@ -26,8 +26,8 @@ export default function Title({ input, audio, hasSave, onNew, onContinue, onHelp
 
   const items = [
     ...(hasSave ? [{ label: 'CONTINUE', key: 'continue' }] : []),
-    { label: hasSave ? 'NEW GAME' : 'START', key: 'new' },
-    { label: 'HOW TO PLAY', key: 'help' },
+    { label: hasSave ? 'START OVER' : 'START', key: 'new' },
+    { label: 'HOW IT WORKS', key: 'help' },
     { label: 'LEAVE', key: 'exit' },
   ];
 
@@ -40,8 +40,9 @@ export default function Title({ input, audio, hasSave, onNew, onContinue, onHelp
           <span className="gym-logo-quest">QUEST</span>
         </h1>
         <p className="gym-title-sub">
-          A gym RPG built from {LOG.totals.sessions} real workouts logged in Hevy, {monthYear(LOG.totals.firstDate)} –{' '}
-          {monthYear(LOG.totals.lastDate)}. Every machine holds a personal record. Beat it.
+          A walk-around gym built from {LOG.totals.sessions} real workouts logged in Hevy and every run synced
+          from Strava, {monthYear(LOG.totals.firstDate)} – {monthYear(LOG.totals.lastDate)}. Every machine replays
+          what was lifted on it.
         </p>
         {open ? (
           <div className="gym-title-menu px-box">

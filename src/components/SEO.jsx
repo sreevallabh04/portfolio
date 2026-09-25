@@ -17,7 +17,8 @@ const SEO = ({
   section,
   isArticle = false
 }) => {
-  const fullTitle = `${title} | Sreevallabh Kakarala`;
+  // The bare site name is used as-is; anything else gets the name appended.
+  const fullTitle = !title || title === 'Sreevallabh Kakarala' ? 'Sreevallabh Kakarala' : `${title} | Sreevallabh Kakarala`;
   const canonicalUrl = absolute(url);
   const imageUrl = absolute(image);
 

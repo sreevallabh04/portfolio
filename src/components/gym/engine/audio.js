@@ -70,7 +70,9 @@ export function createAudio({ muted = false, music = true } = {}) {
   let musicOn = music;
   let current = null;
   let timer = 0;
-  let hiddenSuspended = false;
+  // Why the context is held off: 'hidden' (tab in the background), 'tv'
+  // (Goggins is talking). Sound only comes back when every reason is gone.
+  const holds = new Set();
 
   function ensure() {
     if (typeof window === 'undefined') return null;
@@ -92,7 +94,7 @@ export function createAudio({ muted = false, music = true } = {}) {
       const data = noiseBuffer.getChannelData(0);
       for (let i = 0; i < length; i++) data[i] = Math.random() * 2 - 1;
     }
-    if (ctx.state === 'suspended' && !hiddenSuspended) ctx.resume().catch(() => {});
+    if (ctx.state === 'suspended' && !holds.size) ctx.resume().catch(() => {});
     return ctx;
   }
 
@@ -132,6 +134,34 @@ export function createAudio({ muted = false, music = true } = {}) {
 
   const arp = (notes, step = 0.07, opts = {}) =>
     notes.forEach((n, i) => tone({ f: freq(n), at: i * step, d: step * 1.6, ...opts }));
+
+  /*
+   * A chiptune horn: a sawtooth that scoops up into the note, through a
+   * low-pass that snaps open on the attack ("blat") and closes as it rings.
+   */
+  function brass({ f, at = 0, d = 0.3, v = 0.08, bus }) {
+    const c = ensure();
+    if (!c || !f) return;
+    const start = c.currentTime + at;
+    const osc = c.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(f * 0.94, start);
+    osc.frequency.exponentialRampToValueAtTime(f, start + 0.035);
+    const filter = c.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.Q.value = 3;
+    filter.frequency.setValueAtTime(f * 1.2, start);
+    filter.frequency.exponentialRampToValueAtTime(f * 7, start + 0.045);
+    filter.frequency.exponentialRampToValueAtTime(f * 2, start + d);
+    const gain = c.createGain();
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(v, start + 0.018);
+    gain.gain.setValueAtTime(v, start + d * 0.55);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + d);
+    osc.connect(filter).connect(gain).connect(bus || sfxBus);
+    osc.start(start);
+    osc.stop(start + d + 0.03);
+  }
 
   const SFX = {
     blip: () => tone({ f: 1320, d: 0.025, v: 0.05 }),
@@ -180,6 +210,24 @@ export function createAudio({ muted = false, music = true } = {}) {
     pr: () => {
       arp(['C5', 'G5', 'C6', 'E6', 'G6', 'C7'], 0.07, { v: 0.12 });
       noise({ at: 0.4, d: 0.5, v: 0.08, filter: 'highpass', cutoff: 6000 });
+    },
+    // GOGGINS's "voice" in the text box: a low, rough blip with a little
+    // pitch wobble instead of the usual high beep. Deliberately not speech.
+    gogginsBlip: () => {
+      const f = 130 + Math.random() * 45;
+      tone({ f, f2: f * 0.78, d: 0.055, v: 0.08, type: 'sawtooth' });
+      tone({ f: f / 2, d: 0.05, v: 0.07, type: 'square' });
+    },
+    // STAY HARD: two hits, a short minor stab on a kick, then a longer brass
+    // chord on a bigger kick with a crash.
+    stayHard: () => {
+      tone({ f: 170, f2: 42, d: 0.16, v: 0.5, type: 'sine' });
+      noise({ d: 0.1, v: 0.22, filter: 'bandpass', cutoff: 1400 });
+      ['D3', 'A3', 'D4', 'F4'].forEach((n) => brass({ f: freq(n), d: 0.14, v: 0.055 }));
+      tone({ f: 170, f2: 38, at: 0.19, d: 0.3, v: 0.55, type: 'sine' });
+      noise({ at: 0.19, d: 0.12, v: 0.25, filter: 'bandpass', cutoff: 1400 });
+      noise({ at: 0.19, d: 0.6, v: 0.12, filter: 'highpass', cutoff: 5000 });
+      ['A#2', 'F3', 'A#3', 'D4'].forEach((n) => brass({ f: freq(n), at: 0.19, d: 0.62, v: 0.06 }));
     },
   };
 
@@ -273,13 +321,13 @@ export function createAudio({ muted = false, music = true } = {}) {
       musicOn = value;
       if (musicBus && ctx) musicBus.gain.setTargetAtTime(value ? 1 : 0, ctx.currentTime, 0.05);
     },
-    suspend() {
-      hiddenSuspended = true;
+    suspend(reason = 'hidden') {
+      holds.add(reason);
       ctx?.suspend().catch(() => {});
     },
-    resume() {
-      hiddenSuspended = false;
-      if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+    resume(reason = 'hidden') {
+      holds.delete(reason);
+      if (!holds.size && ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
     },
     close() {
       clearInterval(timer);

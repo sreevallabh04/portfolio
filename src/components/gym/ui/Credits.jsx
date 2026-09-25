@@ -68,6 +68,9 @@ export default function Credits({ input, audio, onClose }) {
             <div><dt>MOVED</dt><dd>{formatVolume(t.volume)}</dd></div>
           </dl>
           <p className="gym-credits-end">Logged in Hevy. Lifted for real. Thanks for playing.</p>
+          <p className="gym-tribute">
+            David Goggins appears as a fan tribute. Not affiliated with or endorsed by him.
+          </p>
           <button type="button" className="gym-press-start px-font" onClick={onClose}>
             BACK TO THE GYM
           </button>

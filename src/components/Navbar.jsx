@@ -11,7 +11,7 @@ const VALID_PROFILES = ['recruiter', 'developer', 'stalker', 'fitness'];
 const BROWSE_ITEMS = [
   { to: '/browse/recruiter', label: 'Portfolio', hint: 'Experience, research and projects' },
   { to: '/browse/recruiter/projects', label: 'All Projects', hint: 'Filterable project catalogue' },
-  { to: '/browse/developer', label: 'PR Quest', hint: 'A gym RPG built from real training logs' },
+  { to: '/browse/developer', label: 'PR Quest', hint: 'A pixel gym built from real training logs' },
   { to: '/browse/stalker', label: 'The Trailer', hint: 'HopeCore and every social link' },
   { to: '/browse/fitness', label: '75 Hard', hint: 'The training block, in full' },
   { to: '/skills', label: 'Skills', hint: 'The AI engineering stack' },

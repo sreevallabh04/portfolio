@@ -1,6 +1,5 @@
 import React from 'react';
-import { GROUPS, STATIONS, formatDate, formatKg, formatSet, formatVolume } from '../gameData';
-import { starsFor } from '../save';
+import { GROUPS, STATIONS, formatDate, formatKg, formatSet, formatVolume, isFreshPr } from '../gameData';
 
 export const dexNo = (n) => `#${String(n).padStart(3, '0')}`;
 
@@ -43,9 +42,9 @@ function History({ exercise }) {
   );
 }
 
-export default function ExerciseDetail({ exercise, save, showStation = false }) {
+export default function ExerciseDetail({ exercise, showStation = false }) {
   const group = GROUPS[exercise.group];
-  const stars = starsFor(save, exercise.id);
+
   return (
     <div className="gym-detail">
       <div className="gym-detail-head">
@@ -58,7 +57,7 @@ export default function ExerciseDetail({ exercise, save, showStation = false }) 
       <p className="gym-detail-sub">
         {exercise.name}
         {showStation && <> · {STATIONS[exercise.station]?.name}</>}
-        {stars > 0 && <span className="gym-caught"> · PR BROKEN {'★'.repeat(stars)}</span>}
+        {isFreshPr(exercise) && <span className="gym-caught"> · ★ NEW BEST THIS WEEK</span>}
       </p>
       <dl className="gym-stats">
         <div>

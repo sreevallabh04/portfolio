@@ -161,6 +161,122 @@ const PATCHES = {
   },
 };
 
+/*
+ * GOGGINS, the walking partner. He gets his own body rather than a recolour
+ * of the shared template: a bald dome instead of hair volume, a thick neck
+ * running straight into the traps, two-pixel arms, and shoulders one pixel
+ * wider on each side than everyone else, so he reads as the biggest person
+ * in the room at 16×20. H/W are the shine on the scalp, g the beard.
+ */
+const GOGGINS_DOWN = [
+  R(0),
+  R(5, 'sHHsss'),
+  R(4, 'sHWHsssS'),
+  R(4, 'sHHssssS'),
+  R(4, 'sssssssS'),
+  R(3, 'SsggssggsS'),
+  R(3, 'SsweSSewsS'),
+  R(4, 'sssSSssS'),
+  R(4, 'gsggggsg'),
+  R(3, 'ssggggggss'),
+  R(2, 'ssstSSSStsss'),
+  R(2, 'sSttuSSuttSs'),
+  R(2, 'sSttttttttSs'),
+  R(2, 'sSTttttttTSs'),
+  R(2, 'SSbbbbbbbbSS'),
+  R(4, 'bbbBBbbb'),
+];
+
+const GOGGINS_UP = [
+  R(0),
+  R(5, 'sHHsss'),
+  R(4, 'sHWHsssS'),
+  R(4, 'sHHssssS'),
+  R(4, 'sssssssS'),
+  R(3, 'SssssssssS'),
+  R(3, 'SssssssssS'),
+  R(4, 'ssssssSS'),
+  R(4, 'gSssssSg'),
+  R(3, 'ssSSSSSSss'),
+  R(2, 'sssttttttsss'),
+  R(2, 'sSttttttttSs'),
+  R(2, 'sSttttttttSs'),
+  R(2, 'sSTttttttTSs'),
+  R(2, 'SSbbbbbbbbSS'),
+  R(4, 'bbbBBbbb'),
+];
+
+const GOGGINS_LEFT = [
+  R(0),
+  R(6, 'HHss'),
+  R(5, 'HWHsss'),
+  R(4, 'sHHssssS'),
+  R(4, 'ssssssssS'),
+  R(3, 'ggsssssssS'),
+  R(3, 'sesssSsssS'),
+  R(2, 'ssssssSSssS'),
+  R(3, 'ggssggsssS'),
+  R(3, 'gggggsSSs'),
+  R(4, 'ttsssttT'),
+  R(4, 'ttssSttT'),
+  R(4, 'TtssSttT'),
+  R(4, 'TtsSSttT'),
+  R(4, 'bbSSSbbb'),
+  R(4, 'bbbbbbBb'),
+];
+
+// Side-view arm swing: forward past the chest, then back past the lats.
+const GOGGINS_LEFT_ARMS = {
+  stepA: [R(4, 'tssStttT'), R(3, 'ssStttttT'), R(2, 'SSSttttttT')],
+  stepB: [R(4, 'tttssStT'), R(4, 'TtttssST'), R(4, 'TttttSSSS')],
+};
+
+const GOGGINS_LEGS = {
+  down: {
+    stand: [R(4, 'sss..sss'), R(4, 'fff..fff'), R(4, 'FFF..FFF'), R(0)],
+    stepA: [R(4, 'sss..sss'), R(4, 'fff..FFF'), R(4, 'FFF'), R(0)],
+    stepB: [R(4, 'sss..sss'), R(4, 'FFF..fff'), R(9, 'FFF'), R(0)],
+  },
+  left: {
+    stand: [R(5, 'ssss'), R(4, 'fffff'), R(4, 'FFFFF'), R(0)],
+    stepA: [R(4, 'sss.sss'), R(3, 'ffff.fff'), R(3, 'FFFF.FFF'), R(0)],
+    stepB: [R(4, 'sss.sss'), R(3, 'ffff.fff'), R(3, 'FFFF.FFF'), R(0)],
+  },
+};
+
+// Front double biceps. The mirror gets two of them.
+const GOGGINS_FLEX = [
+  R(0),
+  R(5, 'sHHsss'),
+  R(4, 'sHWHsssS'),
+  R(4, 'sHHssssS'),
+  R(0, 'SS..sssssssS..SS'),
+  R(0, 'ss.SsggssggsS.ss'),
+  R(0, 'sS.SsweSSewsS.Ss'),
+  R(0, 'sS..sssSSssS..Ss'),
+  R(0, '.sS.gsggggsg.Ss.'),
+  R(0, '.sSsssggggggsSs.'),
+  R(1, 'sSsstSSSStssSs'),
+  R(2, 'ssttuSSuttss'),
+  R(3, 'tTttttttTt'),
+  R(4, 'TttttttT'),
+  R(4, 'bbbbbbbb'),
+  R(4, 'bbbBBbbb'),
+  R(4, 'sss..sss'),
+  R(4, 'fff..fff'),
+  R(4, 'FFF..FFF'),
+  R(0),
+];
+
+export const GOGGINS_TEMPLATES = {
+  down: GOGGINS_DOWN,
+  up: GOGGINS_UP,
+  left: GOGGINS_LEFT,
+  leftArms: GOGGINS_LEFT_ARMS,
+  legs: GOGGINS_LEGS,
+  flex: GOGGINS_FLEX,
+};
+
 function frame(topRows, legRows, palette, patches, facing) {
   const grid = toGrid([...topRows, ...legRows]);
   for (const [name, options] of patches) PATCHES[name]?.(grid, facing, options);
@@ -169,28 +285,30 @@ function frame(topRows, legRows, palette, patches, facing) {
 
 /**
  * Builds { down:[stand,stepA,stepB], up:[...], left:[...], right:[...], flex }.
- * `accessories` is a list of [patchName, options].
+ * `accessories` is a list of [patchName, options]; `templates` swaps in a
+ * different body (see GOGGINS_TEMPLATES) for anyone who isn't the default build.
  */
-export function buildCharacter(palette, accessories = []) {
+export function buildCharacter(palette, accessories = [], templates = {}) {
   const fullPalette = { e: '#120e14', w: '#ffffff', ...palette };
+  const tpl = { down: DOWN_TOP, up: UP_TOP, left: LEFT_TOP, leftArms: LEFT_ARMS, legs: LEGS, flex: FLEX, ...templates };
   const leftTop = (arms) => {
-    if (!arms) return LEFT_TOP;
-    return [...LEFT_TOP.slice(0, 11), ...arms, ...LEFT_TOP.slice(14)];
+    if (!arms) return tpl.left;
+    return [...tpl.left.slice(0, 11), ...arms, ...tpl.left.slice(14)];
   };
 
   const down = ['stand', 'stepA', 'stepB'].map((f) =>
-    frame(DOWN_TOP, LEGS.down[f], fullPalette, accessories, 'down')
+    frame(tpl.down, tpl.legs.down[f], fullPalette, accessories, 'down')
   );
   const up = ['stand', 'stepA', 'stepB'].map((f) =>
-    frame(UP_TOP, LEGS.down[f], fullPalette, accessories, 'up')
+    frame(tpl.up, tpl.legs.down[f], fullPalette, accessories, 'up')
   );
   const left = [
-    frame(leftTop(null), LEGS.left.stand, fullPalette, accessories, 'left'),
-    frame(leftTop(LEFT_ARMS.stepA), LEGS.left.stepA, fullPalette, accessories, 'left'),
-    frame(leftTop(LEFT_ARMS.stepB), LEGS.left.stepB, fullPalette, accessories, 'left'),
+    frame(leftTop(null), tpl.legs.left.stand, fullPalette, accessories, 'left'),
+    frame(leftTop(tpl.leftArms.stepA), tpl.legs.left.stepA, fullPalette, accessories, 'left'),
+    frame(leftTop(tpl.leftArms.stepB), tpl.legs.left.stepB, fullPalette, accessories, 'left'),
   ];
   const right = left.map(flipX);
-  const flexGrid = toGrid(FLEX);
+  const flexGrid = toGrid(tpl.flex);
   for (const [name, options] of accessories) PATCHES[name]?.(flexGrid, 'down', options);
   const flex = outline(fromRows(toRows(flexGrid), fullPalette), fullPalette.o || '#0b0c10');
   return { down, up, left, right, flex };
@@ -232,6 +350,15 @@ export const PALETTES = {
     t: '#2e5c8a', T: '#1e4163', u: '#4379ad',
     b: '#2a5480', B: '#1b3a5b', f: '#1c1c20', F: '#0e0e10',
   },
+  // Bald, so the "hair" is skin; H and W are the shine on the scalp. The
+  // black kit is lifted off pure black so it still separates from the outline.
+  goggins: {
+    h: '#744630', H: '#a0694a', W: '#dcaa85', s: '#744630', S: '#51301f', g: '#17100d',
+    e: '#0c0909', w: '#efe9df',
+    t: '#2c2f38', T: '#1c1e25', u: '#3f4350',
+    b: '#23262e', B: '#17191f', f: '#3b3f4b', F: '#22242b',
+    m: '#3b1614', n: '#e7e0d3',
+  },
 };
 
 export const CHARACTER_SPECS = {
@@ -242,13 +369,17 @@ export const CHARACTER_SPECS = {
   curler: [PALETTES.curler, []],
   runner: [PALETTES.runner, [['ponytail']]],
   janitor: [PALETTES.janitor, [['cap']]],
+  goggins: [PALETTES.goggins, [], GOGGINS_TEMPLATES],
 };
 
 let cache = null;
 export function characters() {
   if (!cache) {
     cache = Object.fromEntries(
-      Object.entries(CHARACTER_SPECS).map(([id, [palette, acc]]) => [id, buildCharacter(palette, acc)])
+      Object.entries(CHARACTER_SPECS).map(([id, [palette, acc, templates]]) => [
+        id,
+        buildCharacter(palette, acc, templates),
+      ])
     );
   }
   return cache;
@@ -329,4 +460,75 @@ export function buildBackSprite(palette = PALETTES.sree) {
     if (grid[y][x] === 'H') grid[y][x] = 'h';
   });
   return outline(fromRows(grid.map((r) => r.join('')), { e: '#120e14', ...palette }), '#0b0c10');
+}
+
+/*
+ * GOGGINS in your corner during a battle: waist up, facing the camera, at
+ * the same 2× the back view of SREE is drawn at so the two read as one team.
+ * Arms crossed while you lift; a fist in the air and the mouth open when he
+ * has something to say.
+ */
+const GOGGINS_CORNER = {
+  idle: [
+    '.........HHssss.........',
+    '.......sHWHssssss.......',
+    '......sHHHsssssssS......',
+    '......sHHssssssssS......',
+    '......ssssssssssSS......',
+    '.....SsggssssssggsS.....',
+    '.....SssgggSSgggssS.....',
+    '.....SsswesSSsewssS.....',
+    '.....SssssSssSssssS.....',
+    '......ssggSSSSggss......',
+    '......gsggggggggsg......',
+    '......ggggmmmmgggg......',
+    '.......gggggggggg.......',
+    '....ssssSggggggSssss....',
+    '.ssssssttSSSSSSttssssss.',
+    '.sssssStttSSSStttSsssss.',
+    '.ssssSttuuttttuuttSssss.',
+    '.ssssSttttttttttttSssss.',
+    '.SssssssssssssssssSssss.',
+    '.SsSSSSSSSSSSSSSsssSsss.',
+    '.SssssssssssssssssssssS.',
+    '..SSSSSSSSSSSSSSSSSSSS..',
+    '..TttttttttttttttttttT..',
+    '..TttttttttttttttttttT..',
+    '..TTttttttttttttttttTT..',
+    '..bbbbbbbbbbbbbbbbbbbb..',
+  ],
+  shout: [
+    '.........HHssss.........',
+    '.......sHWHssssss.......',
+    '......sHHHsssssssS......',
+    '.SSSS.sHHssssssssS......',
+    '.Ssss.ssssssssssSS......',
+    '.SsssSsggssssssggsS.....',
+    '.SSSSSssgggSSgggssS.....',
+    '..ss.SsswesSSsewssS.....',
+    '..ss.SssssSssSssssS.....',
+    '..ss..ssggSSSSggss......',
+    '.Sss..gsggggggggsg......',
+    '.Sss..gggmnnnnmggg......',
+    '.Sss...ggmmmmmmgg.......',
+    '.SssssssSggggggSssss....',
+    '.ssssssttSSSSSSttssssss.',
+    '.sssssStttSSSStttSsssss.',
+    '.ssssSttuuttttuuttSssss.',
+    '..TtttttttttttttttSssss.',
+    '..TtttttttttttttttSssss.',
+    '..TtttttttttttttttSssss.',
+    '..TtttttttttttttttSssss.',
+    '..Tttttttttttttttttssss.',
+    '..TttttttttttttttttSSSS.',
+    '..TttttttttttttttttttT..',
+    '..TTttttttttttttttttTT..',
+    '..bbbbbbbbbbbbbbbbbbbb..',
+  ],
+};
+
+export function buildGogginsCorner(palette = PALETTES.goggins) {
+  const full = { e: '#120e14', w: '#ffffff', ...palette };
+  const make = (rows) => outline(fromRows(rows, full), '#0b0c10');
+  return { idle: make(GOGGINS_CORNER.idle), shout: make(GOGGINS_CORNER.shout) };
 }

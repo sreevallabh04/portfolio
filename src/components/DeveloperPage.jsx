@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import GymGame from './gym/GymGame';
 import { EXERCISES, LOG, formatDate, formatSet } from './gym/gameData';
+import { RUNS, TOTALS as RUN_TOTALS, formatKm } from '@/lib/strava';
 
 /**
- * /browse/developer — PR Quest, a gym RPG built from the Hevy training log in
- * src/data/workouts.csv. The game is canvas and pixel UI; the hidden summary
+ * /browse/developer — PR Quest, a walk-around pixel gym built from the Hevy log
+ * in src/data/workouts.csv and the Strava summary in src/data/strava.json. The game is canvas and pixel UI; the hidden summary
  * below carries the same records as plain text for screen readers and search.
  */
 export default function DeveloperPage() {
@@ -32,12 +33,13 @@ export default function DeveloperPage() {
       </Helmet>
 
       <section className="gym-sr" aria-label="Training records">
-        <h1>PR Quest — a gym RPG built from Sreevallabh&apos;s training log</h1>
+        <h1>PR Quest — a pixel gym built from Sreevallabh&apos;s training logs</h1>
         <p>
           {LOG.totals.sessions} sessions logged in Hevy between {formatDate(LOG.totals.firstDate)} and{' '}
           {formatDate(LOG.totals.lastDate)}: {LOG.totals.sets} sets, {LOG.totals.reps} reps,{' '}
-          {Math.round(LOG.totals.volume).toLocaleString('en-US')} kg lifted. Each machine in the game holds
-          the best set below; the game asks you to beat it.
+          {Math.round(LOG.totals.volume).toLocaleString('en-US')} kg lifted, plus {RUNS.length} runs ({formatKm(RUN_TOTALS.byType.Run?.distance || 0, 1)}) synced
+          from Strava. Each machine in the gym replays
+          the sessions logged on it; the best set for every lift is below.
         </p>
         <table>
           <thead>

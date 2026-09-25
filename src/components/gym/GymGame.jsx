@@ -4,25 +4,19 @@ import { buildAssets } from './engine/assets';
 import { createAudio } from './engine/audio';
 import { createInput, LAYER } from './engine/input';
 import { World } from './engine/world';
-import {
-  BOSS_TEAM,
-  EXERCISE_BY_ID,
-  GROUPS,
-  STATIONS,
-  TYPICAL_START,
-  exercisesAt,
-  xpForChallenge,
-} from './gameData';
-import { badgesEarned, bossUnlocked, freshSave, loadSave, starsFor, totalXp, writeSave } from './save';
+import { EXERCISE_BY_ID, FRESH_PR_STATIONS, TYPICAL_START, exercisesAt } from './gameData';
+import { freshSave, loadSave, writeSave } from './save';
+import { GOGGINS_NAME, gogginsBark, gogginsLine, gogginsSay, gogginsSession } from './goggins';
 import { focusLabel, introLines, runInteraction } from './scripts';
-import Battle from './Battle';
+import Showcase from './Showcase';
 import Credits from './ui/Credits';
 import Dialog from './ui/Dialog';
+import GogginsTV from './ui/GogginsTV';
 import HowToPlay from './ui/HowToPlay';
 import Hud from './ui/Hud';
 import LiftDex from './ui/LiftDex';
 import Menu from './ui/Menu';
-import StationSheet from './ui/StationSheet';
+import RunLog from './ui/RunLog';
 import Title from './ui/Title';
 import TouchControls from './ui/TouchControls';
 import TrainerCard from './ui/TrainerCard';
@@ -42,10 +36,11 @@ export default function GymGame() {
   const saveRef = useRef(save);
   const [audio] = useState(() => createAudio({ muted: save.muted, music: save.music }));
 
+  // title → play ⇄ showcase / credits
   const [phase, setPhase] = useState('title');
   const [dialog, setDialog] = useState(null);
   const [overlay, setOverlay] = useState(null);
-  const [battle, setBattle] = useState(null);
+  const [showcase, setShowcase] = useState(null);
   const [focus, setFocus] = useState(null);
   const [toast, setToast] = useState(null);
   const [touch, setTouch] = useState(coarsePointer);
@@ -58,6 +53,8 @@ export default function GymGame() {
   const busy = useRef(false);
   const handlers = useRef({});
   const toastTimer = useRef(0);
+  // GOGGINS says his piece walking in the doors once per session, not every time.
+  const gogginsGreeted = useRef(false);
   const phaseRef = useRef(phase);
   useLayoutEffect(() => {
     phaseRef.current = phase;
@@ -112,71 +109,34 @@ export default function GymGame() {
     toastTimer.current = setTimeout(() => setToast(null), 2200);
   }, []);
 
-  /* ---------------------------------------------------------- battles */
+  /* --------------------------------------------------------- showcase */
 
-  const startBattle = useCallback(
-    (team, { boss = false } = {}) => {
-      const s = saveRef.current;
-      const repeat = !boss && team.every(({ exercise, challenge }) => starsFor(s, exercise.id) >= challenge.stars);
-      const raw = team.reduce((sum, { exercise, challenge }) => sum + xpForChallenge(exercise, challenge), 0);
-      const xpGain = Math.round(boss ? raw * 1.5 : repeat ? raw * 0.25 : raw);
-      audio.play('encounter');
+  /** Opens a machine: the replay of its lifts, starting from `exercise`. */
+  const openShowcase = useCallback(
+    (stationId, exercise) => {
+      const exercises = exercisesAt(stationId);
+      if (!exercises.length) return;
+      audio.play('select');
       setOverlay(null);
-      setDialog(null);
-      dialogRef.current = null;
-      setBattle({ team, boss, repeat, xpGain, xpBefore: totalXp(s), chalkBonus: s.chalkBonus || 0, key: Date.now() });
-      setPhase('battle');
+      setShowcase({ stationId, exercises, exercise: exercise || exercises[0], key: Date.now() });
+      setPhase('showcase');
     },
     [audio]
   );
 
-  const startBoss = useCallback(() => {
-    const team = BOSS_TEAM.map(({ id, stars }) => {
-      const exercise = EXERCISE_BY_ID[id];
-      return { exercise, challenge: exercise.challenges[stars - 1] };
-    });
-    startBattle(team, { boss: true });
-  }, [startBattle]);
+  const closeShowcase = useCallback(() => {
+    setShowcase(null);
+    setPhase('play');
+  }, []);
 
-  const onBattleFinish = useCallback(
-    async ({ outcome, perfects }) => {
-      const config = battle;
-      const before = badgesEarned(saveRef.current);
-      const wasUnlocked = bossUnlocked(saveRef.current);
-      const next = commit((prev) => {
-        const base = { ...prev, chalkBonus: 0, battles: (prev.battles || 0) + 1, perfects: (prev.perfects || 0) + perfects };
-        if (outcome !== 'win') return base;
-        const prs = { ...prev.prs };
-        const today = new Date().toISOString();
-        if (!config.boss) {
-          for (const { exercise, challenge } of config.team) {
-            if ((prs[exercise.id]?.stars || 0) < challenge.stars) prs[exercise.id] = { stars: challenge.stars, date: today };
-          }
-        }
-        return { ...base, prs, xp: (prev.xp || 0) + config.xpGain, bossBeaten: prev.bossBeaten || config.boss };
-      });
-      setBattle(null);
-      setPhase('play');
-      audio.music(worldRef.current?.map?.music || 'gym');
-
-      if (outcome !== 'win') return;
-      const earned = badgesEarned(next).filter((g) => !before.includes(g));
-      busy.current = true;
-      for (const group of earned) {
-        audio.play('badge');
-        await say([`SREE earned the ${GROUPS[group].badge}!`, `Every ${GROUPS[group].name} PR on the board counts toward it.`]);
-      }
-      if (!wasUnlocked && bossUnlocked(next) && !next.bossBeaten) {
-        await say(['Word travels fast in a small gym.', 'COACH wants to see you on the platform.']);
-      }
-      if (config.boss) {
-        await say(["COACH nods once. That's the whole speech.", 'Roll the credits.']);
-        setPhase('credits');
-      }
-      busy.current = false;
-    },
-    [audio, battle, commit, say]
-  );
+  // Goggins' commentary in the showcase: a line when it opens, then only when
+  // the timeline lands somewhere worth a word (the best, the first session,
+  // a comeback, a new heaviest). Ordinary sessions stay quiet.
+  const showcaseLine = useCallback((context, { exercise, session } = {}) => {
+    if (context === 'showcase') return gogginsSay('showcase', { exercise });
+    const line = gogginsSession(exercise, session.index);
+    return line.context === 'showcase' ? null : line;
+  }, []);
 
   /* ------------------------------------------------------------ world */
 
@@ -195,12 +155,11 @@ export default function GymGame() {
         return worldRef.current;
       },
       open: (name) => setOverlay(name),
-      openStation: (id) => setOverlay({ station: id }),
-      startBoss,
+      openStation: (id) => openShowcase(id),
       credits: () => setPhase('credits'),
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [say, ask, commit, audio, navigate, startBoss]
+    [say, ask, commit, audio, navigate, openShowcase]
   );
 
   const onInteract = async (target) => {
@@ -223,11 +182,17 @@ export default function GymGame() {
     await world.fadeTo(0, 0.32);
     setTransitioning(false);
     showToast(world.map.name);
-    if (trigger.to === 'gym' && !saveRef.current.metDesk) {
-      busy.current = true;
-      await say(['Hey, SREE! Over here. Front desk.'], { speaker: 'FRONT DESK' });
-      busy.current = false;
+    if (trigger.to !== 'gym') return;
+    const greet = !saveRef.current.metDesk;
+    const hype = !gogginsGreeted.current;
+    if (!greet && !hype) return;
+    busy.current = true;
+    if (greet) await say(['Hey, SREE! Over here. Front desk.'], { speaker: 'FRONT DESK' });
+    if (hype) {
+      gogginsGreeted.current = true;
+      await say([gogginsLine('enterGym')], { speaker: GOGGINS_NAME });
     }
+    busy.current = false;
   };
 
   const onZone = (zone) => showToast(zone.name);
@@ -307,32 +272,27 @@ export default function GymGame() {
   // Development-only handle for driving the game from the console or a test.
   useEffect(() => {
     if (!import.meta.env.DEV) return undefined;
-    window.__gym = { world: worldRef.current, startBattle, startBoss, commit, setOverlay, setPhase, EXERCISE_BY_ID };
+    window.__gym = { world: worldRef.current, openShowcase, commit, setOverlay, setPhase, EXERCISE_BY_ID };
     return () => {
       delete window.__gym;
     };
-  }, [startBattle, startBoss, commit]);
+  }, [openShowcase, commit]);
 
   const paused = phase !== 'play' || !!dialog || !!overlay || transitioning;
   useEffect(() => {
-    if (worldRef.current) worldRef.current.hidden = phase === 'battle' || phase === 'credits';
+    if (worldRef.current) worldRef.current.hidden = phase === 'showcase' || phase === 'credits';
   }, [phase]);
   useEffect(() => {
     worldRef.current?.setPaused(paused);
   }, [paused]);
 
-  // Station markers: "!" while a lift there is unbeaten, a star once all are.
+  // Markers: a gold star over machines where a new best was set in the last
+  // week of the log, and a "!" over the desk until you've checked in.
   useEffect(() => {
-    const status = {};
-    for (const id of Object.keys(STATIONS)) {
-      const list = exercisesAt(id);
-      if (!list.length) continue;
-      status[id] = list.every((e) => save.prs[e.id]) ? 'done' : 'new';
-    }
-    if (bossUnlocked(save) && !save.bossBeaten) status['npc:coach'] = 'boss';
+    const status = Object.fromEntries(FRESH_PR_STATIONS.map((id) => [id, 'done']));
     if (!save.metDesk) status['npc:desk'] = 'new';
     worldRef.current?.setStatus(status);
-  }, [save]);
+  }, [save.metDesk]);
 
   useEffect(() => {
     if (phase !== 'play' || !hint) return undefined;
@@ -359,6 +319,7 @@ export default function GymGame() {
         audio.music('street');
         busy.current = true;
         await say(introLines(TYPICAL_START));
+        await say([gogginsLine('street')], { speaker: GOGGINS_NAME });
         busy.current = false;
         return;
       }
@@ -368,6 +329,9 @@ export default function GymGame() {
       setPhase('play');
       await world.fadeTo(0, 0.3);
       showToast('THE GYM');
+      // Continuing drops you straight onto the floor: a bark, not a dialog,
+      // so you can walk off the moment the screen fades in.
+      world.bark(gogginsBark('enterGym'));
     },
     [audio, commit, say, showToast]
   );
@@ -391,21 +355,21 @@ export default function GymGame() {
   };
 
   const menuItems = [
-    { label: 'LIFTDEX', key: 'dex' },
+    { label: 'LIFTDEX', key: 'dex', detail: 'EVERY LIFT' },
+    { label: 'RUN CLUB', key: 'runs', detail: 'STRAVA' },
     { label: 'TRAINER CARD', key: 'card' },
     { label: 'TRAINING LOG', key: 'log' },
-    { label: 'HOW TO PLAY', key: 'help' },
+    { label: 'GOGGINS TV', key: 'tv' },
+    { label: 'HOW IT WORKS', key: 'help' },
     { label: 'SOUND', key: 'sound', detail: save.muted ? 'OFF' : 'ON' },
     { label: 'MUSIC', key: 'music', detail: save.music ? 'ON' : 'OFF' },
     { label: 'LEAVE GYM', key: 'exit' },
-    { label: 'CLOSE', key: 'close' },
   ];
 
   const onMenu = (item) => {
     if (item.key === 'sound') return toggleSound();
     if (item.key === 'music') return toggleMusic();
     if (item.key === 'exit') return navigate('/');
-    if (item.key === 'close') return setOverlay(null);
     return setOverlay(item.key);
   };
 
@@ -413,7 +377,6 @@ export default function GymGame() {
 
   /* ----------------------------------------------------------- render */
 
-  const station = overlay && typeof overlay === 'object' ? overlay.station : null;
   const label = phase === 'play' && !paused ? focusLabel(focus) : null;
 
   return (
@@ -475,23 +438,16 @@ export default function GymGame() {
           </div>
         </div>
       )}
-      {overlay === 'dex' && <LiftDex save={save} input={input} audio={audio} onClose={closeOverlay} />}
+      {overlay === 'dex' && (
+        <LiftDex input={input} audio={audio} onClose={closeOverlay} onOpen={(e) => openShowcase(e.station, e)} />
+      )}
+      {overlay === 'runs' && <RunLog input={input} audio={audio} onClose={closeOverlay} />}
+      {overlay === 'tv' && <GogginsTV input={input} audio={audio} onClose={closeOverlay} />}
       {overlay === 'card' && (
-        <TrainerCard save={save} input={input} audio={audio} onClose={closeOverlay} sprite={assets.chars.sree.flex} />
+        <TrainerCard input={input} audio={audio} onClose={closeOverlay} sprite={assets.chars.sree.flex} />
       )}
       {overlay === 'log' && <TrainingLog input={input} audio={audio} onClose={closeOverlay} />}
       {overlay === 'help' && <HowToPlay input={input} audio={audio} onClose={closeOverlay} touch={touch} />}
-      {station && (
-        <StationSheet
-          key={station}
-          stationId={station}
-          save={save}
-          input={input}
-          audio={audio}
-          onClose={closeOverlay}
-          onChallenge={(exercise, challenge) => startBattle([{ exercise, challenge }])}
-        />
-      )}
 
       {dialog && (
         <Dialog
@@ -503,15 +459,18 @@ export default function GymGame() {
         />
       )}
 
-      {phase === 'battle' && battle && (
-        <Battle
-          key={battle.key}
-          config={battle}
+      {phase === 'showcase' && showcase && (
+        <Showcase
+          key={showcase.key}
+          stationId={showcase.stationId}
+          exercises={showcase.exercises}
+          initialExercise={showcase.exercise}
           assets={assets}
           input={input}
           audio={audio}
           touch={touch}
-          onFinish={onBattleFinish}
+          onLine={showcaseLine}
+          onClose={closeShowcase}
         />
       )}
 

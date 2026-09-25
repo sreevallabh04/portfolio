@@ -1,29 +1,31 @@
 import React from 'react';
-import { ACTIVE_GROUPS, xpForLevel } from '../gameData';
-import { badgesEarned, playerLevel, totalXp } from '../save';
-import BadgeIcon from './BadgeIcon';
+import { LOG, formatVolume, xpForLevel } from '../gameData';
+import { playerLevel, totalXp } from '../save';
 
 /** Overworld heads-up display. Everything here is also reachable by keyboard. */
 export default function Hud({ save, focusLabel, toast, touch, showHint, onMenu, onCard, onToggleSound }) {
-  const level = playerLevel(save);
-  const xp = totalXp(save);
+  const level = playerLevel();
+  const xp = totalXp();
   const into = xp - xpForLevel(level);
   const span = xpForLevel(level + 1) - xpForLevel(level);
-  const earned = badgesEarned(save);
 
   return (
     <>
       <div className="gym-hud-top">
-        <button type="button" className="gym-hud-chip px-box" onClick={onCard} aria-label={`Trainer card, level ${level}`}>
+        <button
+          type="button"
+          className="gym-hud-chip px-box"
+          onClick={onCard}
+          aria-label={`Trainer card. Level ${level} from ${formatVolume(LOG.totals.volume)} lifted`}
+          title={`${(span - into).toLocaleString('en-US')} kg more lifting to Lv${level + 1}`}
+        >
           <span className="gym-hud-name px-font">SREE</span>
           <span className="gym-hud-level px-font">Lv{level}</span>
           <span className="gym-xpbar is-mini" aria-hidden="true">
             <span style={{ width: `${Math.max(3, (into / span) * 100)}%` }} />
           </span>
-          <span className="gym-hud-badges" aria-label={`${earned.length} of ${ACTIVE_GROUPS.length} badges`}>
-            {ACTIVE_GROUPS.map((g) => (
-              <BadgeIcon key={g} group={g} earned={earned.includes(g)} size={12} />
-            ))}
+          <span className="gym-hud-sub">
+            {formatVolume(LOG.totals.volume)} · {LOG.totals.sessions} SESSIONS
           </span>
         </button>
         <div className="gym-hud-actions">

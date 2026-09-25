@@ -1,0 +1,229 @@
+/* The lobby CRT. The player sits in .gym-tv-screen untouched; all styling is around it. */
+
+.gym-tv-room {
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(70, 90, 130, 0.18), transparent 60%),
+    rgba(3, 4, 6, 0.9);
+}
+
+.gym-tv-room {
+  overflow-y: auto;
+}
+
+.gym-tv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  /* Wide and short screens (a phone on its side) size the set by height, so
+     the controls under it always fit. */
+  width: min(920px, 100%, calc((100dvh - 200px) * 16 / 9 + 122px));
+  min-width: min(300px, 100%);
+  animation: gym-tv-on 0.42s steps(7) both;
+}
+
+.gym-tv.is-off {
+  animation: gym-tv-offanim 0.38s steps(6) forwards;
+}
+
+@keyframes gym-tv-on {
+  0% { transform: scaleY(0.02) scaleX(0.6); filter: brightness(4); opacity: 0.8; }
+  45% { transform: scaleY(0.04) scaleX(1); filter: brightness(3); }
+  100% { transform: none; filter: none; opacity: 1; }
+}
+
+@keyframes gym-tv-offanim {
+  0% { transform: none; }
+  55% { transform: scaleY(0.03); filter: brightness(3); }
+  100% { transform: scaleY(0.01) scaleX(0); opacity: 0; }
+}
+
+.gym-tv-case {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px;
+  gap: 14px;
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(160deg, #2a2d36, #16181e 70%);
+  box-shadow:
+    inset 0 0 0 3px #3a3e4a,
+    inset 0 -6px 0 #0f1014,
+    0 0 0 3px #0b0c10,
+    0 18px 50px rgba(0, 0, 0, 0.6);
+}
+
+.gym-tv-screen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #050608;
+  box-shadow: 0 0 0 4px #0b0c10, 0 0 0 7px #2e323d, 0 0 60px rgba(90, 140, 220, 0.12);
+}
+
+.gym-tv-player,
+.gym-tv-player > div,
+.gym-tv-player iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.gym-tv-player {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.gym-tv-player.is-live {
+  opacity: 1;
+}
+
+/* Shown only while nothing is playing: tuning, paused-before-start, no signal. */
+.gym-tv-static {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 3px),
+    repeating-radial-gradient(circle at 30% 40%, #1b1e26 0 2px, #2a2e38 2px 3px, #15171d 3px 5px);
+  background-size: 100% 100%, 7px 7px;
+  animation: gym-tv-snow 0.18s steps(3) infinite;
+}
+
+.gym-tv-static.is-nosignal {
+  animation: none;
+  background: repeating-linear-gradient(90deg, #d8d8d8 0 12.5%, #d8d000 0 25%, #00d0d0 0 37.5%, #00d000 0 50%, #d000d0 0 62.5%, #d00000 0 75%, #0000d0 0 87.5%, #111 0 100%);
+}
+
+@keyframes gym-tv-snow {
+  0% { background-position: 0 0, 0 0; }
+  33% { background-position: 0 1px, 3px 2px; }
+  66% { background-position: 0 2px, -2px 4px; }
+  100% { background-position: 0 0, 1px -3px; }
+}
+
+.gym-tv-static .px-font {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #f2f3f7;
+  background: rgba(0, 0, 0, 0.55);
+  text-shadow: 2px 2px 0 #000;
+}
+
+.gym-tv-nosignal {
+  padding: 10px 14px;
+  font-size: 11px;
+  color: #fff;
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 0 2px #0b0c10;
+}
+
+.gym-tv-tap {
+  padding: 14px 20px;
+  font-size: 14px;
+  color: #fff;
+  background: #d31f2b !important;
+  box-shadow: inset 0 -4px 0 #7a0f17, 0 0 0 3px #0b0c10;
+}
+
+.gym-tv-bezel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding-top: 4px;
+}
+
+.gym-tv-brand {
+  font-size: 7px;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  text-align: center;
+  color: #e2b021;
+}
+
+.gym-tv-led {
+  padding: 6px 8px;
+  font-size: 14px;
+  color: #ff3b4c;
+  background: #140507;
+  box-shadow: inset 0 0 0 2px #2a0b0f;
+  text-shadow: 0 0 8px rgba(255, 59, 76, 0.8);
+}
+
+.gym-tv-grille {
+  flex: 1;
+  width: 44px;
+  min-height: 60px;
+  background: repeating-linear-gradient(0deg, #0e0f13 0 3px, #262a33 3px 6px);
+}
+
+.gym-tv-info {
+  text-align: center;
+}
+
+.gym-tv-title {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.gym-tv-meta {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.gym-tv-meta a {
+  color: var(--gold);
+}
+
+.gym-tv-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.gym-tv-controls button {
+  min-width: 64px;
+  min-height: 44px;
+  padding: 10px 14px;
+  font-size: 10px;
+}
+
+.gym-tv-off {
+  color: var(--red);
+}
+
+@media (max-width: 640px) {
+  .gym-tv-case {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 10px;
+  }
+
+  .gym-tv-bezel {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 4px;
+  }
+
+  .gym-tv-grille {
+    flex: 0 0 60px;
+    height: 16px;
+    min-height: 0;
+    background: repeating-linear-gradient(90deg, #0e0f13 0 3px, #262a33 3px 6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gym-tv,
+  .gym-tv.is-off,
+  .gym-tv-static {
+    animation: none;
+  }
+}

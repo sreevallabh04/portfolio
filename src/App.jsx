@@ -19,7 +19,6 @@ const DeveloperPage = lazy(() => import('@/components/DeveloperPage'));
 const FitnessPage = lazy(() => import('@/pages/FitnessPage'));
 const Blog = lazy(() => import('@/pages/Blog'));
 const BlogPost = lazy(() => import('@/pages/BlogPost'));
-const Terms = lazy(() => import('@/pages/Terms'));
 const Admin = lazy(() => import('@/pages/Admin'));
 // Lazy too: its tree pulls in @supabase/supabase-js, @emailjs/browser and the
 // knowledge base, which as a static import sat in the eager entry bundle on
@@ -180,7 +179,14 @@ const getSEOConfig = (pathname) => {
         ...baseConfig,
         title: 'PR Quest',
         description:
-          'A playable gym RPG built from real Hevy training logs: walk the gym floor, pick a machine, and try to beat the personal record stored on it.',
+          'A walk-around pixel gym built from real Hevy and Strava logs: every machine replays the lifts logged on it, the treadmills hold every run, and David Goggins is in your corner.',
+        type: 'profile',
+      };
+    case pathname.startsWith('/browse/stalker'):
+      return {
+        ...baseConfig,
+        title: 'The Trailer',
+        description: 'HopeCore, the latest writing, and every place to find Sreevallabh Kakarala online.',
         type: 'profile',
       };
     case pathname.startsWith('/skills'):
@@ -361,7 +367,6 @@ function AppContent() {
             />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/terms" element={<Terms />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

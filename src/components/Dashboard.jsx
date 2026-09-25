@@ -81,14 +81,20 @@ const Dashboard = () => {
         on top of the logo. `min-h` lets the hero grow to fit instead, and the
         top padding keeps the first line clear of the navbar.
       */}
-      <header className="relative flex min-h-[34rem] w-full items-end overflow-hidden pt-20 md:min-h-[70vh] lg:min-h-[80vh]">
+      {/*
+        The photo is landscape with the subject on the right. On wide screens it
+        fills the hero behind the copy; on phones it takes the top of the hero
+        and fades to black, so the name never sits on the face.
+      */}
+      <header className="relative flex min-h-[40rem] w-full items-end overflow-hidden pt-20 md:min-h-[70vh] lg:min-h-[80vh]">
         <img
           src={PROFILE.bannerImage}
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover object-right md:object-[85%_center]"
+          className="absolute inset-x-0 top-0 h-[62%] w-full object-cover object-[80%_35%] md:inset-0 md:h-full md:object-[85%_center]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/75 to-black/30 md:to-transparent" />
+        <div className="absolute inset-x-0 top-[30%] h-[33%] bg-gradient-to-b from-transparent to-black md:hidden" />
+        <div className="absolute inset-0 hidden bg-gradient-to-r from-black via-black/75 to-transparent md:block" />
         <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/90 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black to-transparent" />
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { LAYER, useInputLayer } from '../engine/input';
-import { ACTIVE_GROUPS, GROUPS, EXERCISES, TRAINER, formatDate, formatKg, formatVolume, xpForLevel } from '../gameData';
-import { badgesEarned, caughtCount, playerLevel, totalXp } from '../save';
-import BadgeIcon from './BadgeIcon';
+import { GROUPS, EXERCISES, TRAINER, formatDate, formatKg, formatSet, formatVolume, isFreshPr, xpForLevel } from '../gameData';
+import { playerLevel, totalXp } from '../save';
+import { BESTS, TOTALS, formatDuration, formatKm } from '@/lib/strava';
 
 function Portrait({ sprite }) {
   const ref = useRef(null);
@@ -17,8 +17,8 @@ function Portrait({ sprite }) {
   return <canvas ref={ref} width={96} height={120} className="gym-canvas gym-portrait" aria-hidden="true" />;
 }
 
-/** The trainer card: real training stats, plus what's been won in here. */
-export default function TrainerCard({ save, input, audio, onClose, sprite }) {
+/** The trainer card: every number on it comes from the training logs. */
+export default function TrainerCard({ input, audio, onClose, sprite }) {
   useInputLayer(
     input,
     {
@@ -33,14 +33,14 @@ export default function TrainerCard({ save, input, audio, onClose, sprite }) {
   );
 
   const t = TRAINER.totals;
-  const level = playerLevel(save);
-  const xp = totalXp(save);
+  const level = playerLevel();
+  const xp = totalXp();
   const into = xp - xpForLevel(level);
   const span = xpForLevel(level + 1) - xpForLevel(level);
-  const earned = badgesEarned(save);
   const hours = Math.floor(t.minutes / 60);
   const mins = t.minutes % 60;
   const most = EXERCISES.find((e) => e.name === t.mostTrained);
+  const fresh = EXERCISES.filter(isFreshPr);
 
   const rows = [
     ['MEMBER SINCE', formatDate(t.firstDate)],
@@ -53,6 +53,17 @@ export default function TrainerCard({ save, input, audio, onClose, sprite }) {
     ['FAVOURITE DAY', t.favouriteWeekday.toUpperCase()],
     ['MOST TRAINED', most ? most.short : '—'],
   ];
+
+  // Cardio comes from the Strava export, not Hevy.
+  const run = TOTALS.byType.Run;
+  const cardio = [
+    run && ['RUN DISTANCE', formatKm(run.distance, 1), `${run.count} RUNS`],
+    BESTS.fastest5k && ['FASTEST 5K', formatDuration(BESTS.fastest5k.seconds), BESTS.fastest5k.activity.name],
+    BESTS.fastest1k && ['FASTEST 1K', formatDuration(BESTS.fastest1k.seconds), BESTS.fastest1k.activity.name],
+    BESTS.longestRun && ['LONGEST RUN', formatKm(BESTS.longestRun.distance, 1), BESTS.longestRun.activity.name],
+    ['TIME MOVING', `${Math.floor(TOTALS.movingTime / 3600)}H ${String(Math.floor((TOTALS.movingTime % 3600) / 60)).padStart(2, '0')}M`, `${TOTALS.activities} ACTIVITIES`],
+    ['CLIMBED', `${Math.round(TOTALS.elevationGain)} M`, 'RUNS, RIDES, WALKS'],
+  ].filter(Boolean);
 
   const lifts = [
     ['PUSH', TRAINER.push],
@@ -73,10 +84,10 @@ export default function TrainerCard({ save, input, audio, onClose, sprite }) {
             <p className="gym-card-full">{TRAINER.fullName}</p>
             <div className="gym-card-level">
               <span className="px-font">Lv{level}</span>
-              <span className="gym-xpbar" aria-label={`${into} of ${span} XP to next level`}>
+              <span className="gym-xpbar" aria-label={`${(span - into).toLocaleString('en-US')} kg more lifting to level ${level + 1}`}>
                 <span style={{ width: `${Math.max(2, (into / span) * 100)}%` }} />
               </span>
-              <span className="gym-muted">{(span - into).toLocaleString('en-US')} XP TO GO</span>
+              <span className="gym-muted">{(span - into).toLocaleString('en-US')} KG MORE LIFTING TO Lv{level + 1}</span>
             </div>
           </div>
         </div>
@@ -97,20 +108,33 @@ export default function TrainerCard({ save, input, audio, onClose, sprite }) {
             </div>
           ))}
         </div>
-        <div className="gym-card-badges">
-          <p className="gym-eyebrow">
-            BADGES {earned.length}/{ACTIVE_GROUPS.length} · PRS BROKEN {caughtCount(save)}/{EXERCISES.length}
-          </p>
-          <ul>
-            {ACTIVE_GROUPS.map((g) => (
-              <li key={g} className={earned.includes(g) ? 'is-earned' : ''} title={GROUPS[g].badge}>
-                <BadgeIcon group={g} earned={earned.includes(g)} />
-                <span>{GROUPS[g].badge.replace(' BADGE', '')}</span>
-              </li>
+        <div className="gym-card-cardio">
+          <p className="gym-eyebrow">CARDIO · SYNCED FROM STRAVA</p>
+          <dl>
+            {cardio.map(([k, v, sub]) => (
+              <div key={k}>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+                <span className="gym-muted">{sub}</span>
+              </div>
             ))}
-          </ul>
+          </dl>
         </div>
-        <p className="gym-card-foot">Every number above comes from the Hevy log. A · CLOSE</p>
+        {fresh.length > 0 && (
+          <div className="gym-card-fresh">
+            <p className="gym-eyebrow">NEW BESTS IN THE LAST WEEK OF THE LOG</p>
+            <ul>
+              {fresh.map((e) => (
+                <li key={e.id} style={{ '--chip': GROUPS[e.group].color }}>
+                  <span className="gym-card-fresh-star">★</span>
+                  <span>{e.short}</span>
+                  <strong>{formatSet(e, e.best)}</strong>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <p className="gym-card-foot">Every number above comes from the Hevy and Strava logs. A · CLOSE</p>
       </div>
     </div>
   );

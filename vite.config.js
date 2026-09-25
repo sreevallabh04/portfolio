@@ -59,9 +59,9 @@ export default defineConfig(({ mode }) => {
 		},
 		server: {
 			cors: true,
-			headers: {
-				'Cross-Origin-Embedder-Policy': 'credentialless',
-			},
+			// No Cross-Origin-Embedder-Policy here: nothing needs cross-origin
+			// isolation, production doesn't send it, and it blocks third-party
+			// iframes such as the YouTube player on the developer page.
 			allowedHosts: true,
 			proxy: {
 				'/api': {

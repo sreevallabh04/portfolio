@@ -28,7 +28,7 @@ export const PROFILE = {
   period: 'Sep. 2022 - June 2027',
   tagline:
     'AI Engineer building RAG systems, time-series forecasting models and LLM agents in production',
-  bannerImage: '/photo1.jpg',
+  bannerImage: '/hero-sree.jpg',
 };
 
 /**

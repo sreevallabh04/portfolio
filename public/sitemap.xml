@@ -5,7 +5,7 @@
 
   Previously this listed /about and /developer, neither of which is a route
   (the developer profile lives at /browse/developer), and omitted the stalker,
-  fitness, blog and terms pages entirely. /admin is deliberately excluded and
+  fitness and blog pages entirely. /admin is deliberately excluded and
   is disallowed in robots.txt.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -62,11 +62,5 @@
     <lastmod>2026-09-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>__SITE_URL__/terms</loc>
-    <lastmod>2026-09-18</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
   </url>
 </urlset>
