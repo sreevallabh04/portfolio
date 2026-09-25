@@ -178,9 +178,9 @@ const getSEOConfig = (pathname) => {
     case pathname.startsWith('/browse/developer'):
       return {
         ...baseConfig,
-        title: 'Developer Portfolio',
+        title: 'PR Quest',
         description:
-          'Technical deep-dive into my development projects, coding skills, and software engineering expertise.',
+          'A playable gym RPG built from real Hevy training logs: walk the gym floor, pick a machine, and try to beat the personal record stored on it.',
         type: 'profile',
       };
     case pathname.startsWith('/skills'):
@@ -288,8 +288,11 @@ function AppContent() {
 
   // The navbar links to profile-scoped pages, so it is noise on the picker, and
   // the admin console is its own full-screen layout.
+  // The developer page is a full-screen game with its own menu and exit.
   const hideNavbar =
-    location.pathname === '/' || location.pathname.startsWith('/admin');
+    location.pathname === '/' ||
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/browse/developer');
 
   return (
     <>

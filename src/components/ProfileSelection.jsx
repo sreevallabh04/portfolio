@@ -21,7 +21,7 @@ const PROFILES = [
   {
     id: 'developer',
     name: 'Developer',
-    blurb: 'A terminal, some games, and the stack',
+    blurb: 'A gym RPG built from my real training log',
     avatar: '/avatars/avatar2.jpeg',
     accent: 'group-hover:ring-emerald-400',
   },
