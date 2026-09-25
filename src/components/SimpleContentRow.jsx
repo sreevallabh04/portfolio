@@ -201,6 +201,7 @@ const SimpleContentRow = ({ title, items, isSkills, onProjectClick }) => {
                       src={item.imageUrl}
                       title={item.title}
                       className="absolute inset-0"
+                      matPadding="px-6 pt-3 pb-14"
                     />
 
                     {/* Resting caption */}
